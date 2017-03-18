@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Spring에서 Redis 사용하기"
-date:   2017-02-12
+date:   2017-02-18
 desc: "Spring에서 Redis 사용하기"
 keywords: "redis, spring, database, server programming"
 categories: [Web]

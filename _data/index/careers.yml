@@ -35,7 +35,7 @@
     detail: MemDebugger, Social Magazine, OS for examining memory defect.
     i18n: company_c_desc
   date:
-    detail: July.2011 - Feb. 2013
+    detail: July. 2011 - Feb. 2013
     i18n: company_c_date
   job:
     detail: Reverse engineering, Windows IOCP, x86 assembly, OS.
@@ -49,7 +49,7 @@
     detail: Graduated in 2013.
     i18n: company_d_desc
   date:
-    detail: Mar.2006 - Feb. 2013
+    detail: Mar. 2006 - Feb. 2013
     i18n: company_d_date
   job:
     detail: Computer Engineering
