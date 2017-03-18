@@ -32,7 +32,7 @@ author:  # change following line to your infomation.
 
 # comment
 disqus:  # if you wanna comment feature, go to https://disqus.com/ to get your configuration; if not, comment following two lines.
-  name: jalpc
+  name: dongho_sim
   public_key: oit8jaEabK1tHhdKBbPZkEcgdMrCASYiv2utJVf4Zirqn6eSRr9vwHzJDPNk9S5b
 
 # analytics
