@@ -13,15 +13,17 @@ icon: icon-html
  mockito는 유닛 테스트를 위한 java mocking framework이다.
  mockito를 사용하면 대부분의 비즈니스 로직을 검증가능한데, 여기서는 기본 사용법에 대해 작성하였다.
 
+---
 
 ## Declare Maven Dependency
  mocktio는 maven repository를 지원하는데, 다음과 같이 pom.xml에서 선언하면 사용 가능하다.
-
 
 ### Maven repository
 
 ![2017-02-12-spring_mockito_usage_00.jpg](/static/assets/img/blog/web/2017-02-12-spring_mockito_usage/2017-02-12-spring_mockito_usage_00.jpg)
 여기서는 mocktio를 1.10.19, junit을 4.12 버전으로 사용한다.
+
+---
 
 ## Mockito usage examples
 
@@ -39,6 +41,7 @@ icon: icon-html
 ![2017-02-12-spring_mockito_usage_02.jpg](/static/assets/img/blog/web/2017-02-12-spring_mockito_usage/2017-02-12-spring_mockito_usage_02.jpg)
 
 
+
 ### @Mock
 
  mock() 메소드 말고도 mock 객체를 만들기 위해 @Mock annotation을 선언하는 방법도 있다.
@@ -50,6 +53,7 @@ MockitoAnnotations.initMocks(this)를 이용하면, Mockito annotation이 선언
 객체로 만들어낸다.
 
 
+
 ### When 01
 
  아주 간단한 when() 메소드 사용법이다.
@@ -59,6 +63,7 @@ when() 메소드는 지정 메소드에 대해 반환해줄 값을 설정할 수
 
  위의 예에서 Person 클래스의 getName() 메소드에서 "Dongho Sim"을 리턴하도록 설정하였지만,
 getAge() 메소드에 대해서는 24를 리턴하도록 하였다. 39번 라인에서 AssertionError가 발생하는 것을 확인할 수 있다.
+
 
 
 ### When 02
@@ -75,6 +80,7 @@ getAge() 메소드에 대해서는 24를 리턴하도록 하였다. 39번 라인
  만약 특정 값을 넣어야 한다면, eq() 메소드를 사용하여 매개변수 값을 넣어준다.
 
 
+
 ### doThrow
  테스트할 클래스의 어떤 메소드에서 특정 예외를 던지고 싶을 때에는 doThrow() 메소드를 사용한다.
 
@@ -84,11 +90,13 @@ getAge() 메소드에 대해서는 24를 리턴하도록 하였다. 39번 라인
 @Test annotation에 해당 exception을 설정하였으므로, 테스트가 통과하는 것을 알 수 있다.
 
 
+
 ### doNothing
 
  리턴 값이 없는 메소드에 대해서 when을 걸 때는 doNothing()을 사용하도록 한다.
 
 ![2017-02-12-spring_mockito_usage_08.jpg](/static/assets/img/blog/web/2017-02-12-spring_mockito_usage/2017-02-12-spring_mockito_usage_08.jpg)
+
 
 
 ### Verify
@@ -99,6 +107,7 @@ getAge() 메소드에 대해서는 24를 리턴하도록 하였다. 39번 라인
 ![2017-02-12-spring_mockito_usage_09.jpg](/static/assets/img/blog/web/2017-02-12-spring_mockito_usage/2017-02-12-spring_mockito_usage_09.jpg)
 
  위의 예에서 setName() 메소드에 "ETC" 라는 String을 넣은적이 없으므로, fail이 발생하는 것이다..
+
 
 
 ### @InjectMocks
