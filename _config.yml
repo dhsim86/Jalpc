@@ -1,7 +1,7 @@
 # Welcome to Jekyll!
 
 # Website settings
-title: Jalpc
+title: dhsim86
 description: Dongho Sim's blog,use Jekyll and github pages.
 keywords: blog,Jekyll,github
 baseurl:  # if you have suburl as homepage like '/homepage', please change it to '/homepage' and your repo's name should be 'homepage'
@@ -11,14 +11,14 @@ img_path: /static/assets/img/blog  # url should be '/homepage/static/assets/img/
 
 # author -- index page "about me" section
 author:  # change following line to your infomation.
-  name: GitHub  # Be used at blog posts' author.
-  first_name: Hub  # Be used at index page about me section.
-  last_name: Git  # Be used at index page about me section.
+  name: Dongho Sim  # Be used at blog posts' author.
+  first_name: Dongho  # Be used at index page about me section.
+  last_name: Sim  # Be used at index page about me section.
   avatar: /static/assets/img/landing/avatar.jpg  # upload your avatar at directory and edit it.
   github_username: dhsim86  # Leave blank if you don't have now
-  linkedin_id: kun-jia-991264a2 # Leave blank if you don't have now
-  facebook_username: jiakunnj  # Leave blank if you don't have now
-  twitter_username: jiakun614  # Leave blank if you don't have now
+  linkedin_id: dongho-sim-39720b11b # Leave blank if you don't have now
+  facebook_username: dhsim86  # Leave blank if you don't have now
+  twitter_username:  # Leave blank if you don't have now
   email: dhsim86@gmail.com  # Leave blank if you don't have now
   cv:  # A online CV can be printed as PDF, leave blank if you don't have now
   # skill icons are on avatar's left and right side. Reference urls are http://fontawesome.io/ and http://fizzed.com/oss/font-mfizz
