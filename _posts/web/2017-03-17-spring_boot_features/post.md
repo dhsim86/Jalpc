@@ -30,7 +30,8 @@ public static void main(String[] args) {
 배너는 Spring Boot 애플리케이션이 시작될 때, 출력되는 것으로 banner.txt를 클래스패스에 추가하는 것으로 기본적으로 출력되는 배너를 바꿀 수 있다.
 
 Spring Boot 1.1 버전부터 커스터마이징이 가능하지만 1.4버전까지 업데이트되면서 그림파일도 넣을 수 있다.
-[Spring Boot 시작배너 바꾸기][spring_boot_official]
+
+[Spring Boot 시작배너 바꾸기][spring_banner_change]
 
 > 그림파일을 아스키코드로 바꾸어 변경해주는 것을 통해 사용하고 싶은 그림으로 배너를 바꿀 수 있다. 그리고 1.4버전부터는 gif, jpg, png 이미지 파일을 직접 배너로 설정하는 것도 가능하다.
 
