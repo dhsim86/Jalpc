@@ -48,7 +48,7 @@ icon: icon-html
  일반적인 문자열로 최대 512MByte 길이까지 지원한다.
  Text 문자열 뿐만 아니라 integer와 같은 숫자나 jpg와 같은 binary file 까지 저장할 수 있다.
 
- 명령어: [https://redis.io/commands#string][command_string]
+ [https://redis.io/commands#string][command_string]
 
 ---
 #### Set
@@ -58,7 +58,7 @@ icon: icon-html
 
 ![2017-02-18-spring_redis_linkage/data_type_set.jpg](/static/assets/img/blog/web/2017-02-18-spring_redis_linkage/data_type_set.jpg)
 
- 명령어: [http://redis.io/commands#set][command_set]
+ [http://redis.io/commands#set][command_set]
 
 ---
 #### Sorted Set
@@ -68,7 +68,7 @@ icon: icon-html
 
 ![2017-02-18-spring_redis_linkage/data_type_sortedset.jpg](/static/assets/img/blog/web/2017-02-18-spring_redis_linkage/data_type_sortedset.jpg)
 
- 명령어: [http://redis.io/commands#sorted_set][command_sorted_set]
+ [http://redis.io/commands#sorted_set][command_sorted_set]
 
 ---
 #### Hashes
@@ -78,7 +78,7 @@ icon: icon-html
 
 ![2017-02-18-spring_redis_linkage/data_type_hash.jpg](/static/assets/img/blog/web/2017-02-18-spring_redis_linkage/data_type_hash.jpg)
 
- 명령어: [http://redis.io/commands#hash][command_hash]
+ [http://redis.io/commands#hash][command_hash]
 
 ---
 #### List
@@ -89,8 +89,10 @@ icon: icon-html
 
 ![2017-02-18-spring_redis_linkage/data_type_list.jpg](/static/assets/img/blog/web/2017-02-18-spring_redis_linkage/data_type_list.jpg)
 
- 명령어: [http://redis.io/commands#list][command_list]
+ [http://redis.io/commands#list][command_list]
 
+<br>
+---
 ### 데이터 구조체 정리
 
  지금까지 간략하게 redis가 지원하는 데이터 구조체들에 대해서 살펴보았다.
@@ -175,7 +177,6 @@ icon: icon-html
 ![2017-02-18-spring_redis_linkage/redis_maven_00.jpg](/static/assets/img/blog/web/2017-02-18-spring_redis_linkage/redis_maven_00.jpg)
 <br>
 ![2017-02-18-spring_redis_linkage/redis_maven_01.jpg](/static/assets/img/blog/web/2017-02-18-spring_redis_linkage/redis_maven_01.jpg)
-<figure>
 
 ---
 ### applicationContext.xml에 추가
