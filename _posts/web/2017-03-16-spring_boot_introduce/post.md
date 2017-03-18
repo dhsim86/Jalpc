@@ -49,6 +49,7 @@ icon: icon-html
  | Undertow 1.3 | 3.1 | Java 7+ |
 
 <br>
+---
 ## Hello Spring Boot!
 
  * STS 3.8.4 기준으로 Spring Start Project를 생성하면 다음과 같은 class가 이미 만들어져 있다.
@@ -102,8 +103,7 @@ public static ConfigurableApplicationContext run(Object[] sources, String[] args
  이 메소드에서 하는 역할은 크게 두가지이다.
 
  * Main Class 셋팅
-
- SpringApplication run static 메소드는 내부적으로 SpringApplication 객체를 생성하여 생성자로 application class 를 넘기고, args는 run 메소드에 넘기는데 application class, 즉 개발자가 만든 main class로 다음 코드와 같이 셋팅하는 것을 알 수 있다.
+SpringApplication run static 메소드는 내부적으로 SpringApplication 객체를 생성하여 생성자로 application class 를 넘기고, args는 run 메소드에 넘기는데 application class, 즉 개발자가 만든 main class로 다음 코드와 같이 셋팅하는 것을 알 수 있다.
 
 ~~~java
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -137,9 +137,7 @@ private Class<?> deduceMainApplicationClass() {
   return null;
 ~~~
  * ApplicationContext (ConfigurableApplicationContext) 생성 및 refresh
-
-  SpringApplication run 메소드에서는 ConfigurableApplicationContext를 생성하고, refreshContext 메소드를 실행하여
-  Spring 을 구동한다.
+  SpringApplication run 메소드에서는 ConfigurableApplicationContext를 생성하고, refreshContext 메소드를 실행하여 Spring 을 구동한다.
 
  ~~~java
  public ConfigurableApplicationContext run(String... args) {
