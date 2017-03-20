@@ -69,4 +69,90 @@ public class HelloSpringBootApplication {
     suffix: .jsp
  ~~~
 
+<br>
+## Accessing Argument Banner.
+
+SpringApplication run 에 넘겨지는 파라미터, args를 확인하고 싶다면 다음과 같이 ApplicationArgument 인터페이스를 통해 확인한다.
+
+~~~java
+package com.nhnent.hellospringboot;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ArgsCheck {
+
+    private static final Logger logger = LoggerFactory.getLogger(ArgsCheck.class);
+
+    @Autowired
+    public ArgsCheck(ApplicationArguments args) {
+
+        Set<String> argsList = args.getOptionNames();
+
+        Iterator<String> iter = argsList.iterator();
+
+        logger.info("ArgsCheck");
+        while (iter.hasNext()) {
+
+            String paramName = iter.next();
+            List<String> valueList = args.getOptionValues(paramName);
+
+            for (String value : valueList) {
+
+                logger.info("[" + paramName + "] " + value);
+            }
+
+        }
+    }
+
+}
+~~~
+그러면 console 창에서 다음 그림과 같이 확인할 수 있다.
+![02.png](/static/assets/img/blog/web/2017-03-17-spring-boot-features/02.png)
+
+<br>
+## Using the ApplicationRunner or CommandLineRunner
+
+SpringApplication을 시작할 때, 수행해야할 루틴이 있다면 ApplicationRunner나 CommandLineRunner 인터페이스 구현을 통해 자신이 원하는 루틴을 실행할 수 있도록 할 수 있다.
+
+> 루틴은 SpringApplication.run 이 끝나기 전에 한 번 실행된다.
+
+* CommandLineRunner 인터페이스는 Spring Boot Application에 전해지는 파라미터를 String 배열 형식을 접근할 수 있다.
+~~~java
+@Component
+public class MyCommandLineRoutine implements CommandLineRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(MyCommandLineRoutine.class);
+
+    public void run(String ... args) {
+
+        logger.info("CommandLineRunner Do.");
+    }
+}
+~~~
+* ApplicationRunner는 파라미터를 ApplicationArguments 형식으로 접근가능하다.
+~~~java
+@Component
+public class MyApplicationRunnerRoutine implements ApplicationRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(MyApplicationRunnerRoutine.class);
+
+    public void run(ApplicationArguments args) {
+
+        logger.info("ApplicationRunner Do.");
+    }
+}
+~~~
+
+위의 코드를 작성하였을 때 다음과 같이 콘솔에서 확인할 수 있다.
+![03.png](/static/assets/img/blog/web/2017-03-17-spring-boot-features/03.png)
+
 [spring_banner_change]: http://5mango.com/_10
