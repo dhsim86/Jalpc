@@ -14,7 +14,20 @@ icon: icon-html
  Spring Boot는 Spring Framework를 사용하는 프로젝트를 아주 간편하게 셋업할 수 있는, Spring Framework의 서브 프로젝트이다.
  Spring application을 개발하는데 있어 필요한 의존성과 xml 구성 등의 일반적인 공통된 설정 작업을 자동으로 진행해주고, 개발자는 즉시 application 로직 개발을 시작할 수 있도록 지원하는 도구이다.
 
+ > 기존의 Spring framework를 이용한 개발환경 구축은 제법 많은 XML 설정파일들의 작성량을 요구했다. 그래서 잘 만들어놓은 설정 파일을 복사해서 사용하거나 검색을 통해 얻은 정보를 그대로 복사해서 사용하는 경우가 다반사였는데, 실상 특별한 경우의 설정을 제외하고는 거의 항상 동일한 옵션을 가져가게 되는 것이 사실이다.
+
+ > Spring Boot는 Spring을 기반으로 하는, 바로 출시할 수 있는 수준의 '실행가능한', 단독실행형 서버 애플리케이션을 만들기 위해 사용한다. Spring Platform과 서드파티 라이브러리들에 대한 선택을 최소한의 논의로 결정할 수 있도록 해준다.
+ 그러한 부분에서 Spring Boot는 반복되는 개발환경 구축을 위한 코드 작성 등의 작업을 확연히 줄여주고, 빠르고 쉽게 프로젝트를 작성할 수 있도록 도와주는 것이다.
+
  [https://projects.spring.io/spring-boot/][spring_boot_official]
+
+<br>
+### Spring Boot의 목표
+
+1. 매우 빠르게 모든 Spring 개발에 대한 광범위한 접근을 제공한다.
+2. 차이가 있겠지만, 기본값으로부터 요구사항들에 따라 분기하며 빠르게 진행할 수 있다.
+3. 프로젝트 환경 구축에서 큰 영역을 차지하는 비기능적인 기능들을 기본적으로 제공한다. (내장형 서버, 시큐리티, 측정, 상태점검, 외부설정 등)
+4. 절대적으로 XML 기반 설정을 요구하거나 그 이상의 코드 작성을 하지 않는다.
 
  Spring Boot를 이용해 -jar를 이용하여 Java 애플리케이션을 만들거나, 이전 외부 tomcat를 사용하는 것처럼 웹앱을 만들 수 있다.
 
@@ -86,6 +99,19 @@ public class HelloSpringBootApplication {
 	}
 }
 ~~~
+* 위의 클래스는 단독실행 및 스크립트를 통한 실행을 지원하기 위해 Spring Boot 개발환경에서 반드시 작성되어야하는 애플리케이션 클래스이다.
+
+
+* @SpringBootApplication
+이 annotation은 프로젝트 개발환경에서 많이 사용하는 annotation들을 쉽고 빠르게 사용할 수 있도록 다음과 같은 annotation들의 속성들을 포함하고 있는 annotation이다.
+  + @Configuration
+  + @EnableConfiguration
+  + @ComponentScan
+
+> @EnableAutoConfiguration
+   Spring Boot autoconfiguration은 추가된 jar dependency 기반으로 Spring application을 자동으로 설정하는 것을 시도한다. 예를 들어 HSQL DB가 class path에 있으면, DB 연결 빈을 정의하지 않아도 자동적으로 in-memory 데이터베이스에 접근할 것이다.
+   자동 설정은 비 침입적으로, DataSource 빈을 추가한다면 디폴트로 자동 설정되는 것은 사라질 것이다.
+
 <br>
 ~~~java
 //SpringApplication.run method
@@ -199,8 +225,41 @@ public class HelloRestController {
   Spring 4.0에 추가된 annotation으로 @Controller 및 @ResponseBody를 합쳐놓은 기능을 제공한다.
   @Conroller annotation과는 달리 요청을 처리하는 모든 메소드에 @ResponseBody를 추가할 필요가 없다.
 
- > @EnableAutoConfiguration
-  Spring Boot autoconfiguration은 추가된 jar dependency 기반으로 Spring application을 자동으로 설정하는 것을 시도한다. 예를 들어 HSQL DB가 class path에 있으면, DB 연결 빈을 정의하지 않아도 자동적으로 in-memory 데이터베이스에 접근할 것이다.
-  자동 설정은 비 침입적으로, DataSource 빈을 추가한다면 디폴트로 자동 설정되는 것은 사라질 것이다.
+<br>
+#### Properties
+
+Spring Boot는 별다른 설정없이 즉시 시작할 수 있는 프로퍼티 환경을 제공한다.
+디렉토리 내 'resources' 하위에 'application.properties' 라는 파일을 생성해두면 기본적으로 해당 파일에 있는 프로퍼티를 Spring Boot가 참조한다.
+
+1. 프로퍼티 생성위치는 바꿀 수 있다.
+2. 다른 프로퍼티를 여러 개 생성해서 쓸 수 있다.
+3. Spring Boot의 프로퍼티는 우선순위로 오버라이드된다.
+
+<br>
+##### Usage
+
+application.properties 파일을 다음과 같이 작성한다.
+~~~
+hello_spring_boot.print.hello=Hello Spring Boot!
+~~~
+
+그리고 다음과 같이 /로 접속했을 때 출력할 수 있도록 @Value annotation을 사용해서 실험해본다.
+~~~java
+@RestController
+public class HelloRestController {
+
+  @Value("${hello_spring_boot.print.hello}")
+  private String hello_string;
+
+  @RequestMapping("/")
+  public String index() {
+
+      return hello_string;
+  }
+}
+~~~
+
+그러면 localhost로 접속했을 때 다음과 같이 application.properties에 추가한 것이 출력되는 것을 확인할 수 있다.
+![00.png](/static/assets/img/blog/web/2017-03-16-spring_boot_introduce/00.png)
 
 [spring_boot_official]: https://projects.spring.io/spring-boot/
