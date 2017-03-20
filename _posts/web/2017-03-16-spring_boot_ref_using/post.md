@@ -96,6 +96,7 @@ icon: icon-html
   > @EnableAutoConfiguration
    Spring Boot autoconfiguration은 추가된 jar dependency 기반으로 Spring application을 자동으로 설정하는 것을 시도한다. 예를 들어 HSQL DB가 class path에 있으면, DB 연결 빈을 정의하지 않아도 자동적으로 in-memory 데이터베이스에 접근할 것이다.
    자동 설정은 비 침입적으로, DataSource 빈을 추가한다면 디폴트로 자동 설정되는 것은 사라질 것이다.
+   이 annotation은 하나만 사용해야 한다.
 
   > @ComponentScan
   Spring에게 패키지안에서 다른 컴포넌트, 설정, 서비스를 스캔하도록 한다. 이를 통해 사용자가 추가한 Controller / Service 클래스를 찾는 것이 가능해진다. @Component, @Service, @Repository, @Controller와 같은 컴포넌트들이 자동적으로 Spring 빈으로 추가된다.
@@ -182,6 +183,6 @@ Spring Boot 1.3에서 Spring application 개발에 있어서 편리함을 제공
 <br>
 ### Remote applications
 
- Develop tool은 local에 대해서만 사용되는 것이 아니라, 원격에 대한 애플리케이션에 대해서도 사용할 수 있다. 
+ Develop tool은 local에 대해서만 사용되는 것이 아니라, 원격에 대한 애플리케이션에 대해서도 사용할 수 있다.
 
 [componentscan_analysis]: http://thswave.github.io/spring/2015/02/02/spring-mvc-annotaion.html

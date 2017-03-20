@@ -24,6 +24,8 @@ public static void main(String[] args) {
 
 > 만약 애플리케이션을 시작하는데 실패하면 FailureAnalyzers를 통해 에러 메시지를 확인하여 대응할 수 있다.
 
+![04.png](/static/assets/img/blog/web/2017-03-17-spring-boot-features/04.png)
+
 <br>
 ## Spring Boot Banner
 
@@ -63,10 +65,8 @@ public class HelloSpringBootApplication {
  소스가 아니더라도 src/main/resources 에 있는 application.properties를 통해 SpringApplication 설정 정보를 다음과 같이 변경할 수 도 있다.
 
  ~~~
- spring:
-  mvc.view:
-    prefix: /WEB-INF/jsp/
-    suffix: .jsp
+ spring.mvc.view.prefix: /WEB-INF/jsp/
+ spring.mvc.view.suffix: .jsp
  ~~~
 
 <br>
@@ -154,5 +154,165 @@ public class MyApplicationRunnerRoutine implements ApplicationRunner {
 
 위의 코드를 작성하였을 때 다음과 같이 콘솔에서 확인할 수 있다.
 ![03.png](/static/assets/img/blog/web/2017-03-17-spring-boot-features/03.png)
+
+## Using YAML instead of Properties
+
+Spring Boot에서는 application.propertes 대신에 YAML 형식의 파일을 대신 property 추가에 사용할 수 있다.
+
+YAML 파일 형식에서는 다음과 같이 property를 셋팅한다.
+~~~
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+~~~
+
+또한 한 property에 여러 개의 값을 추가하고 싶을 때는 - 를 쓸 수 있다.
+~~~
+my:
+  servers:
+    - dev.bar.com
+    - foo.bar.com
+~~~
+
+위의 property를 사용하고자 할 때는 다음과 같이 java code를 작성한다.
+~~~java
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Component
+@ConfigurationProperties(prefix="my")
+public class YAMLTest {
+
+    private List<String> servers = new ArrayList<String>();
+
+    public List<String> getServers() {
+
+        return servers;
+    }
+}
+~~~
+그러면 2개의 server 도메인 이름이 **servers** List에 차례로 주입될 것이다.
+
+### multi-profile YAML
+
+spring.profiles를 사용해 한 YAML 파일에서 다양한 프로파일에 대한 property를 지정할 수 있다.
+~~~
+server:
+  address: 192.168.1.100
+---
+spring:
+  profiles: development
+server:
+  address: 127.0.0.1
+---
+spring:
+  profiles: production
+server:
+  address: 192.168.1.120
+~~~
+위의 상황에서 development 프로파일에 대해서는 server.address가 127.0.0.1로 셋팅되고, 프로파일을 지정하지 않았을 경우 192.168.1.100으로 셋팅된다.
+
+밑의 YAML 파일에서는 **security.user.password property** 는 오로지 development 프로파일에 대해서만 셋팅된다.
+~~~
+server:
+  port: 8000
+---
+spring:
+  profiles: development
+security:
+  user:
+    password: weak
+~~~
+
+그렇지만 다음과 같이 작성하면 모든 프로파일에 대해서 사용할 수 있다.
+~~~
+server:
+  port: 8000
+security:
+  user:
+    password: weak
+~~~
+
+## Type-safe Configuration Properties
+
+다음과 같은 class를 통해 @Value annotation 및 properties 파일을 사용할 필요없이 property를 설정하는 것과 같은 효과를 낼 수 있다.
+~~~java
+@ConfigurationProperties("foo")
+public class FooProperties {
+
+  private boolean enabled;
+  private InetAddress remoteAddress;
+  private final Security security = new Security();
+
+  public boolean isEnabled() {...}
+  public void setEnabled(boolean enabled) {...}
+  public InetAddress getRemoteAddress() {...}
+  public void setRemoteAddress(InetAddress remoteAddress) {...}
+  public Security getSecurity() {...}
+
+  public static class Security {
+
+    private String username;
+    private String password;
+    private List<String> roles = new ArrayList()(Collections.single-ton("USER"));
+
+    public String getUserName() {...}
+    public void setUserName(String username) {...}
+    public String getPassword() {...}
+    public void setPassword(String password) {...}
+    public List<String> getRoles() {...}
+    public void setRoles(List<String> roles) {...}
+  }
+}
+~~~
+
+이 클래스는 다음과 같이 property들을 정의한다.
+* foo.enabled 는 false로 정의된다.
+* foo.remote-address는 String 타입으로 정의된다.
+* 이너 클래스를 통해, foo.security.password / foo.security.roles가 정의된다.
+
+이 클래스로 정의된 property를 다른 곳에서 사용하고자 할 때는 다음과 같이 @EnableConfigurationProperties 를 사용한다.
+~~~java
+@Configuration
+@EnableConfigurationProperties(FooProperties.class)
+public class MyConfiguration {
+
+}
+~~~
+
+## Relaxed Binding
+
+Spring Boot는 @ConfigurationProperties annotation으로 properties 파일로부터 property를 읽어 특정 클래스의 필드로 로드할 때, 필드의 이름과 properties안에 있는 해당되는 property 이름이 완전히 같지 않아도 된다.
+
+예를 들어 다음과 같이 person 으로 시작하는 property로 구성하는 클래스가 있다고 하자.
+~~~java
+@ConfigurationProperties(prefix="person")
+public class OwnerProperties {
+
+  private String firstName;
+
+  public String getFirstName() {
+    return this.firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+}
+~~~
+위 클래스의 필드 **"firstName"** 에 대해 properties 파일에서는 다음과 같이 다양한 property 이름으로도 로드될 수 있다.
+~~~
+person.firstName
+
+person.first-name
+
+person.first_name
+
+PERSON_FIRST_NAME
+~~~
+
+> 많이 사용되는 @Value annotation은 이것을 지원하지 않는다.
 
 [spring_banner_change]: http://5mango.com/_10
