@@ -9,6 +9,8 @@ tags: [spring boot, spring]
 icon: icon-html
 ---
 
+> Spring Boot Reference Guide Part 3 Review
+
 ## Build Systems
 
  Spring Boot는 introduction을 review 할 때도 언급하였지만, maven이나 gradle과 같은 dependency managment를 함께 사용할 것을 강력히 권장한다. 또한 기본적으로 사용되는 의존성있는 라이브러리 및 version을 미리 구성해준다. 이렇게해서 개발자는 어떤 의존성을 사용할지, 또는 각 의존성간 어떤 버전이 호환성이 좋은지 걱정할 필요없이 즉시 작업을 시작할 수 있다.

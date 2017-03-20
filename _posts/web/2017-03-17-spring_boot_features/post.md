@@ -9,6 +9,8 @@ tags: [spring boot, spring]
 icon: icon-html
 ---
 
+> Spring Boot Reference Guide Part4, Chapter 25까지의 Review
+
 ## SpringBootApplication
 
 SpringApplication 클래스는 main method로부터 시작하는 Spring 애플리케이션을 쉽게 시작할 수 있도록 도와주는 클래스이다.

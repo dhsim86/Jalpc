@@ -9,6 +9,8 @@ tags: [spring boot, spring]
 icon: icon-html
 ---
 
+> Spring Boot 설명 / Spring Boot Refrence Guide Part 1/2 Review
+
 ## Spring Boot Getting Started!
 
  Spring Boot는 Spring Framework를 사용하는 프로젝트를 아주 간편하게 셋업할 수 있는, Spring Framework의 서브 프로젝트이다.
