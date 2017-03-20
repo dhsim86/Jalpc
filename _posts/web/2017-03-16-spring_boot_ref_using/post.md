@@ -11,7 +11,7 @@ icon: icon-html
 
 ## Build Systems
 
- Spring Boot는 Part 2를 review 할 때도 언급하였지만, maven이나 gradle과 같은 dependency managment를 함께 사용할 것을 강력히 권장한다. 또한 기본적으로 사용되는 의존성있는 라이브러리 및 version을 미리 구성해준다. 이렇게해서 개발자는 어떤 의존성을 사용할지, 또는 각 의존성간 어떤 버전이 호환성이 좋은지 걱정할 필요없이 즉시 작업을 시작할 수 있다.
+ Spring Boot는 introduction을 review 할 때도 언급하였지만, maven이나 gradle과 같은 dependency managment를 함께 사용할 것을 강력히 권장한다. 또한 기본적으로 사용되는 의존성있는 라이브러리 및 version을 미리 구성해준다. 이렇게해서 개발자는 어떤 의존성을 사용할지, 또는 각 의존성간 어떤 버전이 호환성이 좋은지 걱정할 필요없이 즉시 작업을 시작할 수 있다.
 
 <br>
 ### Dependency management
@@ -72,8 +72,22 @@ icon: icon-html
 <br>
 #### Locating the main application classes
 
- Spring Boot에서는 main method를 가지는 main application class를 root package에 놓는 것을 권장한다.
- main application class에는 @EnableAutoConfiguration이나 @ComponentScan, @SpringBootApplication annotation을 사용할 수 있다.
+ Spring Boot에서는 main method를 가지는 main application class를 다음과 같이 root package에 놓는 것을 권장한다.
+
+ - com
+   - example
+      - myproject
+        - **Application.java**
+        - domain
+          - Customer.java
+          - CustomerRepostiory.java
+        - service
+          - CustomerService.java
+        - web
+          - CustomerController.java
+
+
+ 보통 @EnableAutoConfiguration annotation을 main application class에 사용하는데, 이것은 암묵적으로 다른 Package에 있는 빈을 찾기 위한 Base 로 정의하기 때문이다. main application class에는 @EnableAutoConfiguration이나 @ComponentScan, @SpringBootApplication annotation을 사용할 수 있다.
 
  > @Configuration
   현재의 클래스가 Spring의 설정 파일임을 애플리케이션 컨텍스트에 알려주는 역할
@@ -149,5 +163,25 @@ Spring Boot 1.3에서 Spring application 개발에 있어서 편리함을 제공
 
  * Live Reload
  Developer tool은 embedded LiveReload 서버를 제공하여, resource 파일의 변경이 일어날 때마다 browser를 refresh 함으로써 반영한 부분을 확인해볼 수 있다. LiveReload 를 위해 크롬이나 사파리, 파이어폭스 등에서 extension을 제공한다.
+ 만약 Live Reload를 사용하지 않으려면 다음과 같이 application.properties에 추가한다.
+ ~~~
+ spring.devtools.livereload.enabled=false
+ ~~~
+
+<br>
+### trigger file
+
+ 보통 IDE를 사용하면 (특히 Intellij) 소스 파일을 에디트할 때마다 계속 컴파일하면서 변경하는 경우가 있다. 이럴 때, 트리거 파일을 통해 어느 특정 시점에 서버를 재시작하여 반영 여부를 확인해볼 수 있다.
+ 트리거 파일은 이 파일에 변경이 일어날 때만 서버를 자동 재시작하는 특별한 파일이다.
+
+ 이 트리거 파일은 다음과 같이 application.properties에 추가할 수 있다.
+ ~~~
+ spring.devtools.restart-trigger-file=...
+ ~~~
+
+<br>
+### Remote applications
+
+ Develop tool은 local에 대해서만 사용되는 것이 아니라, 원격에 대한 애플리케이션에 대해서도 사용할 수 있다. 
 
 [componentscan_analysis]: http://thswave.github.io/spring/2015/02/02/spring-mvc-annotaion.html
