@@ -155,6 +155,8 @@ public class MyApplicationRunnerRoutine implements ApplicationRunner {
 위의 코드를 작성하였을 때 다음과 같이 콘솔에서 확인할 수 있다.
 ![03.png](/static/assets/img/blog/web/2017-03-17-spring-boot-features/03.png)
 
+---
+<br>
 ## Using YAML instead of Properties
 
 Spring Boot에서는 application.propertes 대신에 YAML 형식의 파일을 대신 property 추가에 사용할 수 있다.
@@ -195,6 +197,7 @@ public class YAMLTest {
 ~~~
 그러면 2개의 server 도메인 이름이 **servers** List에 차례로 주입될 것이다.
 
+<br>
 ### multi-profile YAML
 
 spring.profiles를 사용해 한 YAML 파일에서 다양한 프로파일에 대한 property를 지정할 수 있다.
@@ -235,6 +238,7 @@ security:
     password: weak
 ~~~
 
+<br>
 ## Type-safe Configuration Properties
 
 다음과 같은 class를 통해 @Value annotation 및 properties 파일을 사용할 필요없이 property를 설정하는 것과 같은 효과를 낼 수 있다.
@@ -282,6 +286,7 @@ public class MyConfiguration {
 }
 ~~~
 
+<br>
 ## Relaxed Binding
 
 Spring Boot는 @ConfigurationProperties annotation으로 properties 파일로부터 property를 읽어 특정 클래스의 필드로 로드할 때, 필드의 이름과 properties안에 있는 해당되는 property 이름이 완전히 같지 않아도 된다.
