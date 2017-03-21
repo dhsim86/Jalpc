@@ -9,7 +9,7 @@ tags: [spring boot, spring]
 icon: icon-html
 ---
 
-> Spring Boot Reference Guide Part4, Chapter 26 Logging
+> Spring Boot Reference Guide Part4, Chapter 27 Developing web applications
 
 ## Developing web applications
 
@@ -172,3 +172,20 @@ public BasicErrorController errorController(
     };
 }
 ~~~
+
+<br>
+#### Custom Error pages
+
+만약 HTTP status에 따라 커스터마이징한 Error 페이지를 보여주고 싶다면 다음과 같이 /error 폴더를 만들어 그 안에 html이나 FreeMaker, jsp 등을 넣어두면 된다.
+
+* src
+  * main
+    * java
+      * source codes
+    * resources
+      * public
+        * error
+          * 404.html
+      * templates
+        * error
+          * 5xx.ftl
