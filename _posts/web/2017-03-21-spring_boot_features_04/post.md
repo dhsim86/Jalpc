@@ -204,10 +204,12 @@ public class MyApplicationRunnerRoutine implements ApplicationRunner {
 
 ![01.png](/static/assets/img/blog/web/2017-03-21-spring_boot_features_04/01.png)
 
+<br>
 ## Working with NoSQL technologies
 
 Spring Data는 MongoDB, ElasticSearch, Redis, Cassandra와 같은 다양한 NoSQL을 지원한다. Spring Boot는 이러한 NoSQL을 위한 자동 설정을 지원한다.
 
+<br>
 ### Redis
 
 Redis는 "REmote DIctionary System"의 약자로 memory 기반의 key / value store 이다.
