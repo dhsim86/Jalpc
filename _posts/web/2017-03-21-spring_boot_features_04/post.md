@@ -9,7 +9,7 @@ tags: [spring boot, spring]
 icon: icon-html
 ---
 
-> Spring Boot Reference Guide Part4, Chapter 29
+> Spring Boot Reference Guide Part4, Chapter 29 / 30
 
 ## Working with SQL databases
 
@@ -206,8 +206,111 @@ public class MyApplicationRunnerRoutine implements ApplicationRunner {
 
 ## Working with NoSQL technologies
 
+Spring Data는 MongoDB, ElasticSearch, Redis, Cassandra와 같은 다양한 NoSQL을 지원한다. Spring Boot는 이러한 NoSQL을 위한 자동 설정을 지원한다.
 
+### Redis
 
+Redis는 "REmote DIctionary System"의 약자로 memory 기반의 key / value store 이다.
+Spring Boot는 Jedis와 같은 Redis client 라이브러리를 위하 auto configuration을 지원하며, spring-boot-starter-data-redis 아티팩트 추가를 통해 쉽게 사용가능하다.
+
+먼저 다음과 같이 Redis를 사용하기 위해 pom.xml에 dependency를 추가한다.
+~~~xml
+<dependency>
+  <groupId>org.springframework.session</groupId>
+  <artifactId>spring-session</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-redis</artifactId>
+    <version>1.3.8.RELEASE</version>
+</dependency>
+~~~
+
+그리고 Redis를 사용하기 위해 application.properties에 다음과 같이 추가한다.
+~~~
+redis.host=localhost
+redis.port=6379
+redis.database=0
+~~~
+
+여기서는 HttpSession을 사용하여 Cookie 값을 Redis로 저장해보겠다.
+Spring Boot에서는 JedisConnectionFactory와 CookieSerializer를 @Bean annotation을 사용해서 주입할 수 있기 때문에, 다음과 같이 JedisConnectionFactory와 CookieSerializer를 리턴하는 @Bean 메소드를 정의한다.
+
+~~~java
+package com.nhnent.hellospringboot;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
+
+@Configuration
+@EnableRedisHttpSession
+@PropertySource("classpath:application.properties")
+public class SessionConfig {
+
+    @Value("${redis.host}")
+    private String host;
+
+    @Value("${redis.port}")
+    private int port;
+
+    @Value("${redis.database}")
+    int database;
+
+    @Bean
+    public JedisConnectionFactory connectionFactory() {
+
+        JedisConnectionFactory conn = new JedisConnectionFactory();
+
+        conn.setHostName(host);
+        conn.setPort(port);
+        conn.setDatabase(database);
+        conn.setUsePool(true);
+
+        return conn;
+    }
+
+    @Bean
+    public CookieSerializer cookieSerializer() {
+
+        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+
+        return serializer;
+    }
+}
+~~~
+위의 소스와 같이 application.properties 에 정의한 Redis 관련 값들을 @Value annotation으로 주입받아 JedisConnectionFactory를 초기화하고, CookieSerializer로는 DefaultCookieSerializer를 사용한다.
+
+그리고 다음과 같이 controller에 테스트용 url를 만들어 Redis에 쿠키 관련 값들이 저장되는지 확인한다.
+~~~java
+import javax.servlet.http.HttpSession;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloRestController {
+
+    @RequestMapping(path="/session-test", produces="text/plain")
+    public String sessionTest(HttpSession session) {
+
+        session.setAttribute("test", "hello");
+        return (String)session.getAttribute("test");
+    }
+}
+~~~
+
+그리고 웹 브라우저로 /session-test에 접속, 현재 쿠키 값을 확인해보자.
+![02.png](/static/assets/img/blog/web/2017-03-21-spring_boot_features_04/02.png)
+
+redis-cli를 통해 Redis 에 저장된 쿠키 값을 다음과 같이 키로 저장되어 있는 것을 확인할 수 있을 것이다.
+![03.png](/static/assets/img/blog/web/2017-03-21-spring_boot_features_04/03.png)
 
 
 [query_creation]:http://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.query-creation
