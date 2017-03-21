@@ -71,8 +71,3 @@ trace=true
 Spring Boot는 console에만 로그 메시지를 출력하므로, 파일에 쓸려면 logging.file이나 logging.path property를 application.properties에 추가해야 한다.
 
 > 기본적으로 console과 같이 ERROR, WARN, INFO 레벨의 로그 메시지가 파일에 쓰여지게 되며, 로그 파일이 10MB가 넘어가게 되면 다시 파일 처음으로 돌아가 덮어쓰게 된다.
-
-
-
-
-[spring_banner_change]: http://5mango.com/_10
