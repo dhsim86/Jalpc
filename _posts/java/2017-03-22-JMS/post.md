@@ -9,11 +9,7 @@ tags: [java, messaging]
 icon: icon-html
 ---
 
-> Spring Boot Reference Guide Part4, Chapter 32 messaging
-
 ## JMS
-
-먼저 Spring 에서 사용하는 messaging feature를 설명하기 전에, JMS란 무엇인가에 대해 살펴보자.
 
 JMS는 Java Messaging System의 약자로 Java에서 Messaging System을 사용하기 위한 API들의 정의이다.
 
