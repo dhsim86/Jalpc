@@ -203,7 +203,7 @@ public class SenderConfig {
 
 Kafka로부터 메시지를 받기 위해 **@KafkaListener** 라는 annotation을 사용하는데, 이를 위해 **ConsumerFactory를 사용하여 KafkaListenerContainerFactory 라는 이름의 ConcurrentKafkaListenerContainerFactory 빈을 생성해주어야 한다.**
 
-다음 코드와 같이 KafkaListenerContainerFacto빈ry 빈을 생성해주자.
+다음 코드와 같이 KafkaListenerContainerFactory 빈을 생성해주자.
 ~~~java
 package com.nhnent.hellospringboot;
 
