@@ -355,7 +355,6 @@ public class HelloController {
     public void kafkaTest(@PathVariable String value) {
 
         sender.sendMessage("helloworld.t", value);
-
     }
 ~~~
 <br>
