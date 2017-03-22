@@ -107,11 +107,13 @@ Kafka 클러스터를 구성하는 장점에 대해 LinkedIn의 엔지니어인 
 먼저 Kafka와 주키퍼를 다음과 같이 설치하고 실행시킨다.
 
 * 주키퍼 설치
+
 ![05.png](/static/assets/img/blog/web/2017-03-22-spring_boot_features_06/05.png)
 
 주키퍼를 [다운로드][zookeeper_download] 받아서 위와 같이 디폴트 configuration를 사용하여 시작시킨다.
 
 * Kafka 설치
+
 ![06.png](/static/assets/img/blog/web/2017-03-22-spring_boot_features_06/06.png)
 
 Kafka를 [다운로드][kafka_download] 받아서 위와 같이 기본 설정된 configuration 파일로 daemon 형식으로 시작시킨다.
