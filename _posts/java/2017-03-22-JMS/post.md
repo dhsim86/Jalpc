@@ -4,7 +4,7 @@ title:  "JMS, Java Messaging System"
 date:   2017-03-22
 desc: "JMS, Java Messaging System"
 keywords: "server programming"
-categories: [java]
+categories: [Java]
 tags: [java, messaging]
 icon: icon-html
 ---
