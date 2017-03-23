@@ -45,6 +45,7 @@ public class HelloJerseyEndPoint {
 }
 ~~~
 위의 코드와 같이 작성할 경우, **/helloworld** 에 대해 HTTP 요청이 수신될 때마다 **sayHelloWorld** 메소드가 호출되어 다음의 결과를 확인할 수 있다.
+
 ![00.png](/static/assets/img/blog/web/2017-03-23-spring_boot_with_jersey/00.png)
 
 만약 다음과 같이 **@Get** annotation을 메소드에 붙일 경우 GET 요청에 대해서만 메소드가 호출될 것이다.
