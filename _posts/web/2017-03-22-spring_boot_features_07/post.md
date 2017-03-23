@@ -163,3 +163,174 @@ public class SampleTestApplicationWebIntegrationTests {
 위와 같이 **@MockBean** annotation을 통해 VehicleDetailsService의 모형(mock)으로 mockito bean을 생성할 수 있으며, setup 메소드에 그 빈을 통해 getVehicleDetails 메소드가 호출될 때 어떻게 동작할 것인지를 기술할 수 있다.
 
 > ApplicationContext내에 mock을 새로 생성하거나 같은 타입의, 한 개의 bean을 mock으로 대체한다. 또한 한 테스트 메소드가 끝날 때마다 mock은 새로 초기화된다.
+
+<br>
+## Auto-configured Test
+
+Spring Boot의 자동 설정은 애플리케이션의 대부분의 경우에 잘 동작하지만, test 진행할 때는 기능이 조금 부족한 면이 있다.
+예를 들어 Spring MVC controller들을 테스트할 때 오직 URL이 잘 매핑되었는지만 테스트 진행하고 싶을 때 (DB까지 갈 필요없이), 혹은 JPA 엔티티 클래스들을 테스트할 때 Controller 나 RestController 등 HTTP 요청을 받는 클래스는 제외하고 싶을 때가 있다.
+
+이를 위해 Spring Boot는 spring-boot-test-autoconfigure 모듈을 통해 테스트의 성격에 따라 configuration 정보들 중 일부분만 로드하고 자동 설정하여 테스트를 진행할 수 있다. **@...Test** annotation들을 통해 ApplicationContext를 테스트 성격에 따라 로드하고 **@AutoConfigure...** annotation을 통해 자동 설정을 커스터마이징할 수 있다.
+
+> @...Test annotation에 대해서 excludeAutoConfiguration 애트리뷰트를 통해 특정 configuration 클래스를 제외시킬 수 있다.
+
+<br>
+### Auto-configured JSON tests
+
+JSON 오브젝트가 제대로 직렬화를하는데 테스트를 진행하기 위해 **@JsonTest** annotation을 통해 테스트할 수 있다.
+이 annotation은 **Jackson** ObjectMapper 및 **@JsonComponent** 클래스, Jackson 모듈을 자동 설정한다.
+
+다음은 @JsonTest를 통해 구현된 테스트 클래스이다.
+~~~java
+import org.junit.*;
+import org.junit.runner.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.autoconfigure.json.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.boot.test.json.*;
+import org.springframework.test.context.junit4.*;
+
+import static org.assertj.core.api.Assertions.*;
+
+@RunWith(SpringRunner.class)
+@JsonTest
+public class MyJsonTests {
+
+    @Autowired
+    private JacksonTester<VehicleDetails> json;
+
+    @Test
+    public void testSerialize() throws Exception {
+        VehicleDetails details = new VehicleDetails("Honda", "Civic");
+        // Assert against a `.json` file in the same package as the test
+        assertThat(this.json.write(details)).isEqualToJson("expected.json");
+        // Or use JSON path based assertions
+        assertThat(this.json.write(details)).hasJsonPathStringValue("@.make");
+        assertThat(this.json.write(details)).extractingJsonPathStringValue("@.make")
+                .isEqualTo("Honda");
+    }
+
+    @Test
+    public void testDeserialize() throws Exception {
+        String content = "{\"make\":\"Ford\",\"model\":\"Focus\"}";
+        assertThat(this.json.parse(content))
+                .isEqualTo(new VehicleDetails("Ford", "Focus"));
+        assertThat(this.json.parseObject(content).getMake()).isEqualTo("Ford");
+    }
+
+}
+~~~
+
+<br>
+### Auto-configured Spring MVC tests
+
+Spring MVC Controller를 테스트 하기 위해 **@WebMvcTest** annotation을 사용한다. 이 annotation을 통해 Spring MVC 를 자동 설정하고, @Conroller 및 @ControllerAdvice, @JsonComponent, Filter, WebMvcConfigurer 그리고 HandlerMethodArgumentResolve 만 스캔하여 주입한다.
+  > @Component 빈은 전혀 스캔되지 않는다.
+
+이 테스트를 진행할 때 **@MockBean** annotation 사용할 수 있을 뿐만 아니라 **MockMvc** 를 자동 설정하여 HTTP server를 시작할 필요없이 MVC Controller들을 테스트할 수 있다.
+
+> **@MockBean** annotation은 Spring ApplicationContext에 mock을 주입해주는 기능을 한다. Mock은 클래스 타입이나 빈 이름을 가지고 등록되며, 만약 같은 타입의, 하나의 빈이 이미 ApplicationContext에 등록되어 있었으면 그 것을 mock으로 대체시킨다.
+
+다음은 그 예제 소스이다.
+~~~java
+import org.junit.*;
+import org.junit.runner.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.autoconfigure.web.servlet.*;
+import org.springframework.boot.test.mock.mockito.*;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(UserVehicleController.class)
+public class MyControllerTests {
+
+    @Autowired
+    private MockMvc mvc;
+
+    @MockBean
+    private UserVehicleService userVehicleService;
+
+    @Test
+    public void testExample() throws Exception {
+        given(this.userVehicleService.getVehicleDetails("sboot"))
+                .willReturn(new VehicleDetails("Honda", "Civic"));
+        this.mvc.perform(get("/sboot/vehicle").accept(MediaType.TEXT_PLAIN))
+                .andExpect(status().isOk()).andExpect(content().string("Honda Civic"));
+    }
+
+}
+~~~
+
+<br>
+### Auto-configured Data JPA tests
+
+**@DataJpaTest** 를 통해 entity 및 repository 클래스들을 실제 DB를 사용하지 않고 테스트를 진행할 수 있다.이 annotation을 사용할 때 in-memory의 내장된 DB를 사용하며 @Entity 가 붙은 클래스를 스캔하고, JPA repository 클래스들을 자동 설정한다.
+> @Component 빈은 전혀 스캔되지 않는다.
+
+또한 이 테스트를 진행할 때는 각 테스트에서 수행하는 쿼리문이 하나의 Transaction으로 처리되며, 테스트가 끝나면 자동 롤백된다.
+
+다음은 이 테스트를 진행하는 클래스의 예이다.
+~~~java
+import org.junit.*;
+import org.junit.runner.*;
+import org.springframework.boot.test.autoconfigure.orm.jpa.*;
+
+import static org.assertj.core.api.Assertions.*;
+
+@RunWith(SpringRunner.class)
+@DataJpaTest
+public class ExampleRepositoryTests {
+
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
+    private UserRepository repository;
+
+    @Test
+    public void testExample() throws Exception {
+        this.entityManager.persist(new User("sboot", "1234"));
+        User user = this.repository.findByUsername("sboot");
+        assertThat(user.getUsername()).isEqualTo("sboot");
+        assertThat(user.getVin()).isEqualTo("1234");
+    }
+
+}
+~~~
+
+만약에 테스트 진행시 실제 DB를 가지고 테스트를 진행하고 싶다면 **@AutoConfigureTestDatabase** annotation을 다음과 같이 사용한다.
+~~~java
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@AutoConfigureTestDatabase(replace=Replace.NONE)
+public class ExampleRepositoryTests {
+
+    // ...
+
+}
+~~~
+
+<br>
+### Auto-configured JDBC tests
+
+**@JdbcTest** annotation을 통해 테스트를 진행하는데 @DataJpaTest annotation을 통한 JPA 테스트 진행과 거의 비슷하다.
+이 테스트 또한 in-memory 내장된 DB를 사용하며, JdbcTemplate 를 자동 설정한다. 또한 테스트 중 쿼리는 Transaction으로 처리되고 자동 롤백도 지원한다.
+
+~~~java
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+@RunWith(SpringRunner.class)
+@JdbcTest
+public class ExampleNonTransactionalTests {
+
+}
+~~~
