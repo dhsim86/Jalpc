@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Spring Boot with Jersey
+title:  "Spring Boot with Jersey"
 date:   2017-03-22
 desc: "Spring Boot with Jersey"
 keywords: "spring boot, spring, jersey, server programming"
