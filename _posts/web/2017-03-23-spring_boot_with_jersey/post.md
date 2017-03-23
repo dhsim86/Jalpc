@@ -138,7 +138,7 @@ public class UserService {
 ## Jersey configuration 추가
 
 먼저 Spring Boot와 연동하기 위해 다음과 같은 Configuration 클래스를 추가해야 한다.
-~~~
+~~~java
 package com.nhnent.hellospringboot;
 
 import javax.ws.rs.ApplicationPath;
