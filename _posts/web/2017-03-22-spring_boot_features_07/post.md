@@ -44,9 +44,41 @@ Spring Boot는 애플리케이션 테스트를 위해 다양한 유틸리티나 
 ## Testing Spring applications
 
 Spring Boot에서는 다음과 같은 @annotation 만으로도 테스트를 쉽게 시작할 수 있다. (Spring Boot 1.4 이상)
+
+보통 테스트 클래스를 작성할 때 이렇게 작성했을 것이다. (Spring Boot 1.3)
+
+다음과 같이 @ContextConfugration annotation과 SpringApplicationContextLoader 조합으로 사용했을 수도 있고,
+~~~java
+@RunWith(SpringJunit4ClassRunner.class)
+@ContextConfugration(classes=MyApp.class, loader=SpringApplicationContextLoader.class)
+public class MyTest {
+  ...
+}
+~~~
+
+아래와 같이 @SpringApplicationConfiguration annotation을 사용했을 수도 있고,
+~~~java
+@RunWith(SpringJunit4ClassRunner.class)
+@SpringApplicationConfiguration(MyApp.class)
+public class MyTest {
+  ...
+}
+~~~
+
+아니면 @IntegrationTest annotation을 조합했을 수도 있다.
+~~~java
+@RunWith(SpringJunit4ClassRunner.class)
+@SpringApplicationConfiguration(MyApp.class)
+@IntegrationTest
+public class MyTest {
+  ...
+}
+~~~
+
+**Spring Boot 1.4** 에서는 좀 더 단순해져서, @SpringBootTest annotation 단 하나만 사용하여 일반적인 테스트를 수행할 수 있다.
 ~~~java
 @RunWith(SpringRunner.class)
-@SpringBootTest()
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
 public class SpringBootTestApplicationTests {
 
     @Autowired
@@ -71,13 +103,63 @@ public class SpringBootTestApplicationTests {
 * NONE: ApplicationContext를 로드하기는 하지만 서블릿 컨테이너 환경을 제공하지 않는다.
 
 > @RunWith(@SpringRunner.class) 도 빼먹지 말자. 추가하지 않는다면 @SpringBootTest annotation은 무시된다.
+이 구문은 JUnit에게 Spring 테스트 지원사항을 사용하겠다고 알려주는 구문이다. **SpringRunner** 는 SpringJunit4ClassRunner의 새로운 이름이다.
+
+> @SpringBootTest annotation은 "Spring 테스트 지원의 부트스트랩입니다. (bootstrap with Spring Boot's support)" 라는 걸 의미한다.
+
+> 테스트 시작시 먼저 @Configuration이 붙은 클래스들을 로드하려고 시도할 것이고, 실패한다면 @SpringBootApplication이 붙은 클래스를 찾을 것이다.
 
 
 <br>
 ## Detecting test configuration
 
-Spring Framework로 개발하다보면 **@ContextConfugration** annotation을 써서 ApplicationContext를 로드했을 것이다.
+Spring Framework로 개발하다보면 **@ContextConfugration** annotation을 써서 ApplicationContext를 로드했을 것이다. 아니면  **@Configuration** annotation을 써서 configuration을 설정하도록 했을 것이다.
+
+* @TestConfiguration
+이 annotation을 사용한다면 @SpringBootApplication 이나 @SpringBootConfiguration이 붙은 클래스를 찾아 반영시킨다. 만약 테스트 진행시에만 ApplicationContext를 커스터마이징하고 싶다면, **@TestConfiguration** annotation을 사용할 수 있다.
+<br>
+
+* @TestComponent, @TestConfiguration
+@SpringBootApplication이나 @ComponentScan annotation을 써서 개발을 진행할 때 테스트 시에만 사용할려고 정의해둔 여러 컴포넌트나 configuration 들도 실제 환경에서도 추가될 수가 있다. 이 것을 피하기 위해 Spring Boot에서는 **@TestComponent** 와 **@TestConfiguration** annotation을 제공한다. 이 것은 **src/test/java** 에 있는 클래스에 붙여 테스트가 아닌 환경에서는 Spring Boot의 auto configuration 진행시 추가되는 것을 피할 수 있다.
+
 
 > **@ContextConfugration**
 @ContextConfugration(locations={"/app-config.xml", "/test-config.xml"}) 와 같이 XML 파일로부터 ApplicationContext를 로드
 @ContextConfugration(classes={AppConfig.class, TestConfig.class}) 와 같이 **@Configuration** 클래스로부터 ApplicationContext 로드
+
+<br>
+## Mocking and spying beans
+
+때때로 테스트 진행할 때 사용하는 빈들 중 특정 빈들을 목아웃 (mock out) 하는 것이 도움이 된다는 것을 알 수 있다. 서비스 시뮬레이션을 포함하는 mocking의 일반적인 케이스는 테스트가 진행 중일 때는 사용할 수 없는 것이나 라이브 시스템에서 발생시키기 어려울 때이다.
+
+Spring Boot 1.4 이후부터 이미 존재하는 빈을 대체하거나 새로 생성하는 mockito를 다음과 같이 손쉽게 만들 수 있다.
+
+~~~java
+@Runwith(SpringRunner.class)
+@SpringBootTest(webEnvironment = webEnvironment.RANDOM_PORT)
+public class SampleTestApplicationWebIntegrationTests {
+
+  @Autowired
+  private TestRestTemplate restTemplate;
+
+  @MockBean
+  private VehicleDetailsService vehicleDetailsService;
+
+  @Before
+  public void setUp() {
+    given(this.vehicleDetailsService.
+      getVehicleDetails("123")
+    ).willReturn(
+        new VehicleDetails("Honda", "Civic"));
+  }
+
+  @Test
+  public void test() {
+    this.restTemplate.getForEntity("/{username}/vehicle", String.class, "sframework");
+  }
+}
+~~~
+
+위와 같이 **@MockBean** annotation을 통해 VehicleDetailsService의 모형(mock)으로 mockito bean을 생성할 수 있으며, setup 메소드에 그 빈을 통해 getVehicleDetails 메소드가 호출될 때 어떻게 동작할 것인지를 기술할 수 있다.
+
+> ApplicationContext내에 mock을 새로 생성하거나 같은 타입의, 한 개의 bean을 mock으로 대체한다. 또한 한 테스트 메소드가 끝날 때마다 mock은 새로 초기화된다.
