@@ -38,7 +38,7 @@
     detail: July. 2011 - Feb. 2013
     i18n: company_c_date
   job:
-    detail: Reverse engineering, Windows IOCP Socket programming, x86 assembly, OS development.
+    detail: Reverse engineering, Windows IOCP, x86 assembly, OS development.
     i18n: company_c_job
   icon: fa-plus-square
 
