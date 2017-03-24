@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Spring Boot Reference Guide Review 07"
+title:  "Spring Boot Reference Guide Review 07 : Caching"
 date:   2017-03-21
-desc: "Spring Boot Reference Guide Review 07"
+desc: "Spring Boot Reference Guide Review 07 : Caching"
 keywords: "spring boot, spring, server programming"
 categories: [Web]
 tags: [spring boot, spring]

@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Spring Boot Reference Guide Review 05"
+title:  "Spring Boot Reference Guide Review 05 : Developing web applications"
 date:   2017-03-20
-desc: "Spring Boot Reference Guide Review 05"
+desc: "Spring Boot Reference Guide Review 05 : Developing web applications"
 keywords: "spring boot, spring, server programming"
 categories: [Web]
 tags: [spring boot, spring]

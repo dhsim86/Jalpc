@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Spring Boot Reference Guide Review 10"
+title:  "Spring Boot Reference Guide Review 10 : Spring Boot Actuator / Remote Shell"
 date:   2017-03-24
-desc: "Spring Boot Reference Guide Review 10"
+desc: "Spring Boot Reference Guide Review 10 : Spring Boot Actuator / Remote Shell"
 keywords: "spring boot, spring, server programming"
 categories: [Web]
 tags: [spring boot, spring]
@@ -73,7 +73,7 @@ management.shell.auth.simple.user.name=dongho
 management.shell.auth.simple.user.password=1234
 ~~~
 
-그리고 애플리케이션에 remote shell을 통해 ssh 접속을 해보자.
+그리고 애플리케이션에 remote shell을 통해 ssh 접속을 해보자. (기본 포트는 2000 이다.)
 다음과 같이 ssh를 통해 접속하면 이전에 설정해둔 배너가 출력되고 쉘 프롬프트가 사용자가 커맨드를 입력하기를 기다릴 것이다.
 ![04.png](/static/assets/img/blog/web/2017-03-24-spring_boot_features_10/04.png)
 

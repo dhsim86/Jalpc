@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Spring Boot Reference Guide Review 08"
+title:  "Spring Boot Reference Guide Review 08 : Messaging with Kafka"
 date:   2017-03-22
-desc: "Spring Boot Reference Guide Review 08"
+desc: "Spring Boot Reference Guide Review 08 : Messaging with Kafka"
 keywords: "spring boot, spring, server programming"
 categories: [Web]
 tags: [spring boot, spring]
