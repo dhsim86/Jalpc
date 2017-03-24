@@ -103,9 +103,9 @@ public class HelloSpringBootApplication {
 ~~~
 * 위의 클래스는 단독실행 및 스크립트를 통한 실행을 지원하기 위해 Spring Boot 개발환경에서 반드시 작성되어야하는 애플리케이션 클래스이다.
 
-
-* @SpringBootApplication
-이 annotation은 프로젝트 개발환경에서 많이 사용하는 annotation들을 쉽고 빠르게 사용할 수 있도록 다음과 같은 annotation들의 속성들을 포함하고 있는 annotation이다.
+<br>
+### @SpringBootApplication
+이 annotation은 Spring Boot의 가장 핵심적인 부분으로, 프로젝트 개발환경에서 많이 사용하는 annotation들을 쉽고 빠르게 사용할 수 있도록 다음과 같은 annotation들의 속성들을 포함하고 있는 annotation이다.
   + @Configuration
   + @EnableConfiguration
   + @ComponentScan
@@ -113,6 +113,53 @@ public class HelloSpringBootApplication {
 > @EnableAutoConfiguration
    Spring Boot autoconfiguration은 추가된 jar dependency 기반으로 Spring application을 자동으로 설정하는 것을 시도한다. 예를 들어 HSQL DB가 class path에 있으면, DB 연결 빈을 정의하지 않아도 자동적으로 in-memory 데이터베이스에 접근할 것이다.
    자동 설정은 비 침입적으로, DataSource 빈을 추가한다면 디폴트로 자동 설정되는 것은 사라질 것이다.
+
+이 @SpringBootApplication annotation을 추적해보면, 이 클래스가 자바 Configuration을 사용하며, AutoConfiguration을 허용하며, 해당 Class가 있는 위치부터 컴포넌트를 스캔해서 빈으로 등록하는 것을 알 수 있다.
+~~~java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan(excludeFilters = {
+		@Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+public @interface SpringBootApplication {
+~~~
+
+따라서 이 annotation이 선언된 메인 Spring Boot 애플리케이션 클래스는 프로젝트 패키지 루트에 지정하는 것이 좋다. 그래야 별다른 설정없이도 컴포넌트 스캔이 동작되어 클래스를 검색해 빈으로 등록할 수 있는 것이다.
+
+이 annotation을 사용하게 되면 특별한 이유가 없는 한, 개발자는 자동설정을 별도로 할 필요가 없다.
+
+<br>
+### Spring Boot의 autoconfiguration
+
+Spring Boot의 자동 설정은 Java Configuration을 기반으로 하는데, 이와 관련된 설정은 이미 **spring-boot-autoconfiguration** 이라고 하는 프로젝트 안에 추가되어 있다.
+
+여기서 우리가 사용하는 Web 과 관련된 **WebMvcAutoConfiguration** 을 살펴보자.
+~~~java
+@Configuration
+@ConditionalOnWebApplication
+@ConditionalOnClass({ Servlet.class, DispatcherServlet.class, WebMvcConfigurerAdapter.class })
+@ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
+@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
+@AutoConfigureAfter(DispatcherServletAutoConfiguration.class)
+public class WebMvcAutoConfiguration {
+    public static String DEFAULT_PREFIX = "";
+    public static String DEFAULT_SUFFIX = "";
+
+    @Bean
+    @ConditionalOnMissingBean(HiddenHttpMethodFilter.class)
+    public OrderedHiddenHttpMethodFilter hiddenHttpMethodFilter() {
+        return new OrderedHiddenHttpMethodFilter();
+    }
+~~~
+
+Servlet 및 DispatcherServlet, WebMvcConfigurerAdapter 클래스가 있고, WebMvcConfigurationSupport가 없을 때 우선권을 추가로 설정해서 빈을 등록하고, 이 설정 후에 DispatcherServletAutoConfiguration을 설정하라고 되어 있다.
+
+<br>
+### SpringApplication.run method
 
 <br>
 ~~~java
@@ -125,8 +172,6 @@ public static ConfigurableApplicationContext run(Object[] sources, String[] args
  * HelloSpringBootApplication의 main 메소드가 Spring Framework를 수행하기 위해 사용하는 SpringApplication 클래스는 Spring 기반의 web application을 구동하는 편리한 방법을 제공한다.
  * Spring MVC에서 servlet context 설정과 같은 복잡한 과정 대신에, main 메소드에서 SpringApplication의 run static 메소드에 class 및 main 메소드의 파라미터, args만 넘기는 것으로 Spring Framework를 실행한다. 과연 run method 에서는 어떤 일을 할까?
 
-<br>
-### SpringApplication.run method
 
  이 메소드에서 하는 역할은 크게 두가지이다.
 
