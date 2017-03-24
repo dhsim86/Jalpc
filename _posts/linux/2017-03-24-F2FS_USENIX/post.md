@@ -9,27 +9,33 @@ tags: [file system, kernel, linux]
 icon: icon-html
 ---
 
-# F2FS: A New File System for Flash Storage
+# **F2FS: A New File System for Flash Storage**
 
-https://www.usenix.org/conference/fast15/technical-sessions/presentation/lee
+[https://www.usenix.org/conference/fast15/technical-sessions/presentation/lee][url]
 
-## Authors:
+<br>
+## **Authors:**
 
-Changman Lee, Dongho Sim, Joo-Young Hwang, and Sangyeun Cho, Samsung Electronics Co., Ltd.
+**Changman Lee, Dongho Sim, Joo-Young Hwang, and Sangyeun Cho, Samsung Electronics Co., Ltd.**
 
-## Open Access Content
+<br>
+## **Open Access Content**
 
 USENIX is committed to Open Access to the research presented at our events. Papers and proceedings are freely available to everyone once the event begins. Any video, audio, and/or slides that are posted after the event are also free and open to everyone. Support USENIX and our commitment to Open Access.
 
 [Lee PDF Download][pdf_download]
+<br>
 [View the slides][slide_download]
+<br>
 [BibTeX Download][bibtext_download]
 
+[url]: https://www.usenix.org/conference/fast15/technical-sessions/presentation/lee
 [pdf_download]: https://www.usenix.org/system/files/conference/fast15/fast15-paper-lee.pdf
 [slide_download]: https://www.usenix.org/sites/default/files/conference/protected-files/fast15_slides_lee.pdf
 [bibtext_download]: https://www.usenix.org/biblio/export/bibtex/188454
 
-## Abstract
+<br>
+## **Abstract**
 
 F2FS is a Linux file system designed to perform well on modern flash storage devices. The file system builds on append-only logging and its key design decisions were made with the characteristics of flash storage in mind. This paper describes the main design ideas, data structures, algorithms and the resulting performance of F2FS.
 
@@ -78,14 +84,3 @@ Experimental results highlight the desirable performance of F2FS; on a state-of-
       </audio>
   <p><a href="https://2459d6dc103cb5933875-c0245c5c937c5dedcca3f1764ecc9b2f.ssl.cf2.rackcdn.com/fast15/lee.mp3">Download Audio</a></p>
 </div>
-  </div>
-
-</div>
-
-</div>
-
-  </div>
-
-  </div>
-</div>
-                </div>
