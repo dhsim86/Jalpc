@@ -1,15 +1,15 @@
 ---
 layout: post
-title:  "Spring Boot Reference Guide Review 10 : Spring Boot Actuator / Remote Shell"
+title:  "Spring Boot Reference Guide Review 11 : Spring Boot CLI"
 date:   2017-03-24
-desc: "Spring Boot Reference Guide Review 10 : Spring Boot Actuator / Remote Shell"
+desc: "Spring Boot Reference Guide Review 11 : Spring Boot CLI"
 keywords: "spring boot, spring, server programming"
 categories: [Web]
 tags: [spring boot, spring]
 icon: icon-html
 ---
 
-> Spring Boot Reference Guide Part5, Spirng Boot Actuator, Production-Ready features.
+> Spring Boot Reference Guide Part7, Spring Boot CLI
 
 # Spring Boot Actuator / Remote Shell
 
