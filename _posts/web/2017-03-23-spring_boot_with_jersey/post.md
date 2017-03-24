@@ -36,7 +36,7 @@ public class HelloJerseyEndPoint {
 }
 ~~~
 
-기본적으로 다음과 같이 **@Path** annotation을 붙이고 메소드를 정의하면 된다.
+Jersey를 사용해서 기본적으로 다음과 같이 **@Path** annotation을 붙이고 메소드를 정의하면 된다.
 ~~~java
 import javax.ws.rs.Path;
 
