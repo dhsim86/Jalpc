@@ -12,14 +12,18 @@ icon: icon-html
 # Jersey ?
 
 Jersey는 Java에서 Restful API를 사용하는 서버를 아주 간단하게 구현할 수 있게 도와주는 web framework이다.
-GlassFish 프로젝트의 서브 프로젝트이며, JAX-RS(JSR 311) 스펙에 따른 구현체이다
+GlassFish 프로젝트의 서브 프로젝트이며, JAX-RS(JSR 311) 스펙에 따른 구현체이다.
+
+JAX-RS 표준을 구현한 공식 레퍼런스 구현체로, Java 플랫폼에서는 Restful Web Service를 높은 생산성으로 쉽게 구현할 수 있게 해준다. (JAX-RS 표준이 서버만을 고려하여 작성된 데에 비해, Jersey는 클라이언트 입장에서도 서비스를 편리하게 사용할 수 있도록 구현되었다.)
 
 이 web application framework는 JAX-RS 스펙에 맞게 구현되었기 때문에, JAX-RS 를 알아야 이해할 수 있다.
+
+> Spring Web MVC는 JSR-311을 따르지는 않지만 Rest 기반의 웹 서비스 개발에 필요한 기능 대부분을 구현하고 있다. 하나의 자원을 여러 개의 Representation(JSON / XML / ATOM / RSS 등)으로 표현할 수 있고, 무엇보다도 Spring이 지원하는 강력한 기능을 사용할 수 있다는 장점이 있다.
 
 <br>
 ## JAX-RS ?
 
-JAX-RS는 인터페이스의 콜렉션으로, REST API를 서비스하는 서버 애플리케이션 개발을 쉽게 만드는 Java의 어노테이션의 모음이다.
+JAX-RS는 인터페이스의 콜렉션으로, REST API를 서비스하는 서버 애플리케이션 개발을 쉽게 만들어즈는 자바 플랫폼에서 경량화된 REST 방식의 웹 애플리에키션 구현을 지원하는 자바 API 이다.
 JAX-RS 기술을 이용하면 REST(Representational State Transfer) 응용 프로그램은 기타 분배 시스템 유형에 비해 개발 및 이용이 용이하다.
 
 대표적인 annotation으로 @Path, @GET, @POST, @PUT 등이 있다.
