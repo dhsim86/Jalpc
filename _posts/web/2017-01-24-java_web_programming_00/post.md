@@ -129,6 +129,7 @@ icon: icon-html
 ### \<welcome-file\>
 * 웰컴 파일은 디렉토리의 기본 웹 페이지
 * 여러 개 정의되어 있으면 위에서부터 아래로 순차적으로 조회. 먼저 찾은 것을 response.
+
 ~~~xml
 <!-- welcome file setting -->
 <welcome-file-list>
@@ -258,5 +259,5 @@ public interface ServletResponse {
 <br>
 ### @WebServlet 애노테이션
 * 클래스위의 @WebServlet("") 으로 서블릿 배치 정보 설정 가능.
-  * web.xml 에서 <servlet>…</servlet>, <servlet-mapping></servlet-mapping> 생략
+  * web.xml 에서 서블릿 선언 및 매핑부분 생략 가능
 * [https://github.com/dhsim86/java_webdev_workbook/commit/a700245c92f62e6f842c97a1e05bec5704eb1362](https://github.com/dhsim86/java_webdev_workbook/commit/a700245c92f62e6f842c97a1e05bec5704eb1362)
