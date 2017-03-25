@@ -11,8 +11,6 @@ icon: icon-html
 
 > Java Web Development Workbook Chapter. 05
 
-Chapter05. MVC Architecture
-
 ### MVC (Model-View-Architecture)
 
 ![00.png](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/00.png)
@@ -42,21 +40,21 @@ Chapter05. MVC Architecture
 
 * 웹 서버가 요청을 받아 서블릿 컨테이너로 넘김.
 * 서블릿 컨테이너는 서블릿 찾아서 실행
-* 서블릿은 실제 업무를 처리하는 모델 자바 객체의 메서드 호출
-  * 웹 브라우저가 보낸 데이터를 저장하거나 변경해야 한다면, 그 데이터를 가공하여 값 객체를 생성 후 모델 객체의 메서드 호출 때 인자로 넘김
-* 모델 객체는 JDBC를 활용, 값 객체를 데이터베이스에 넘기거나 질의 결과를 받아서 값 객체로 만들어 반환
-* 서블릿은 결과를 JSP에 전달
+* 서블릿(Controller)은 실제 업무를 처리하는 모델 자바 객체의 메서드 호출
+  * 웹 브라우저가 보낸 데이터를 저장하거나 변경해야 한다면, 그 **데이터를 가공하여 값 객체** 를 생성 후 모델 객체의 메서드 호출 때 인자로 넘김
+* 모델 객체는 JDBC를 활용, **값 객체** 를 데이터베이스에 넘기거나 질의 결과를 받아서 값 객체로 만들어 반환
+* 서블릿은 결과를 **JSP** 에 전달
 * JSP는 서블릿으로부터 받은 값 객체를 참조하여 출력할 결과 화면을 만듬
 
 <br>
 ### JSP  
-* 웹 브라우저가 출력할 화면을 생성
+* 웹 브라우저가 출력할 **화면을 생성**
   * 서블릿이 직접 출력 함수를 이용해 화면을 만드는 것보다 용이.
-  * 콘텐츠를 출력하는 코딩을 단순화가 목적
+  * 콘텐츠를 출력하는 코딩을 **단순화** 가 목적
 * JSP의 실행
 <br>
 ![02.png](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/02.png)
-  * JSP 파일 작성 후 클라이언트가 요청하면 JSP 파일에 대응하는 자바 서블릿 실행
+  * JSP 파일 작성 후 클라이언트가 요청하면 **JSP 파일에 대응하는 자바 서블릿** 실행
   * 서블릿이 없거나 JSP 파일이 변경되었다면 JSP 엔진을 통해 JSP 파일을 해석 후 **서블릿 자바 소스 생성**
   * 서블릿 자바 소스는 자바 컴파일러를 통해 클래스 파일로 컴파일 됨
   * 생성된 서블릿은 service 함수를 통해 서비스하고 출력 메서드를 통해 HTML 화면을 웹 브라우저로 보냄
@@ -70,9 +68,9 @@ Chapter05. MVC Architecture
 ![03.png](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/03.png)
 * JspPage
   * **jspInit**
-    * JspPage에 생성된 jspInit은 JSP 객체 (JSP로부터 생성된 서블릿 객체)가 생성될 때 호출
+    * JspPage에 생성된 **jspInit** 은 JSP 객체 (JSP로부터 생성된 서블릿 객체)가 생성될 때 호출
       * 자동 생성된 서블릿 코드를 보면 init 호출될 때 **jspInit을 호출**
-      * JSP 페이지에서 init 오버라이딩이 아닌 jspInit을 오버라이딩
+      * JSP 페이지에서 init 오버라이딩이 아닌 **jspInit** 을 오버라이딩
   * **jspDestory**
     * JSP 객체가 언로드될 때 호출
   * **_jspService**
@@ -100,11 +98,55 @@ Chapter05. MVC Architecture
 * 템플릿 데이터
   * 클라이언트로 출력되는 콘텐츠 (HTML, 자바스크립트, 스타일 시트 등)
   * 별도의 문법이 없이 **문서 작성 하듯 출력할 내용을 작성**
+
+
+~~~java
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="Lesson05.Member" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+
+...
+
+<%
+    if (member.getEmail() != null) {
+%>
+<%=member.getName()%>
+<a style="color:white;"
+   href="<%=request.getContextPath()%>/auth/logout">Logout</a>
+<%
+    }
+%>
+
+...
+<%!
+    private String calculate(int a, int b, String op) {
+        int r = 0;
+
+        if ("+".equals(op)) {
+            r = a + b;
+        }
+        else if ("-".equals(op)) {
+            r = a - b;
+        }
+        else if ("*".equals(op)) {
+            r = a * b;
+        }
+        else if ("/".equals(op)) {
+            r = a / b;
+        }
+
+        return Integer.toString(r);
+    }
+%>
+~~~
+
 * JSP 전용 태그
   * 특정 **자바 명령문으로 바뀜**
   * <%@ 지시자 속성="값" 속성="값" ... %>
     * 지시자나 속성에 따라 자바 코드 생성
-    * page 지시자
+    * **page** 지시자
       * JSP 페이지와 관련된 속성을 정의
       * language 속성
         * 스크립트릿이나 표현식, 선언부 작성시 사용할 프로그래밍 언어 명시
@@ -145,15 +187,29 @@ Chapter05. MVC Architecture
 ### 서블릿에서 뷰 분리하기
 * 서블릿은 데이터를 준비 (모델 역할) / JSP에 전달 (컨트롤러 역할)
 * JSP는 준비한 데이터를 가지고 웹 브라우저로 출력할 화면을 만듬
-* JSP에 데이터를 준비하기 위해 값 객체 (VO)가 필요
-  * RequestDispatcher
-    * 다른 서블릿이나 JSP로 작업 위임시 사용
-    * HttpServletRequest로부터 얻음
+* JSP에 데이터를 준비하기 위해 **값 객체 (VO)** 가 필요
 
-    * forward
+~~~java
+@Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+
+    RequestDispatcher rd = request.getRequestDispatcher(
+        "/Lesson05/MemberAdd.jsp"
+    );
+
+    rd.include(request, response);
+}
+~~~
+
+  * **RequestDispatcher**
+    * 다른 서블릿이나 JSP로 작업 위임시 사용
+    * **HttpServletRequest** 로부터 얻음
+
+    * **forward**
       * 서블릿으로 제어권 위임. 돌아오지 않음.
       * jsp에서 jsp로 포워드 위임 <jsp:forward page=".jsp"/>
-    * include
+    * **include*8
       * 제어권을 넘기면 그 서블릿이 작업 후 다시 제어권이 돌아옴
       * jsp에서 jsp로 인클루딩 위임 <jsp:include page=".jsp"/>
       <br>
@@ -177,33 +233,34 @@ Chapter05. MVC Architecture
 * 데이터 공유 방법. 서블릿 기술은 네 가지 종류의 데이터 보관소를 제공
 <br>
 ![08.png](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/08.png)
-* ServletContext 보관소
-  * 웹 애플리케이션이 시작될 때 생성 및 종료될 때까지 유지되는 객체
-  * 모든 서블릿이 사용 가능
+* **ServletContext** 보관소
+  * 웹 애플리케이션이 **시작될 때 생성 및 종료될 때까지 유지** 되는 객체
+  * **모든 서블릿이 사용 가능**
   * jsp에서는 **application** 변수를 통해 참조
   * HttpServlet으로 부터 상속 후, init 및 destroy 메서드 오버라이딩 후 보관소 사용
   * [https://github.com/dhsim86/java_webdev_workbook/commit/7e0cbaf44ef2bb732b4f9838dbba1abc5387da16](https://github.com/dhsim86/java_webdev_workbook/commit/7e0cbaf44ef2bb732b4f9838dbba1abc5387da16)
-
-* HttpSession 보관소
-  * 클라이언트 최초 요청시 생성 후 브라우저를 닫을 때까지 유지
+<br>
+* **HttpSession** 보관소
+  * 클라이언트 **최초 요청시 생성 후 브라우저를 닫을 때까지** 유지
     * 클라이언트 당 하나 생성
     * HttpSession 객체는 그 웹브라우저로부터 일정 시간 동안 timeout 요청이 없으면 삭제 됨
   * 로그인할 때 초기화, 로그아웃하면 비움.
-  * jsp에서는 session 변수를 통해 참조
+  * jsp에서는 **session** 변수를 통해 참조
   * [https://github.com/dhsim86/java_webdev_workbook/commit/a53bb3830196ccde678f34e73c0c36e2229e659f](https://github.com/dhsim86/java_webdev_workbook/commit/a53bb3830196ccde678f34e73c0c36e2229e659f)
-
-* ServletRequest 보관소
-  * 요청이 들어올 때 생성 후 응답할 때까지 유지
+<br>
+* **ServletRequest** 보관소
+  * **요청이 들어올 때 생성 후 응답할 때까지 유지**
   * 포워딩이나 인클루딩하는 서블릿들 사이에서 값을 공유할 때 유용
     * request나 response를 같이 사용
-  * request 변수를 통해 참조
-
-* JspContext 보관소
-  * jsp 페이지를 실행하는 동안만 유지
+  * **request** 변수를 통해 참조
+<br>
+* **JspContext** 보관소
+  * **jsp 페이지를 실행하는 동안만 유지**
     * jsp 페이지 내부에서만 사용될 데이터 공유하는데 사용
   * 태그 핸들러는 JspContext만 참조가능 (Include된 jsp에서 다른 jsp의 로컬 변수는 참조 불가)
-  * jsp에서는 pageContext를 통해 참조
+  * jsp에서는 **pageContext** 를 통해 참조
 
+<br>
 * 모든 보관소는 setAttribute 및 getAttribute를 통해 값을 다룸
 
 <br>
@@ -232,7 +289,7 @@ Chapter05. MVC Architecture
     int value = ojb.getNo();
   * 보관소를 지정하면 해당 보관소에서만 객체를 찾음.
 * [https://github.com/dhsim86/java_webdev_workbook/commit/5a6fb0f6507ffd6ece0bcc03169bfa428f525774](https://github.com/dhsim86/java_webdev_workbook/commit/5a6fb0f6507ffd6ece0bcc03169bfa428f525774)
-* [https://github.com/dhsim86/java_webdev_workbook/commit/b605749655ad4f563fb388537b360d5399b50855j](https://github.com/dhsim86/java_webdev_workbook/commit/b605749655ad4f563fb388537b360d5399b50855j)
+* [https://github.com/dhsim86/java_webdev_workbook/commit/b605749655ad4f563fb388537b360d5399b50855](https://github.com/dhsim86/java_webdev_workbook/commit/b605749655ad4f563fb388537b360d5399b50855)
 
 <br>
 ### JSTL
@@ -260,7 +317,7 @@ Chapter05. MVC Architecture
 
 <br>
 ### DAO
-* 데이터 처리를 전문으로 하는 객체 (Data Access Object)
+* **데이터 처리** 를 전문으로 하는 객체 (Data Access Object)
   * DB나 파일 / 메모리 등을 이용, 애플리케이션 데이터를 CRUD 하는 역할
   * 하나의 DB 테이블이나 뷰에 대응
 * [https://github.com/dhsim86/java_webdev_workbook/commit/d616b7a0b1e963dd41611aafb65aaec78dd81486](https://github.com/dhsim86/java_webdev_workbook/commit/d616b7a0b1e963dd41611aafb65aaec78dd81486)
