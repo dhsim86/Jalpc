@@ -2,7 +2,7 @@
 
 # Website settings
 title: Dongho Sim's dev story
-description: Dongho Sim's story,use Jekyll and github pages.
+description: Dongho Sim's dev story,use Jekyll and github pages.
 keywords: blog,Jekyll,github
 baseurl:  # if you have suburl as homepage like '/homepage', please change it to '/homepage' and your repo's name should be 'homepage'
 url: https://dhsim86.github.io  # url should be 'http://<github_username>.github.io/homepage' as before
