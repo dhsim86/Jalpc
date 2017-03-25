@@ -96,6 +96,7 @@ icon: icon-html
 ### 서블릿 배치 정보 작성 (web.xml)
 * 웹 애플리케이션의 배치 정보를 담고 있는데, 서블릿 컨테이너가 이를 참고
 * 서블릿 선언
+
 ~~~xml
 <servlet>
     <servlet-name>AppInitServlet</servlet-name>
@@ -103,6 +104,7 @@ icon: icon-html
 </servlet>
 ~~~
 * 서블릿 URL 부여
+
 ~~~xml
 <servlet>
     <servlet-name>AppInitServlet</servlet-name>
