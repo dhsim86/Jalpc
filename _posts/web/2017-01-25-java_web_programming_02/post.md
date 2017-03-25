@@ -474,7 +474,7 @@ java.sql 패키지의 기능을 보조하기 위해 만든 확장 패키지.
 * 디렉토리 서비스에 접근하는데 필요한 API
   * 애플리케이션인 이 API를 사용, 서버의 자원 (데이터베이스 서버, 메시징 시스템과 같은 연결 제공 객체) 검색
   * 자원을 서버에 등록할 때 고유한 JNDI 이름 등록
-
+<br>
   | JNDI Name | Resource |
   | ---------- | :--------- |
   | java:comp/env | 응용 프로그램 환경 항목 |
@@ -485,6 +485,7 @@ java.sql 패키지의 기능을 보조하기 위해 만든 확장 패키지.
   | java:comp/env/url | URL 정보 |
   | java:comp/env/jms | JMS 연결 객체 |
 
+<br>
 * 서블릿 컨테이너 관리하는 DataSource를 사용하기 위해 서버 설정
 -> Tomcat의 경우, context.xml 및 web.xml 을 수정
 
