@@ -95,10 +95,21 @@ icon: icon-html
 <br>
 ### 서블릿 배치 정보 작성 (web.xml)
 * 웹 애플리케이션의 배치 정보를 담고 있는데, 서블릿 컨테이너가 이를 참고
-* 서블릿 선언 <servlet></servlet>
-  * <servlet-name>, <servlet-class>
-* 서블릿 URL 부여 <servlet-mapping></servlet-mapping>
-  * <servlet-name>, <url-pattern>
+* 서블릿 선언
+~~~xml
+<servlet>
+    <servlet-name>AppInitServlet</servlet-name>
+    <servlet-class>AppInitServlet</servlet-class>
+</servlet>
+~~~
+* 서블릿 URL 부여
+~~~xml
+<servlet>
+    <servlet-name>AppInitServlet</servlet-name>
+    <servlet-class>AppInitServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+</servlet>
+~~~
   * 서블릿을 요청할 때 클라이언트가 사용할 URL 설정
 
 <br>
@@ -115,15 +126,26 @@ icon: icon-html
 * 인스턴스 변수에 특정 사용자를 위한 데이터를 저장하거나 일시적 데이터 보관용도로 사용하면 안됨.
 
 <br>
-### <welcome-file>
+### \<welcome-file\>
 * 웰컴 파일은 디렉토리의 기본 웹 페이지
 * 여러 개 정의되어 있으면 위에서부터 아래로 순차적으로 조회. 먼저 찾은 것을 response.
+~~~xml
+<!-- welcome file setting -->
+<welcome-file-list>
+  <welcome-file>index.html</welcome-file>
+  <welcome-file>index.htm</welcome-file>
+  <welcome-file>index.jsp</welcome-file>
+  <welcome-file>default.html</welcome-file>
+  <welcome-file>default.htm</welcome-file>
+  <welcome-file>default.jsp</welcome-file>
+</welcome-file-list>
+~~~
 
 <br>
 ### 웹 애플리케이션 배치
 * 프로젝트의 Web 폴더에 들어있는 모든 파일과 폴더가 배치 폴더(Context root)로 복사
   * WebContent 폴더에 있는 모든 내용이 배치 폴더로 폭사
-  * 컴파일된 자바 클래스들은 배치폴더/WEB_INF/classes에 복사
+  * 컴파일된 자바 클래스들은 **배치폴더/WEB_INF/classes** 에 복사
 * 웹 아카이브 (.war), Web Archive
   * 배치할 파일들을 하나의 웹 아카이브 파일로 만들어 배치 폴더에 복사
 
@@ -131,7 +153,7 @@ icon: icon-html
 ### GenericServlet
 * Servlet 인터페이스를 구현할 때의 문제점인 "모든 추상 메서드를 구현해야한다" 라는 단점을 해소하기 위해 **GenericServlet** 추상 클래스 사용
 * 하위 클래스에게 공통의 필드와 메서드를 상속.
-init() / destroy() / getServletConfig() / getServletInfo() 를 미리 구현하여 상속
+**init() / destroy() / getServletConfig() / getServletInfo()** 를 미리 구현하여 상속
 * **service()를 별도로 구현**
   * GenericServlet에 구현되어 있지 않음.
   <br>
@@ -139,6 +161,50 @@ init() / destroy() / getServletConfig() / getServletInfo() 를 미리 구현하�
 
 <br>
 ### ServletRequest
+~~~java
+public interface ServletRequest {
+    Object getAttribute(String var1);
+    Enumeration<String> getAttributeNames();
+    String getCharacterEncoding();
+    void setCharacterEncoding(String var1) throws UnsupportedEncodingException;
+    int getContentLength();
+    long getContentLengthLong();
+    String getContentType();
+    ServletInputStream getInputStream() throws IOException;
+    String getParameter(String var1);
+    Enumeration<String> getParameterNames();
+    String[] getParameterValues(String var1);
+    Map<String, String[]> getParameterMap();
+    String getProtocol();
+    String getScheme();
+    String getServerName();
+    int getServerPort();
+    BufferedReader getReader() throws IOException;
+    String getRemoteAddr();
+    String getRemoteHost();
+    void setAttribute(String var1, Object var2);
+    void removeAttribute(String var1);
+    Locale getLocale();
+    Enumeration<Locale> getLocales();
+    boolean isSecure();
+    RequestDispatcher getRequestDispatcher(String var1);
+
+    /** @deprecated */
+    String getRealPath(String var1);
+
+    int getRemotePort();
+    String getLocalName();
+    String getLocalAddr();
+    int getLocalPort();
+    ServletContext getServletContext();
+    AsyncContext startAsync() throws IllegalStateException;
+    AsyncContext startAsync(ServletRequest var1, ServletResponse var2) throws IllegalStateException;
+    boolean isAsyncStarted();
+    boolean isAsyncSupported();
+    AsyncContext getAsyncContext();
+    DispatcherType getDispatcherType();
+}
+~~~
 * 클라이언트의 요청 정보를 다룰 때 사용.
 * getParameter: GET 이나 POST 요청으로 들어온 매개변수 값을 꺼낼 때 사용.
 * getRemoteAddr: 서비스를 요청한 클라이언트의 IP 주소
@@ -154,6 +220,27 @@ init() / destroy() / getServletConfig() / getServletInfo() 를 미리 구현하�
 
 <br>
 ### ServletResponse
+~~~java
+public interface ServletResponse {
+    String getCharacterEncoding();
+    String getContentType();
+    ServletOutputStream getOutputStream() throws IOException;
+    PrintWriter getWriter() throws IOException;
+    void setCharacterEncoding(String var1);
+    void setContentLength(int var1);
+    void setContentLengthLong(long var1);
+    void setContentType(String var1);
+    void setBufferSize(int var1);
+    int getBufferSize();
+    void flushBuffer() throws IOException;
+    void resetBuffer();
+    boolean isCommitted();
+    void reset();
+    void setLocale(Locale var1);
+    Locale getLocale();
+}
+
+~~~
 * 응답과 관련된 기능 제공
 * setContentType: 출력할 데이터의 인코딩 형식과 문자 집합 지정 ("text/plain”)
   * 클라이언트는 지정된 형식에 맞추어 렌더링
