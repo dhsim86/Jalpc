@@ -501,7 +501,7 @@ java.sql 패키지의 기능을 보조하기 위해 만든 확장 패키지.
       maxActive="10"                // Maximum connections.
       maxIdle="3"                   // Maintaining not used connections.
       maxWait="10000"               // The wait time for preparing connection.
-      username="study"              // user name.s
+      username="study"              // user name.
       password="study"              // password.
       driverClassName="com.mysql.jdbc.Driver" // JDBC driver class name.
       url="jdbc:mysql://localhost/studydb"    // DB connection url.
