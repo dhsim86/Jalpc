@@ -69,25 +69,25 @@ Chapter05. MVC Architecture
 <br>
 ![03.png](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/03.png)
 * JspPage
-  * jspInit
+  * **jspInit**
     * JspPage에 생성된 jspInit은 JSP 객체 (JSP로부터 생성된 서블릿 객체)가 생성될 때 호출
       * 자동 생성된 서블릿 코드를 보면 init 호출될 때 **jspInit을 호출**
       * JSP 페이지에서 init 오버라이딩이 아닌 jspInit을 오버라이딩
-  * jspDestory
+  * **jspDestory**
     * JSP 객체가 언로드될 때 호출
-  * _jspService
+  * **_jspService**
     * JSP 페이지가 해야 할 작업이 들어 있는 메서드
-    * 서블릿 컨테이너가 service를 호출하면 service에서는 _jspService 호출
+    * 서블릿 컨테이너가 service를 호출하면 service에서는 **_jspService** 호출
 
 <br>
 ### 5. JSP 객체 분석
 * 서블릿 클래스 이름은 Hello_jsp, 이름 짓는 방식은 서블릿 컨테이너마다 다름
 * Hello_jsp는 HttpJspBase를 상속
   * **HttpJspBase**는 톰캣에서 제공하는 클래스로, **HttpJspPage** 인터페이스 구현 및 **HttpServlet** 클래스 상속받은 클래스
-* _jspService
+* **_jspService**
   * 매개변수는 HttpServletRequest, HttpServletResponse
   * 로컬 변수 중 반드시 존재해야하는 객체 (JSP 내장 객체)
-  * jsp 파일에 생성한 출력문을 그대로 _jspService 메서드에서 구현됨.
+  * jsp 파일에 생성한 출력문을 그대로 **_jspService** 메서드에서 구현됨.
 
 <br>
 ### HttpJspBase
@@ -123,13 +123,13 @@ Chapter05. MVC Architecture
     * 스크립트릿 <% ... %>
       * JSP 페이지 안에 자바 코드 생성시 스크립트릿 태그 (<% %>)안에 작성
       * 서블릿 파일 생성 시 그대로 복사
-      * _jspService 함수 내부에 복사됨
+      * **_jspService** 함수 내부에 복사됨
 
     * JSP 내장 객체
       * JSP에서는 선언없이 바로 사용가능한 9개 객체 정의
       * request, response, pageContext, session, application, config, out, page, exception
 
-      * 스크립트릿 및 표현식 (<%= %>)에서 작성된 자바코드는 _jspService 메서드로 복사될 때 **JSP 내장 객체를 선언한 문장 뒤에 놓임.**
+      * 스크립트릿 및 표현식 (<%= %>)에서 작성된 자바코드는 **_jspService** 메서드로 복사될 때 **JSP 내장 객체를 선언한 문장 뒤에 놓임.**
 
     * 선언문 <%! ... %>
       * 서블릿 클래스의 멤버 (변수나 메서드)를 선언할 때 사용
@@ -138,7 +138,7 @@ Chapter05. MVC Architecture
 
     * 표현식 <%= %>
       * **문자열 출력 때** 사용, out.print()의 인자 값으로 복사됨
-      * _jspService안에 순서대로 복사
+      * **_jspService** 안에 순서대로 복사
   * [https://github.com/dhsim86/java_webdev_workbook/commit/e4aff02d5bd4bda61e6c333ec52d7108e484ac8b](https://github.com/dhsim86/java_webdev_workbook/commit/e4aff02d5bd4bda61e6c333ec52d7108e484ac8b)
 
 <br>
@@ -237,6 +237,7 @@ Chapter05. MVC Architecture
 <br>
 ### JSTL
 * Maven Dependency
+
 ~~~xml
 <!-- JSTL -->
 <dependency>
