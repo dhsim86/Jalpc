@@ -171,8 +171,8 @@ icon: icon-html
   ![01.png](/static/assets/img/blog/web/2017-01-24-java_web_programming_01/01.png)
 
 * 구현
-<br>
-~~~java
+
+~~~xml
 <!-- filters -->
 <filter>
   <filter-name>CharacterEncodingFilter</filter-name>
@@ -189,6 +189,7 @@ icon: icon-html
   <url-pattern>/*</url-pattern>
   </filter-mapping>
 ~~~
+
   * web.xml에서 <filter> 태그 및 <filter-mapping>을 통해 매핑
   * <init-param> 등을 통해 필터 초기화 매개변수를 설정할 때, FilterConfig 객체를
 통해 꺼낼 수 있음. config.getInitParameter("")
