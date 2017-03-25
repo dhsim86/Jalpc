@@ -35,6 +35,7 @@ icon: icon-html
   * 서블릿을 대신하여 CGI 규칙에 따라 웹 서버와 교환
   * 개발자는 **서블릿 컨테이너와 서블릿의 규칙** 을 알아야 함.
       * JavaEE 기술 사양에 포함되어 있음
+      <br>
        ![00.png](/static/assets/img/blog/web/2017-01-24-java_web_programming_00/00.png)
 
 <br>       
