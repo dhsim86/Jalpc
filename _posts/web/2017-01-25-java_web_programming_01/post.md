@@ -30,6 +30,29 @@ icon: icon-html
 ~~~
 <br>
 ### Database 연결
+
+~~~java
+@Override
+ public void service(ServletRequest request, ServletResponse response)
+  throws ServletException, IOException {
+    Connection conn = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+
+    try {
+      DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+      conn = DriverManager.getConnection("jdbc:mysql://localhost/studydb?useUnicode=true&characterEncoding=UTF-8",
+      "study", "study");
+
+      stmt = conn.createStatement();
+      rs = stmt.executeQuery(
+        "select mno, mname, email, cre_date" +
+        " from members" +
+        " order by mno asc"
+        );
+        ...
+~~~
+
 * DriverManager를 이용, **java.sql.Driver** 인터페이스 구현체 등록
   * mysql JDBC driver는 **com.mysql.jdbc.Driver** 클래스
   * DriverManager는 이 인터페이스에서 connect 메서드를 통해 DB 연결 수행
@@ -53,7 +76,7 @@ icon: icon-html
 * java.sql.Connection: DB 접속 정보를 다룸
 
   * createStatement, prepareStatement, prepareCall: SQL문을 실행하는 객체 리턴
-  -> java.sql.Statement 인터페이스의 구현체
+  -> **java.sql.Statement** 인터페이스의 구현체
 
   * commit / rollback: 트랜잭션 처리
 
@@ -68,7 +91,7 @@ icon: icon-html
   * execute: select 뿐만 아닌 DML / DDL 모두 실행 가능
   * executeBatch: addBatch 메서드로 등록한 여러 개의 SQL문을 한 번에 처리.
   * 리턴 값: 질의 결과인 java.sql.ResultSet 인터페이스의 구현체 리턴
-
+<br>
 * java.sql.ResultSet: SQL 질의 결과
   * first: 서버에서 첫 번째 레코드를 리턴
   * last: 서버에서 마지막 레코드 리턴
@@ -79,7 +102,7 @@ icon: icon-html
   * updateXXX: 레코드의 특정 컬럼의 값을 변경
   * deleteRow: 현재 레코드를 지움
   * [https://github.com/dhsim86/java_webdev_workbook/commit/2fcf87872e851f78aeafa139b3f9613a3637b183](https://github.com/dhsim86/java_webdev_workbook/commit/2fcf87872e851f78aeafa139b3f9613a3637b183)
-
+<br>
 * java.sql.PreparedStatement
   * 반복적인 질의를 하거나 입력 매개변수가 많을 때 유용.
     * SQL문을 미리 준비해두어 컴파일해놓고, 입력 매개변수 값만 추가하여 전송
@@ -89,7 +112,7 @@ icon: icon-html
   * update할 때 executeUpdate 호출
 
 * SQL문을 서버로 보내는 것인가?
-  * 로컬에서 SQL문을 실행하는 것이 아니라 JDBC API에서 SQL문을 보내고 결과를 받는 역할
+  * 로컬에서 **SQL문을 실행하는 것이 아니라 JDBC API에서 SQL문을 보내고 결과를 받는 역할**
   * DB 전용 프로토콜에 맞게 변환하여 보내고 받음
 
 <br>
@@ -148,16 +171,34 @@ icon: icon-html
   ![01.png](/static/assets/img/blog/web/2017-01-24-java_web_programming_01/01.png)
 
 * 구현
+<br>
+~~~java
+<!-- filters -->
+<filter>
+  <filter-name>CharacterEncodingFilter</filter-name>
+  <filter-class>Lesson04.CharacterEncodingFilter</filter-class>
+  <init-param>
+    <param-name>encoding</param-name>
+    <param-value>UTF-8</param-value>
+  </init-param>
+</filter>
+
+<!-- filter mapping -->
+  <filter-mapping>
+  <filter-name>CharacterEncodingFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+  </filter-mapping>
+~~~
   * web.xml에서 <filter> 태그 및 <filter-mapping>을 통해 매핑
   * <init-param> 등을 통해 필터 초기화 매개변수를 설정할 때, FilterConfig 객체를
 통해 꺼낼 수 있음. config.getInitParameter("")
-  * init()
+  * **init()**
     * 필터 객체가 생성되고 나서 준비 작업을 위해 한 번 호출됨
-  * doFilter()
+  * **doFilter()**
     * 필터와 연결된 URL에 대한 요청이 들어올 때 항상 호출
-    * nextFilter 는 다음 필터를 가리킴 (nextFilter.doFilter 호출)
-    * 서블릿 실행되기 전에 작업이 있으면 doFilter 호출 전에 작성
-    * 서블릿 실행된 후 작업이 있으면 doFilter 호출 후에 작성
+    * **nextFilter** 는 다음 필터를 가리킴 (nextFilter.doFilter 호출)
+    * 서블릿 실행되기 전에 작업이 있으면 **doFilter 호출 전에** 작성
+    * 서블릿 실행된 후 작업이 있으면 **doFilter 호출 후에** 작성
   * destroy()
     * 서블릿 컨테이너가 웹 애플리케이션을 종료하기 전에 필터들에 destroy 호출
   * [https://github.com/dhsim86/java_webdev_workbook/commit/19bc501f927555bee31be1502059ce67be125bdf](https://github.com/dhsim86/java_webdev_workbook/commit/19bc501f927555bee31be1502059ce67be125bdf)
