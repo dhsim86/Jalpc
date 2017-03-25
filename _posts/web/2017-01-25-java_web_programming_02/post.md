@@ -189,6 +189,8 @@ icon: icon-html
 * JSP는 준비한 데이터를 가지고 웹 브라우저로 출력할 화면을 만듬
 * JSP에 데이터를 준비하기 위해 **값 객체 (VO)** 가 필요
 
+---
+
 ~~~java
 @Override
 protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -209,12 +211,13 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     * **forward**
       * 서블릿으로 제어권 위임. 돌아오지 않음.
       * jsp에서 jsp로 포워드 위임 <jsp:forward page=".jsp"/>
-    * **include*8
+    * **include**
       * 제어권을 넘기면 그 서블릿이 작업 후 다시 제어권이 돌아옴
       * jsp에서 jsp로 인클루딩 위임 <jsp:include page=".jsp"/>
       <br>
       ![05.png](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/05.png)
 
+<br>
   * ServletRequest
     * 클라이언트 요청을 다루는 기능외에, **어떤 값을 보관하는 보관소 기능도 지님.**
     * setAttribute
