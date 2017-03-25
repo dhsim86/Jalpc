@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Java Web Programming Summary Note: 00"
+title:  "Java Web Programming Summary Note 00: Servlet Programming"
 date:   2017-01-24
-desc: "Java Web Programming Summary Note: 00"
+desc: "Java Web Programming Summary Note 00: Servlet Programming"
 keywords: "java, web, server programming"
 categories: [Web]
 tags: [java, web, server programming]
