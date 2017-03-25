@@ -420,3 +420,112 @@ public class ContextLoaderListener implements ServletContextListener {
 * DB Connection Pool
   * SQL 작업할 때마다 DB Connection을 생성하면 사용자 인증 / 권한 검사 등 실행속도가 느려짐
   * 이를 개선하기 위해 DB Connection Pool 생성
+  * [https://github.com/dhsim86/java_webdev_workbook/commit/1c860a3c3bbaa57728f4685d5213ebb3fc0fbcd0](https://github.com/dhsim86/java_webdev_workbook/commit/1c860a3c3bbaa57728f4685d5213ebb3fc0fbcd0)
+
+---
+
+### DataSource와 JNDI
+
+* **javax.sql** 패키지
+java.sql 패키지의 기능을 보조하기 위해 만든 확장 패키지.
+  * 서버 쪽 데이터 소스에 대한 접근을 쉽게 하고, 좀 더 다양한 방법으로 데이터를 다룰 수 있는 API를 제공
+
+* **javax.sql** 의 주요기능
+  * DriverManager를 대체할 수 있는 DataSource 인터페이스 제공
+  * Connection 및 Statement 풀링
+  * 분산 트랜잭션 처리
+  * Rowsets의 지원
+
+<br>
+### DataSource
+
+* DriverManager를 통해 DB Connection을 얻는 것보다 더 좋은 기법 제공
+  * DataSource는 서버에서 관리 -> DB나 JDBC 드라이버가 변경되어도 **코드 변경** 없음.
+    * DataSource는 Tomcat이 관리
+  * Connection과 Statement 객체를 풀링 가능
+    * 자체적으로 커넥션풀 기능을 구현
+  * 분산 트랜잭션 처리 가능
+
+![10.jpg](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/10.jpg)
+
+* pom.xml 추가
+
+~~~xml
+<dependency>
+  <groupId>commons-dbcp</groupId>
+  <artifactId>commons-dbcp</artifactId>
+  <version>1.4</version>
+</dependency>
+
+<dependency>
+  <groupId>commons-pool</groupId>
+  <artifactId>commons-pool</artifactId>
+  <version>1.6</version>
+</dependency>
+~~~
+
+[https://github.com/dhsim86/java_webdev_workbook/commit/8e1934ba0664c087fbbd0f273a18ba8948b9fee5](https://github.com/dhsim86/java_webdev_workbook/commit/8e1934ba0664c087fbbd0f273a18ba8948b9fee5)
+
+* DataSource가 만들어주는 Connection은 DriverManager가 만드는 Connection을 **한 번 랩핑한** 객체
+
+<br>
+### JNDI (Java Naming and Directory Interface API)
+
+* 디렉토리 서비스에 접근하는데 필요한 API
+  * 애플리케이션인 이 API를 사용, 서버의 자원 (데이터베이스 서버, 메시징 시스템과 같은 연결 제공 객체) 검색
+  * 자원을 서버에 등록할 때 고유한 JNDI 이름 등록
+
+  | JNDI Name | Resource |
+  | ---------- | :--------- |
+  | java:comp/env | 응용 프로그램 환경 항목 |
+  | java:comp/env/jdbc | JDBC DataSource |
+  | java:comp/ejb | EJB 컴포넌트 |
+  | java:comp/UserTransaction | UserTransaction 객체 |
+  | java:comp/env/mail | JavaMail 연결 객체 |
+  | java:comp/env/url | URL 정보 |
+  | java:comp/env/jms | JMS 연결 객체 |
+
+* 서블릿 컨테이너 관리하는 DataSource를 사용하기 위해 서버 설정
+-> Tomcat의 경우, context.xml 및 web.xml 을 수정
+
+~~~xml
+<!-- Context.xml -->
+
+<Context>
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <Resource
+      name="jdbc/studydb"           // JNDI name
+      auth="Container"              // The author of resource
+      type="javax.sql.DataSource"   // The type of resource
+      maxActive="10"                // Maximum connections.
+      maxIdle="3"                   // Maintaining not used connections.
+      maxWait="10000"               // The wait time for preparing connection.
+      username="study"              // user name.s
+      password="study"              // password.
+      driverClassName="com.mysql.jdbc.Driver" // JDBC driver class name.
+      url="jdbc:mysql://localhost/studydb"    // DB connection url.
+      closeMethod="close" />        // close method name. When web application closed, it will invoked.
+</Context>
+~~~
+
+~~~xml
+<!-- web.xml -->
+
+<resource-ref>
+  <res-ref-name>jdbc/studydb</res-ref-name> <!-- JNDI nae -->
+  <res-type>javax.sql.DataSource</res-type> <!-- Return type -->
+  <res-auth>Container</res-auth> <!-- Author of resource -->
+</resource-ref>
+~~~
+
+~~~java
+// Get JNDI Resource.
+
+InitialContext initialContext = new InitialContext();
+
+DataSource dataSource = (DataSource)initialContext.lookup("java:comp/jdbc/studydb");
+
+MemberDao memberDao = new MemberDao();
+memberDao.setDataSource(dataSource);
+...
+~~~
