@@ -171,4 +171,4 @@ init() / destroy() / getServletConfig() / getServletInfo() 를 미리 구현하�
 ### @WebServlet 애노테이션
 * 클래스위의 @WebServlet("") 으로 서블릿 배치 정보 설정 가능.
   * web.xml 에서 <servlet>…</servlet>, <servlet-mapping></servlet-mapping> 생략
-* [https://github.com/dhsim86/java_webdev_workbook/commit/a700245c92f62e6f842c97a1e05bec5704eb1362](https://github.com/dhsim86/java_webdev_workbook/commit/3de1f6b204f126e1b665d09050b50e4c3c7aaf72)
+* [https://github.com/dhsim86/java_webdev_workbook/commit/a700245c92f62e6f842c97a1e05bec5704eb1362](https://github.com/dhsim86/java_webdev_workbook/commit/a700245c92f62e6f842c97a1e05bec5704eb1362)
