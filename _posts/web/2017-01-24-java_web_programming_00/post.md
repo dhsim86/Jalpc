@@ -12,27 +12,28 @@ icon: icon-html
 > Java Web Development Workbook Chapter. 03
 
 ### Servlet Programming
-  서블릿 기술을 이용해 웹 애플리케이션 개발
+**서블릿** 기술을 이용해 웹 애플리케이션 개발
+
 <br>
 ### CGI
 * 웹 애플리케이션은 웹 서버가 프로그램 찾아서 실행 및 결과를 리턴받음.
-* 웹 서버는 그 결과를 HTTP 형식에 맞추어 웹 브라우저로 리턴.
-* 웹 서버와 프로그램 사이의 데이터를 주고 받는 규칙
+* 웹 서버는 그 결과를 **HTTP 형식** 에 맞추어 웹 브라우저로 리턴.
+* CGI: 웹 서버와 프로그램 사이의 데이터를 주고 받는 규칙
   * Common Gateway Interface
 <br>
 ### CGI Program
-* 웹 서버에 의해 실행되며, CGI 규칙에 따라 웹 서버와 데이터를 주고받는 프로그램
+* 웹 서버에 의해 실행되며, **CGI 규칙** 에 따라 웹 서버와 데이터를 주고받는 프로그램
 * Compile Language: C / C++ / Java
 * Script Language: Perl, PHP, Python, VBScript
 
 <br>
 ### Java CGI Program
 * Compile 방식, Servlet
-* 웹 서버와 직접 데이터를 주고 받지 않으며, 전문 프로그램, 서블릿 컨테이너 (ex. Tomcat) 에 의해 관리
+* **웹 서버와 직접 데이터를 주고 받지 않으며**, 전문 프로그램, 서블릿 컨테이너 (ex. Tomcat) 에 의해 관리
 * 서블릿 컨테이너
   * 서블릿의 생성 및 실행, 소멸 관리
   * 서블릿을 대신하여 CGI 규칙에 따라 웹 서버와 교환
-  * 개발자는 서블릿 컨테이너와 서블릿의 규칙을 알아야 함.
+  * 개발자는 **서블릿 컨테이너와 서블릿의 규칙** 을 알아야 함.
       * JavaEE 기술 사양에 포함되어 있음
        ![00.png](/static/assets/img/blog/web/2017-01-24-java_web_programming_00/00.png)
 
@@ -71,7 +72,7 @@ icon: icon-html
 <br>
 ### javax.servlet.Servlet interface
 
-* 서블릿 클래스는 javax.servlet.Servlet 인터페이스를 구현
+* 서블릿 클래스는 **javax.servlet.Servlet** 인터페이스를 구현
 * 서블릿 컨테이너가 서블릿에 대해 호출할 메서드를 정의한 것이 Servlet 인터페이스
 * 서블릿의 생명 주기 메서드
   * init
@@ -102,10 +103,10 @@ icon: icon-html
 <br>
 ### 서블릿 구동 절차
 1. 클라이언트 요청 -> 서블릿 컨테이너는 서블릿 검색
-2. 서블릿이 없으면 서블릿 클래스 로딩, 인스턴스 준비 및 생성자 및 init() 호출
-3. 클라이언트의 요청을 처리하는 service() 호출
+2. 서블릿이 없으면 서블릿 클래스 로딩, 인스턴스 준비 및 생성자 및 **init()** 호출
+3. 클라이언트의 요청을 처리하는 **service()** 호출
 4. service()에서 만든 결과를 HTTP 프로토콜에 맞추어 클라이언트에 response.
-5. 시스템 운영자가 서블릿 컨테이너나 웹 애플리케이션을 종료하면 생성된 모든 서블릿에 대해 destroy() 호출
+5. 시스템 운영자가 서블릿 컨테이너나 웹 애플리케이션을 종료하면 생성된 모든 서블릿에 대해 **destroy()** 호출
 
 <br>
 ### 서블릿 인스턴스
@@ -127,10 +128,10 @@ icon: icon-html
 
 <br>
 ### GenericServlet
-* Servlet 인터페이스를 구현할 때의 문제점인 "모든 추상 메서드를 구현해야한다" 라는 단점을 해소하기 위해 GenericServlet 추상 클래스 사용
+* Servlet 인터페이스를 구현할 때의 문제점인 "모든 추상 메서드를 구현해야한다" 라는 단점을 해소하기 위해 **GenericServlet** 추상 클래스 사용
 * 하위 클래스에게 공통의 필드와 메서드를 상속.
 init() / destroy() / getServletConfig() / getServletInfo() 를 미리 구현하여 상속
-* service()를 별도로 구현
+* **service()를 별도로 구현**
   * GenericServlet에 구현되어 있지 않음.
   <br>
   ![01.png](/static/assets/img/blog/web/2017-01-24-java_web_programming_00/01.png)
@@ -159,7 +160,7 @@ init() / destroy() / getServletConfig() / getServletInfo() 를 미리 구현하�
 기본값: ISO-8851-1
 * getWriter: 출력 스트림 객체 반환
 -> 이미지나 동영상과 같은 바이너리 데이터를 출력: getOutputStream 사용
-* https://github.com/dhsim86/java_webdev_workbook/commit/3de1f6b204f126e1b665d09050b50e4c3c7aaf72
+* [https://github.com/dhsim86/java_webdev_workbook/commit/3de1f6b204f126e1b665d09050b50e4c3c7aaf72](https://github.com/dhsim86/java_webdev_workbook/commit/3de1f6b204f126e1b665d09050b50e4c3c7aaf72)
 
 <br>
 ### Servlet에 데이터 전달 예제
@@ -170,4 +171,4 @@ init() / destroy() / getServletConfig() / getServletInfo() 를 미리 구현하�
 ### @WebServlet 애노테이션
 * 클래스위의 @WebServlet("") 으로 서블릿 배치 정보 설정 가능.
   * web.xml 에서 <servlet>…</servlet>, <servlet-mapping></servlet-mapping> 생략
-* https://github.com/dhsim86/java_webdev_workbook/commit/a700245c92f62e6f842c97a1e05bec5704eb1362
+* [https://github.com/dhsim86/java_webdev_workbook/commit/a700245c92f62e6f842c97a1e05bec5704eb1362](https://github.com/dhsim86/java_webdev_workbook/commit/3de1f6b204f126e1b665d09050b50e4c3c7aaf72)
