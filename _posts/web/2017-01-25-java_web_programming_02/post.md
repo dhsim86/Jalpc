@@ -324,3 +324,99 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
   * DB나 파일 / 메모리 등을 이용, 애플리케이션 데이터를 CRUD 하는 역할
   * 하나의 DB 테이블이나 뷰에 대응
 * [https://github.com/dhsim86/java_webdev_workbook/commit/d616b7a0b1e963dd41611aafb65aaec78dd81486](https://github.com/dhsim86/java_webdev_workbook/commit/d616b7a0b1e963dd41611aafb65aaec78dd81486)
+
+<br>
+### ServletContextListener
+
+* 리스너: 서블릿 컨테이너는 웹 애플리케이션의 상태를 모니터링할 수 있도록 **알림** 기능 제공.
+  * 규칙에 따라 객체를 만들어 DD파일 (web.xml)에 등록
+
+<br>
+![09.jpg](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/09.jpg)
+
+* 특정 사건이 발생할 때 서블릿 컨테이너는 리스너의 메소드를 호출
+
+<br>
+### ServletContextListener
+
+웹 애플리케이션이 시작하거나 종료할 때 발생
+-> 서블릿 컨테이너는 **javax.servlet.ServletContextListener** 의 메소드 호출
+
+<br>
+#### DAO 공유
+
+~~~java
+MemberDao memberDao = new MemberDao();
+memberDao.setConnection((Connection) sc.getAttribute("conn"));
+
+Member member = new Member()
+    .setEmail(request.getParameter("email"))
+    .setPassword(request.getParameter("password"))
+    .setName(request.getParameter("name"));
+
+int result = memberDao.insert(member);
+~~~
+
+* 서블릿이 요청을 처리할 때마다 매번 DAO 인스턴스를 생성
+-> 많은 garbage가 생성, 실행 시간이 길어짐.
+
+* 서블릿 간의 공유: 여러 서블릿이 사용하는 객체를 ServletContext에 저장
+  * DAO 객체 준비: 웹 애플리케이션 이벤트 (생성) 발생시 객체 생성
+
+~~~java
+@WebListener
+public class ContextLoaderListener implements ServletContextListener {
+
+    private Connection conn;
+
+    @Override
+    public void contextInitialized(ServletContextEvent event) {
+
+        try {
+            ServletContext sc = event.getServletContext();
+
+            Class.forName(sc.getInitParameter("driver"));
+            conn = DriverManager.getConnection(
+                sc.getInitParameter("url"),
+                sc.getInitParameter("username"),
+                sc.getInitParameter("password")
+            );
+
+            MemberDao memberDao = new MemberDao();
+            memberDao.setConnection(conn);
+
+            sc.setAttribute("memberDao", memberDao);
+        }
+        catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent event) {
+        try {
+            conn.close();
+        } catch (Exception e) {
+
+        }
+    }
+}
+~~~
+
+* 위 코드같이 웹 애플리케이션이 시작되면 **contextInitialized** 가 호출되어 memberDao 객체를 준비할 것이다.
+* [https://github.com/dhsim86/java_webdev_workbook/commit/0f6202d01aac88ed95e3b53e128bdd75fd1771ce](https://github.com/dhsim86/java_webdev_workbook/commit/0f6202d01aac88ed95e3b53e128bdd75fd1771ce)
+
+<br>
+### DB Connection Pool
+
+* DB Connection 객체를 여러 개 생성하여 풀(pool)에 담아놓고 필요할 때 꺼내쓰는 방식
+* 풀링: 자주 쓰는 객체를 미리 만둘어두고, 필요할 때마다 꺼내 쓰고 반납하는 방식
+
+* 하나의 DB Connection 사용할 때 문제점
+  * DB 작업하다 예외가 발생시 다시 이전 상태로 돌릴 필요가 있음. **rollback**
+  * 롤백할 경우에 다른 DAO가 작업한 것까지 되돌려짐
+  -> 롤백할 때는 자기 자신 것만 이전 상태로 돌아가야 됨.
+
+* DB Connection Pool
+  * SQL 작업할 때마다 DB Connection을 생성하면 사용자 인증 / 권한 검사 등 실행속도가 느려짐
+  * 이를 개선하기 위해 DB Connection Pool 생성
