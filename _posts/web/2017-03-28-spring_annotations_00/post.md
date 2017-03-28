@@ -77,6 +77,7 @@ public @interface Controller {
 이 **@Controller** annotation으로 선언된 클래스의 메서드에 다음과 같이 특정 타입이나 annotation을 사용해 자동 매핑하거나 특정 정보에 접근할 수 있다.
 
 ---
+<br>
 | 파라미터 타입 | 설명 |
 | ---------- | :--------- |
 | HttpServletRequest, HttpServletResponse, HttpSession | Servlet API |
@@ -231,6 +232,7 @@ public String addProduct(HttpServletRequest request,
 }
 ~~~
 ---
+<br>
 | 리턴 타입 | 설명 |
 | ---------- | :--------- |
 | ModelAndView | View / Model 정보를 담고있는 ModelAndView 타입의 객체 |
