@@ -195,7 +195,7 @@ public class SpringbootUsepropertyApplication {
 <br>
 #### 아무것도 주지 않았을 때 (**java -jar app.jar**)
 
-다음과 같이 아무 옵션도 주지 않았을 때 **propertyHello** 를 제외한 나머지 속성 값들은 **application.properties** 에 있는 디폴트 속성 값이 설정된 것을 알 수 있다. **spring.profiles.active=local** 로 설정하였기 때문에 디폴트 프로파일리 **local** 로 설정되어 **application-local.properties** 에 있는 **propertyHello** 값이 설정된 것이다.
+다음과 같이 아무 옵션도 주지 않았을 때 **propertyHello** 를 제외한 나머지 속성 값들은 **application.properties** 에 있는 디폴트 속성 값이 설정된 것을 알 수 있다. **spring.profiles.active=local** 로 설정하였기 때문에 디폴트 프로파일이 **local** 로 설정되어 **application-local.properties** 에 있는 **propertyHello** 값이 설정된 것이다.
 <br>
 ![04.png](/static/assets/img/blog/web/2017-03-28-spring_boot_profile/04.png)
 
@@ -253,6 +253,22 @@ property:
 ~~~
 
 > .properties 파일과는 다르게 yml 파일로 작성하면 각 프로퍼티 간에 계층화시켜 작성할 수 있다는 장점이 있다.
+
+<br>
+### 프로파일별 디렉토리 사용
+
+**src/main/resource** 에 두는 것이 아니라 이 디렉토리 안에 프로파일 별로 디렉토리를 생성하고 그 안에 속성을 담은 파일을 두고 싶을 수도 있다.
+<br>
+![06.png](/static/assets/img/blog/web/2017-03-28-spring_boot_profile/06.png)
+
+각 프로파일 디렉토리 (local, dev, production)에는 각 프로파일마다 필요한 값만 설정되어 있고 profile 디렉토리에 있는 application.properties에는 공통 속성이 있다고 했을 때 다음과 같이 jar 파일을 실행시킬 때 **--spring-config.location** 을 이용하여 프로파일 별로 properties 파일을 다르게 로드하면 된다.
+
+**java -jar useproperty-0.0.1-SNAPSHOT.jar --spring.config.location=classpath:/profiles/application.properties,classpath:/profiles/local/application.properties**
+
+> --spring.config.location에는 properties 파일을 여러 개 줄 수 있는데, 각 properties 파일에 같은 속성에 대한 값이 있다면 **나중에 오는 properties 파일에 있는 값으로 오버라이드 된다.**
+이런 식으로 공통 속성이 있는 properties 파일을 먼저 로드하고 프로파일 별 properties 파일은 나중에 로드함으로써 각 프로파일 별 속성을 다르게 줄 수 있다.
+
+> 이 옵션을 사용할 때 각 파일 path 간에 빈칸을 주면 안된다.
 
 [spring_boot_structuring_code]: http://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-structuring-your-code.html
 [spring_boot_serving_static]: https://spring.io/blog/2013/12/19/serving-static-web-content-with-spring-boot
