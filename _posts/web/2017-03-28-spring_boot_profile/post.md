@@ -270,6 +270,15 @@ property:
 
 > 이 옵션을 사용할 때 각 파일 path 간에 빈칸을 주면 안된다.
 
+이 옵션을 jar 파일을 실행할 때 주기 싫고 자동으로 주고 싶다면 **환경변수, SPRING_CONFIG_LOCATION** 를 활용하자.
+이 것을 이용하면, 각 환경마다 미리 환경 변수를 설정해놓고 아무 옵션없이 알맞는 프로파일을 로드하는 것이 가능해지므로, 실행 스크립트 같은 것을 별도로 만들 필요 없다.
+
+* \*nix system
+**export SPRING_CONFIG_LOCATION=classpath:/profiles/application.properties,classpath:/profiles/local/application.properties**
+
+* Windows OS
+**set SPRING_CONFIG_LOCATION=classpath:/profiles/application.properties,classpath:/profiles/local/application.properties**
+
 [spring_boot_structuring_code]: http://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-structuring-your-code.html
 [spring_boot_serving_static]: https://spring.io/blog/2013/12/19/serving-static-web-content-with-spring-boot
 [spring_boot_best_directory]: http://stackoverflow.com/questions/40902280/what-is-the-recommended-project-structure-for-spring-boot-rest-projects
