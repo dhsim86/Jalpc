@@ -78,7 +78,6 @@ public @interface Controller {
 
 ---
 
-<br>
 | 파라미터 타입 | 설명 |
 | ---------- | :--------- |
 | HttpServletRequest, HttpServletResponse, HttpSession | Servlet API |
@@ -234,7 +233,6 @@ public String addProduct(HttpServletRequest request,
 ~~~
 ---
 
-<br>
 | 리턴 타입 | 설명 |
 | ---------- | :--------- |
 | ModelAndView | View / Model 정보를 담고있는 ModelAndView 타입의 객체 |
