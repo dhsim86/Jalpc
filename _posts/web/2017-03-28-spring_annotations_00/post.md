@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Spring annotations 00"
+title:  "Spring annotations: 00"
 date:   2017-03-28
-desc: "Spring annotations 00"
+desc: "Spring annotations: 00"
 keywords: "spring, spring boot, server programming"
 categories: [Web]
 tags: [spring, spring boot]
