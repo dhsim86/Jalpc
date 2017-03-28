@@ -11,6 +11,8 @@ icon: icon-html
 
 # Spring Annotations: 00
 
+> 원본 글: [http://noritersand.tistory.com/156][original_url]
+
 <br>
 ## @Component
 
@@ -336,3 +338,6 @@ public void addView() {
 #### @ResponseBody annotation
 
 해당 annotation이 붙어 있을 경우, **HTTP ResponseBody** 로 전송한다.
+
+
+[original_url]: http://noritersand.tistory.com/156
