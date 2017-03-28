@@ -139,7 +139,7 @@ public @interface Autowired {
 ...
 ~~~
 
-이 annotation을 사용하려면 xml에 다음과 같이 **AutowiredAnnotationBeanPostProcess** 빈을 등록해야 하지만 **@Required** annotation 때와 마찬가지로 **annotation-config** 태그를 추가하면 사용할 수 있다.
+이 annotation을 사용하려면 xml에 다음과 같이 **AutowiredAnnotationBeanPostProcessor** 빈을 등록해야 하지만 **@Required** annotation 때와 마찬가지로 **annotation-config** 태그를 추가하면 사용할 수 있다.
 
 ~~~xml
 <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
@@ -326,6 +326,16 @@ public class ExController{
         return "restful/result";
     }
 }
+~~~
+
+---
+
+**annotation-config** 태그는 annotation과 관련하여 아래 **BeanPostProcess** 를 등록하는 기능을 담당한다.
+~~~xml
+<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanpostProcessor" />
+<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+<bean class="org.springframework.beans.factory.annotation.CommonAnnotationBeanPostProcessor" />
+<bean class="org.springframework.beans.factory.annotation.ConfigurationClassPostProcessor" />
 ~~~
 
 [original_url]: http://noritersand.tistory.com/156

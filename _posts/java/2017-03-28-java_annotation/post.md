@@ -223,4 +223,31 @@ public class StoredObject {
 
 이렇게 구현함으로써, 자바 리플렉션 및 annotation을 통해 한 번 구현으로 여러 타입의 데이터를 처리할 수 있는 것이다.
 
+---
+## Meta Annotation에 대한 부가적인 설명
+
+**@Target**
+
+* ElementType.Type: 클래스, 인터페이스, enum 선언부
+* ElementType.CONSTRUCTOR: 생성자 선언부
+* ElementType.LOCAL_VARIABLE: 지역 변수 선언부
+* ElementType.METHOD: 메소드 선언부
+* ElementType.PACKAGE: 패키지 선언부
+* ElementType.PARAMETER: 파라미터 선언부
+
+**@Retention**
+
+* RetentionPolicy.RUNTIME: VM에서 유지 (리플렉션을 통해 검색 가능해짐)
+* RetentionPolicy.SOURCE: 컴파일 시에 class 파일에는 추가되지 않는다.
+* RetentionPolicy.CLASS: class 파일 안에는 annotation이 추가되지만 VM에서는 사용되지 않는다.
+
+**@Documented**
+
+* 해당 annotation을 **Javadoc** 에 포함시킨다.
+
+**@Inherited**
+
+* 서브 클래스가 부모 클래스의 annotation을 상속받을 수 있도록 한다.
+
+
 [original_site]: http://www.nextree.co.kr/p5864/
