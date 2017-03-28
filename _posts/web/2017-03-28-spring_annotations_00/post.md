@@ -9,12 +9,21 @@ tags: [spring, spring boot]
 icon: icon-html
 ---
 
-# Spring Annotations 00
+# Spring Annotations: 00
 
 <br>
 ## @Component
 
 package: org.springframework.stereotype
+~~~java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Component {
+
+	String value() default "";
+}
+~~~
 
 **\<context:component-scan\>** 태그를 application context xml 파일에 다음과 깉이 추가하면 해당 annotation 이 적용된 모든 클래스를 스프링 빈으로 등록한다.
 ~~~xml
@@ -66,7 +75,8 @@ public @interface Controller {
 위와 같이 **@Component** annotation이 선언되어 있는 덕분에, **@Controller** annotation이 선언된 클래스도 스프링 빈으로 등록될 수 있는 것이다.
 
 이 **@Controller** annotation으로 선언된 클래스의 메서드에 다음과 같이 특정 타입이나 annotation을 사용해 자동 매핑하거나 특정 정보에 접근할 수 있다.
-<br>
+
+---
 | 파라미터 타입 | 설명 |
 | ---------- | :--------- |
 | HttpServletRequest, HttpServletResponse, HttpSession | Servlet API |
@@ -134,11 +144,193 @@ public String deleteProduct(@RequestParam("productNo") String productNo)
 ~~~
 
 <br>
-#### Servlet API의 HttpServletRequest, HttpServletResponse, HttpSession
+#### java.util.Map 또는 org.springframework.ui.Model / org.springframework.ui.ModelMap
+**View** 로 데이터를 전달해야 하는 경우, 위 타입의 파라미터를 정의하고, 메소드 내부에서 **View** 로 전달할 데이터를 추가
+
 ~~~java
-@RequestParam(params = "param=add")
-public String addProduct(HttpServletRequest request, HttpServletResponse response, HttpSession session)
-  throws Exception {
-    ...
+@RequestMapping("/getProduct.do")
+public String getProduct(@RequestParam("productNo") String productNo, Map map) {
+  Product product = productService.getProduct(productNo);
+  map.put("product", product);
+
+  return "/WEB-INF/jsp/viewProduct.jsp";
 }
 ~~~
+~~~java
+@RequestMapping("/getProduct.do")
+public String getProduct(@RequestParam("productNo") String productNo, Model model) {
+  Product product = productService.getProduct(productNo);
+  model.addAttribute("product", product);
+
+  return "/WEB-INF/jsp/viewProduct.jsp";
+}
+~~~
+~~~java
+@RequestMapping("/getProduct.do")
+public String getProduct(@RequestParam("productNo") String productNo, ModelMap modelMap) {
+  Product product = productService.getProduct(productNo);
+  modelMap.addAttribute("product", product);
+
+  return "/WEB-INF/jsp/viewProduct.jsp";
+}
+~~~
+
+<br>
+#### Command 또는 form 객체
+
+**HTTP Request로 전달된 parameter를 binding** 한 객체로, **View** 에서 사용가능하고, **@SessionAttribute** 를 통해 session에 저장되어 관리될 수 있다.
+
+~~~java
+@RequestMapping("/addProduct.do")
+public String updateProduct(Product product, SessionStatus status)
+        throws Exception {
+    // 여기서 'product'가 Command(/form) 객체이다.
+    return "/listProduct.do";
+}
+
+@RequestMapping("/addProduct.do")
+public String updateProduct(@ModelAttribute("updatedProduct") Product product,
+        SessionStatus status) throws Exception {
+    // 여기서 'updatedProduct'라는 이름의 'product'객체가 Command(/form) 객체이다.
+    return "/listProduct.do";
+}
+~~~
+
+<br>
+#### org.springframework.validation.Errors 또는 org.springframework.validation.BindingResult
+
+바로 이전의 입력파라미터인 **Command 또는 form 객체의 validation 결과 값을 저장하는 객체** 로 해당 command 또는 form 객체 바로 다음에 위치해야 함에 유의하도록 한다.
+
+~~~java
+@RequestMapping(params = "param=add")
+public String addProduct(HttpServletRequest request,
+        Product product, BindingResult result, SessionStatus status) throws Exception {        
+    new ProductValidator().validate(product, result);
+    if (result.hasErrors()) {
+        return "/jsp/annotation/sales/product/productForm.jsp";
+    } else {
+        // 중략
+        return "/listProduct.do";
+    }
+}
+~~~
+
+<br>
+#### org.springframework.web.bind.support.SessionStatus
+
+**폼 처리가 완료되었을 때 status를 처리** 하기 위해서 argument로 설정. SessionStatus.setComplete()를 호출하면 컨트롤러 클래스에 @SessionAttributes로 정의된 Model객체를 session에서 지우도록 이벤트를 발생시킨다.
+
+~~~java
+@RequestMapping(params = "param=add")
+public String addProduct(HttpServletRequest request,
+        Product product, BindingResult result, SessionStatus status) {
+    // 중략
+    productService.addProduct(product);
+    status.setComplete();
+    return "/listProduct.do";
+}
+~~~
+---
+| 리턴 타입 | 설명 |
+| ---------- | :--------- |
+| ModelAndView | View / Model 정보를 담고있는 ModelAndView 타입의 객체 |
+| Model | View에 전달할 객체 정보를 담는 Model 타입의 객체를 리턴. View 이름은 요청 URL로부터 결정된다. |
+| Map, ModelMap | View에 전달할 객체 정보를 담는 Map 혹은 ModelMap을 환리턴. View 이름은 요청 URL로부터 결정된다. |
+| String | View 이름을 리턴 |
+| View 객체 | View 객체를 직접 리턴. 해당 View 객체를 이용해서 View를 생성 |
+| void | 메서드가 ServletResponse나 HttpServletResponse 타입의 파라미터를 가질 때 직접 응답을 처리한다고 가정 |
+| @ResponseBody | 해당 annotation이 선언된 경우 리턴 객체를 HTTP response로 전송한다. HttpMessageConverter를 통해 객체를 HTTP 응답 스트림으로 변환 |
+
+<br>
+#### ModelAndView 객체
+
+**View** 와 **Model** 정보를 모두 포함한 객체를 리턴할 경우
+~~~java
+@RequestMapping(params = "param=addView")
+public ModelAndView addProductView() {
+    ModelAndView mnv = new ModelAndView("/jsp/product/productForm.jsp");
+    // mnv.setViewName("/jsp/product/productForm.jsp");
+    mnv.addObject("product", new Product());
+    return mnv;
+}
+~~~
+
+<br>
+#### Map, ModelMap
+
+**Web View** 로 전달할 데이터만 리턴할 경우
+~~~java
+@RequestMapping("/productList.do")
+public Map getProductList() {
+    List productList = productService.getProductList();
+    ModelMap map = new ModelMap(productList); //productList가 "productList"라는 이름으로 저장됨.
+    return map;
+}
+~~~
+여기서 View에 대한 정보를 명시적으로 리턴하지는 않았지만, 내부적으로 View name은 **RequestToViewNameTranslator** 에 의해서 입력된 HTTP Request를 이용하여 생성된다. 예를 들어 **DefaultRequestToViewNameTranslator** 는 입력된 HTTP Request URI를 변환하여 View name을 다음과 같이 생성한다.
+
+ * http://localhost:8080/display.do -> 생성된 View name: **'display'**
+
+ * http://localhost:8080/admin/index.do -> 생성된 View name: **'admin/index'**
+
+위와 같이 자동으로 생성되는 View name에 'jsp/'와 같이 prefix를 붙이거나 '.jsp' 같은 확장자를 덧붙이고자 할 때는 아래와 같이 속정 정의 xml(xxx-servlet.xml)에 추가하면 된다.
+
+~~~xml
+<bean id="viewNameTranslator"
+        class="org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator">
+    <property name="prefix" value="jsp/"/>
+    <property name="suffix" value=".jsp"/>
+</bean>
+~~~
+
+<br>
+#### ModelMap
+
+**Web View** 로 전달할 데이터만 리턴하는 경우.
+**Model** 은 Java-5 이상에서 사용할 수 있는 인터페이스이다. 기본적으로 ModelMap과 같은 기능을 제공한다.
+Model 인터페이스의 구현클래스에는 BindingAwareModelMap 와 ExtendedModelMap 이 있다. View name은 위에서 설명한 바와 같이 RequestToViewNameTranslator에 의해 내부적으로 생성된다.
+
+~~~java
+@RequestMapping("/productList.do")
+public Model getProductList() {
+    List productList = productService.getProductList();
+    ExtendedModelMap map = new ExtendedModelMap();
+    map.addAttribute("productList", productList);
+    return map;
+}
+~~~
+
+<br>
+#### String
+
+**View 이름** 만 리턴하는 경우
+~~~java
+@RequestMapping(value = {"/addProduct.do", "/updateProduct.do" })
+public String updateProduct(Product product, SessionStatus status) throws Exception {
+    return "/listProduct.do";
+}
+~~~
+
+<br>
+#### void
+
+메서드 내부에서 **직접 HTTP Response를 처리** 하는 경우. 또는 **View name** 이 **RequestToViewNameTranslator** 에 의해 내부적으로 생성되는 경우
+
+~~~java
+@RequestMapping("/addView.do")
+public void addView(HttpServletResponse response) {
+    // 중략
+    // response 직접 처리
+}
+
+@RequestMapping("/addView.do")
+public void addView() {
+    // 중략
+    // View name이 DefaultRequestToViewNameTranslator에 의해서 내부적으로 'addView'로 결정됨.
+}
+~~~
+
+<br>
+#### @ResponseBody annotation
+
+해당 annotation이 붙어 있을 경우, **HTTP ResponseBody** 로 전송한다.
