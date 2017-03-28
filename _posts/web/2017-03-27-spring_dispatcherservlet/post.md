@@ -172,7 +172,7 @@ DispatcherServlet을 사용한다는 것은 Spring에서 제공하는 **@MVC** �
 <br>
 ![02.jpg](/static/assets/img/blog/web/2017-03-27-spring_dispatcherservlet/02.jpg)
 
-만약 이에 대핸 예외 처리를 하지 않으면 위와 같이 에러가 로그에 기록될 것이다. **DispatcherServlet** 이 해당 요청을 처리할 **Controller** 를 찾지 못했다는 메시지이다. 이 문제를 해결하기 위해 방법이 몇 가지가 있다.
+만약 이에 대해 예외 처리를 하지 않으면 위와 같이 에러가 로그에 기록될 것이다. **DispatcherServlet** 이 해당 요청을 처리할 **Controller** 를 찾지 못했다는 메시지이다. 이 문제를 해결하기 위해 방법이 몇 가지가 있다.
 
 (1) **DispatcherServlet** 이 처리할 URL과 자바와 관련없는 Resource의 영역을 분리시키는 것
 
