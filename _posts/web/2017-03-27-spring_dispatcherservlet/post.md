@@ -153,15 +153,25 @@ DispatcherServlet을 사용한다는 것은 Spring에서 제공하는 **@MVC** �
 
 (2) 아래 (3) 부터 (13)의 작업은 **doDispatch** 메소드 안에 있다. **Controller / View** 등의 컴포넌트를 이용한 실제적인 웹 요청 처리가 이루어진다.
 
+
 (3) **getHandler** 메소드는 **RequestMapping** 객체를 이용하여 요청에 해당하는 **Controller(Handler)** 를 얻는다.
+
 (4) 요청에 해당하는 **Handler** 를 찾았다면 **Handler** 를 **HandlerExecutionChain** 이라는 객체에 담아 리턴하는데, 이 때 **HandlerExecutionChain** 은 요청에 해당하는 **intercepter** 들이 있다면 함께 담아서 리턴한다.
+
 (5) 실행될 **intercepter** 들이 있다면 **intercepter** 의 **preHandle** 메소드를 차례로 실행한다.
+
 (6) **Controller** 의 인스턴스는 **HandlerExecutionChain** 객체의 **getHandler** 메소드를 통해 얻는다.
+
 (7) **getHandlerAdapter** 메소드는 **Controller** 에 적절한 **HandlerAdapter** 하나를 리턴한다.
+
 (8) 선택된 **HandlerAdapter** 의 **handle** 메소드가 수행되는데, 실제 실행은 파라미터로 넘어온 **Controller** 를 실행한다.
+
 (9) 계층형 **Controller** 의 경우 **handleRequest** 메소드가 실행된다. **@Controller** 인 경우 **HandlerAdapter(AnnotationMethodHandlerAdapter)** 가 **HandlerMethodInvoker** 를 통해 실행할 **Controller** 의 메소드를 **invoke()** 한다.
+
 (10) **intercepter** 의 **postHandle** 메소드가 실행된다.
+
 (11) **resolveViewName** 메소드는 논리적 뷰 이름을 가지고 해당 **View** 객체를 리턴한다.
+
 (12) **Model** 객체의 데이터를 보여주기 위해 해당 **View** 객체의 **render** 메소드가 수행된다.
 
 <br>
