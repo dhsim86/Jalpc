@@ -229,5 +229,57 @@ public String faqDetail(@RequestParam HashMap<String, String> map) {
 }
 ~~~
 
+<br>
+## @ControllerAdvice / @ExceptionHandler
+
+이 annotation들은 서버 애플리케이션이 운영 도중에 **Exception** 이 발생했을 때 작업을 처리하기 위해 사용한다.
+annotation들의 정의는 다음과 같다.
+~~~java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface ControllerAdvice {
+	...
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface ExceptionHandler {
+~~~
+
+**@ControllerAdvice** 가 선언된 클래스는 자동으로 스프링 빈으로 등록되며, **@ExceptionHandler** annotation 은 메소드에 선언할 수 있는 것을 알 수 있다.
+
+다음은 이 annotation들을 사용해서 예외처리를 담당하는 클래스를 정의한 것이다.
+
+~~~java
+@ControllerAdvice
+public class ExceptionHandler {
+
+	private static Logger logger = (Logger)LoggerFactory.getLogger(ExceptionHandler.class);
+
+	@ExceptionHandler(Exception.class)
+	public void handleException(Exception e) {
+		logger.debug("Exception");
+	}
+
+	@ExceptionHandler(RuntimeException.class)
+	public ModelAndView handleRuntimeException(RuntimeException e) {
+		ModelAndView mnv = new ModelAndView("exceptionHandler");
+		mnv.addObject("data", e.getMessage());
+
+		return mnv;
+	}
+}
+~~~
+
+위와 같이 클래스에 **@ControllerAdvice** annotation을 선언해주고, 각 메소드마다 **@ExceptionHandler** annotation 으로
+어떠한 Exception을 처리할 것인지 정의할 수 있다.
+
+이렇게 처리하면 특정 Exception이 발생할 때 **@ExceptionHandler** annotation이 선언된 메소드가 그 Exception을 받아 처리할 수 있는 것이다.
+
+리턴 값으로는 void 부터 ModelAndView 까지 다양하게 리턴할 수 있다.
+
+
 [original_url]: http://noritersand.tistory.com/457
 [original_url2]: http://noritersand.tistory.com/357
