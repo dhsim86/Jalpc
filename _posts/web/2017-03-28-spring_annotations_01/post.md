@@ -127,7 +127,7 @@ public @interface Autowired {
 }
 ~~~
 
-스프링 빈간의 **의존관계를 자동설정 (DI)** 할 때 사용하며, 타입을 통해 의존성 있는 객체를 자동으로 주입시켜 준다.
+스프링 빈 간의 **의존관계를 자동설정 (DI)** 할 때 사용하며, 타입을 통해 의존성 있는 객체를 자동으로 주입시켜 준다.
 그러므로, **해당 타입의 빈이 존재하지 않거나 2개 이상 존재할 경우 예외를 발생시킨다.**
 
 다음과 같이 이 annotation을 선언한 프로퍼티 중에 반드시 설정할 필요가 없을 경우에는 예외를 발생시키지 않을 수도 있다.
@@ -224,9 +224,10 @@ public @interface PostConstruct {
 
 빈을 생성 한 후에 초기화 작업을 따로 수행할 때 사용한다.
 다음과 같이 특정 메소드에 이 annotation을 선언하면 객체 생성 후 메소드가 자동 실행된다.
-ㅠ
 
 사용하기 위해서는 **CommonAnnotationBeanPostProcessor** 빈을 등록해야 하지만 마찬가지로 **annotation-config** 태그로 대체 가능하다.
+
+이 annotation과 비슷하게 객체 소멸 전에 특정 메소드가 호출될 수 있게하는 **@PreDestroy** annotation 도 있다.
 
 <br>
 ## @Inject
@@ -236,7 +237,7 @@ SR-330 표준 annotation으로 Spring 3부터 지원하는 annotation이다.
 <br>
 ## @SessionAttributes
 
-이 annotation은 세션 상에서 model의 정보를 유지하고 싶을 때 사용한다.
+이 annotation은 세션 상에서 **model의 정보를 유지** 하고 싶을 때 사용한다.
 ~~~java
 @Controller
 @SessionAttributes("blog")
@@ -287,7 +288,7 @@ public @interface ResponseBody {
 }
 ~~~
 
-메소드에 이 annotation이 선언되면 메소드가 리턴되는 값은 **HTTP Response Body** 에 내용이 쓰여진다.
+메소드에 이 annotation이 선언되면 메소드가 리턴되는 값은 **View**를 통해서 출력되지 않고, **HTTP Response Body** 에 내용이 직접 쓰여진다.
 클라이언트로 **JSON** 형태의 값으로 리턴할 때 유용하다. 객체를 넘길 경우, **JASKSON** 에 의하여 문자열로 변환된다.
 
 그리고 이 annotation이 설정될 경우 애플리케이션 컨텍스트에 설정된 **resolver** 를 무시한다.
