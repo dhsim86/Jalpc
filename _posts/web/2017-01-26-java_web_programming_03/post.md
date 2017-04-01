@@ -72,3 +72,11 @@ icon: icon-html
 | getContextPath() | 웹 애플리케이션 경로 | /web06 |
 | getServletPath() | 서블릿 경로 | /member/list.do |
 | getQueryString() | 요청 매개변수 정보 | pageNo=1&pageSize=10 |
+
+<br>
+## Controller 추가
+
+* 페이지 컨트롤러를 서블릿으로 만들 필요가 없음
+  * 일반 클래스로 전환, 메소드로 호출
+  * 프론트 컨트롤러와 일반 클래스로 전환된 컨트롤러 사이에 인터페이스 정의 및 구현
+[https://github.com/dhsim86/java_webdev_workbook/commit/819632323644a2951361b01eb926d373e60dac1d](https://github.com/dhsim86/java_webdev_workbook/commit/819632323644a2951361b01eb926d373e60dac1d)
