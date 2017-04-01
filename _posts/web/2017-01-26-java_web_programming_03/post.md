@@ -11,12 +11,12 @@ icon: icon-html
 
 > Java Web Development Workbook Chapter. 06
 
-## Front Controller
+# Front Controller
 
 * 컨트롤러를 만들다 보면 요청 데이터를 처리하는 코드나, 모델과 뷰 제어코드가 중복되는 경우가 있음
 
 <br>
-### Front Controller Pattern
+## Front Controller Pattern
 
 ![00.png](/static/assets/img/blog/web/2017-01-26-java_web_programming_03/00.png)
 
@@ -40,7 +40,7 @@ icon: icon-html
 * 프레임워크: 디자인 패턴을 적용해 만든 사례 중 베스트를 모아 하나의 개발 틀로 표준화
 
 <br>
-### 구현
+## 구현
 
 [https://github.com/dhsim86/java_webdev_workbook/commit/6d803f61cd555875806931046701c97d8194d088](https://github.com/dhsim86/java_webdev_workbook/commit/6d803f61cd555875806931046701c97d8194d088)
 [https://github.com/dhsim86/java_webdev_workbook/commit/df970742bdb81726048959595023f57ea1873e46](https://github.com/dhsim86/java_webdev_workbook/commit/df970742bdb81726048959595023f57ea1873e46)
@@ -54,3 +54,21 @@ icon: icon-html
     * **service** (ServletRequest, ServletResponse) 메소드는 HttpServlet 클래스에 추가된
     **service** (HttpServletRequest, HttpServletResponse) 메소드 호출.
     * **service** (HttpServletRequest, HttpServletResponse) 메소드는 HTTP 요청 프로토콜 분석 후 **doGet / doPost** 호출
+
+<br>
+## 요청 URL에서 서블릿 경로 알아내기
+
+* 프론트 컨트롤러의 역할: 클라이언트의 요청을 적절한 페이지 컨트롤러에게 전달
+  * 요청을 처리할 서블릿의 URL을 알아내야 함.
+
+* HttpServletRequest의 메소드를 이용, 요청 URL에서 특정 정보를 추출가능
+  * ex: http://localhost:9999/web06/member/list.do?pageNo=1&pageSize=10
+<br>
+
+| 메서드 | 설명 | 반환값 |
+| ---------- | :--------- | --------- |
+| getRequestURL() | 요청 URL 리턴 (단, 매개변수 제외) | http://localhost:9999/web06/member/list.do |
+| getRequestURI() | 서버 주소를 제외한 URL | /web06/member/list.do |
+| getContextPath() | 웹 애플리케이션 경로 | /web06 |
+| getServletPath() | 서블릿 경로 | /member/list.do |
+| getQueryString() | 요청 매개변수 정보 | pageNo=1&pageSize=10 |
