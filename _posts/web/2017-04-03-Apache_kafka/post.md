@@ -9,10 +9,13 @@ tags: [server programming]
 icon: icon-html
 ---
 
+> 원본글: [http://epicdevs.com/17][original_url]
+
 # Apache Kafka
 
 [Apache Kafka][apache_kafka_org]는 LinkedIn 개발된 분산 메시징 시스템으로써, 2011년에 오픈소스로 공개되었다.
 대용량의 실시간 로그처리에 특화된 아키텍처 설계를 통하여 기존 메시징 시스템보다 우수한 TPS를 보여주고 있다.
+
 <br>
 ## Kafka의 기본 구성 요소와 동작
 
@@ -25,6 +28,7 @@ Kafka의 broker는 topic을 기준으로 메시지를 관리한다. Producer는 
 Kafka는 확장성(scale-out)과 고가용성(high availability)를 위하여 broker들이 클러스터로 구성되어 동작하도록 설계되어 있다. 심지어 broker가 1개 밖에 없을 때에도 클러스터로써 동작한다. 클러스터 내의 broker에 대한 분산처리는 아래의 그림과 같이 [Apache ZooKeeper][apache_zookeeper_org]가 담당한다.
 <br>
 ![01.jpg](/static/assets/img/blog/web/2017-04-03-Apache_kafka/01.jpg)
+
 <br>
 ## 기존 메시징 시스템과의 차이점
 
@@ -41,6 +45,7 @@ Kafka는 확장성(scale-out)과 고가용성(high availability)를 위하여 br
 * 기존의 메시징 시스템에서는 broker가 consumer에게 메시지를 push해 주는 방식인데 비해, Kafka는 consumer가 broker로부터 직접 메시지를 가지고 가는 pull 방식으로 동작한다. 따라서 consumer는 자신의 처리능력만큼의 메시지만 broker로 가져오기 때문에 최적의 성능을 낼 수 있다.
   * 기존의 push 방식의 메시징 시스템에서는 broker가 직접 각 consumer가 어떤 메시지를 처리해야 하는지 계산하고 어떤 메시지를 처리 중인지 트랙킹하였는데, Kafka에서는 consumer가 직접 필요한 메시지를 broker로부터 pull 하므로, broker의 consumer와 메시지 관리에 대한 부담이 경감되었다.
   * 메시지를 pull 방식으로 가져오므로, 메시지를 쌓아두었다가 주기적으로 처리하는 batch consumer의 구현이 가능하다.
+
 <br>
 ## 기존 메시징 시스템과의 성능 비교
 
@@ -50,12 +55,15 @@ Kafka는 확장성(scale-out)과 고가용성(high availability)를 위하여 br
 ![02.png](/static/assets/img/blog/web/2017-04-03-Apache_kafka/02.png)
 
 위의 붉은 색 그래프는 메시지를 한 번에 50개씩 batch 로 전송한 결과이고, 연두색 그래프는 한 번에 하나씩 전송한 결과이다.
+
 <br>
 ### Consumer 성능
 <br>
 ![03.png](/static/assets/img/blog/web/2017-04-03-Apache_kafka/03.png)
+
 <br>
 ## 좀 더 자세히..
+
 <br>
 ### Topic과 Partition
 
@@ -65,6 +73,7 @@ Kafka의 topic은 partition이라는 단위로 쪼개어져 클러스터의 각 
 
 위의 그림은 하나의 topic이 3개의 partition에 분산되어 순차적으로 저장되는 모습을 보여준다.
 각 partition은 0부터 1씩 증가하는 offset값을 메시지에 부여하는데, 이 값은 각 partition 내에서 메시지를 식별하는 ID로 사용된다. Offset 값은 partition마다 별도로 관리되므로 topic내에서 메시지를 식별할 때는 partition 번호와 offset 값을 함께 사용한다.
+
 <br>
 ### Partition의 분산
 <br>
@@ -73,6 +82,7 @@ Kafka의 topic은 partition이라는 단위로 쪼개어져 클러스터의 각 
 위의 그림에서는 3개의 broker로 이루어진 클러스터에서 하나의 topic이 3개의 partition P0, P1, P2로 분산되어 저장되어 있다. Producer가 메시지를 실제로 어떤 partition으로 전송할지는 사용자가 구현한 partition 분배 알고리즘에 의해 결정된다. 예를 들어 라운드-로빈 방식의 partition 분배 알고리즘을 구현하여 각 partition에 메시지를 균등하게 분배하도록 하거나, 메시지의 키를 활용하여 알파벳 A로 시작하는 키를 가진 메시지는 P0에만 전송하고, B로 시작하는 키를 가진 메시지는 P1에만 전송하는 형태의 구성도 가능하다.
 
 좀 더 복잡한 예로써 사용자 ID의 CRC32 값을 partition의 수로 modulo 연산을 수행하여 (CRC32(ID) % partition의 수) 동일한 ID에 대한 메시지는 동일한 partition에 할당되도록 구성할 수도 있다.
+
 <br>
 ### Partition의 복제
 
@@ -85,6 +95,7 @@ Replication factor를 N으로 설정할 경우, N개의 replica는 1개의 leade
 각 partition에 대한 읽기와 쓰기는 모두 leader에서 이루어지며, follower는 단순히 leader를 복제하기만 한다. 만약 leader에 장애가 발생할 경우 follower 중 하나가 새로운 leader가 된다. Kakfa의 복제 모델인 ISR 모델은 f+1개의 replica를 가진 topic이 f개의 장애까지 버틸 수 있다고 한다.
 
 Leader에서만 읽기와 쓰기를 수행한다고 하면 부하 분산이 되지 않는다고 생각할 수 있는데, 각 partition의 leader가 클러스터 내의 broker들에게 균등하게 분배되도록 알고리즘이 설계되어 있기 때문에 부하는 자연스럽게 분산이 된다. 위의 그림처럼 3개의 broker에 P0, P1, P2의 leader가 균등하게 분배되므로 부하 또한 자연스럽게 분산되게 된다.
+
 <br>
 ### Consumer와 Consumer Group
 
@@ -105,6 +116,7 @@ Consumer group을 구성하는 consumer의 수가 partition의 수보다 적으�
 이처럼 하나의 consumer에 의해 독점적으로 partition이 액세스되기 때문에 동일 partition 내의 메시지는 partition에 저장된 순서대로 처리된다. 만약 특정 키를 지닌 메시지가 발생 시간 순으로 처리되어야 한다면 partition 분배 알고리즘을 적절하게 구현하여 특정 키를 지닌 메시지는 동일한 partition에 할당되어 단일 consumer에 의해 처리되도록 해야한다.
 
 그러나 다른 partition에 속한 메시지의 순차적 처리는 보장되어 있지 않기 때문에, 특정 topic의 전체 메시지가 발생 시간 순으로 처리되어야 할 경우 해당 topic의 하나의 partition만을 가지도록 설정해야 한다.
+
 <br>
 ### 파일 시스템을 활용한 고성능 디자인
 
@@ -153,7 +165,7 @@ Zero-copy 기법을 사용하면 위에서 언급한 커널모드와 유저모�
 
 
 
-
+[original_url]: http://epicdevs.com/17
 [apache_kafka_org]: http://kafka.apache.org/
 [apache_zookeeper_org]: http://zookeeper.apache.org/
 [apache_activemq_org]: http://activemq.apache.org/
