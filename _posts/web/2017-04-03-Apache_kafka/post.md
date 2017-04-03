@@ -56,6 +56,7 @@ Kafka는 확장성(scale-out)과 고가용성(high availability)를 위하여 br
 
 위의 붉은 색 그래프는 메시지를 한 번에 50개씩 batch 로 전송한 결과이고, 연두색 그래프는 한 번에 하나씩 전송한 결과이다.
 
+
 <br>
 ### Consumer 성능
 <br>
