@@ -15,6 +15,7 @@ icon: icon-html
 
 여기서는 **Apache Kafka** 와 **RabbitMQ** 을 간략하게나마 비교해보려고 한다.
 
+<br>
 ## 특징면
 
 메시징 시스템에서의 broker는 producer와 consumer라는 두 개 타입의 프로세스와 연결되어 있는데, 보통 메시징 시스템에서는 consumer가 각 메시지의 최종 목적지이며, consumer의 메시지 처리 속도가 메시징 시스템을 사용하는 전체 시스템의 성능과 직결된다.
@@ -74,9 +75,9 @@ Kafka와 RabbitMQ, 두 메시징 시스템 모두 좋은 시스템이지만 다�
 <br>
 ## 참고
 
-[Kafka or RabbitMQ: depends on your messages nature][kafka_rabbitmq]
-[Apache Kafka v/s RabbitMQ – Message Queue Comparison][benchmark_url]
-[Why Kafka so fast (stackoverflow)][why_kafka_so_fast]
+[Kafka or RabbitMQ: depends on your messages nature][kafka_rabbitmq] <br>
+[Apache Kafka v/s RabbitMQ – Message Queue Comparison][benchmark_url] <br>
+[Why Kafka so fast (stackoverflow)][why_kafka_so_fast] <br>
 
 [zero-copy]: https://www.ibm.com/developerworks/linux/library/j-zerocopy/
 [kafka_rabbitmq]: https://yurisubach.com/2016/05/19/kafka-or-rabbitmq/
