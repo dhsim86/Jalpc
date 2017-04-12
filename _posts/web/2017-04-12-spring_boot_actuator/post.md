@@ -163,7 +163,7 @@ Actuator에서 제공하는 endpoint를 포함한 controller 매핑 정보를 �
 ## Spring Boot Admin
 
 Actuator에서 제공하는 endpoint들로 애플리케이션을 모니터링할 수는 있지만 좀 더 보기 좋게 모니터링을 할 수 있다.
-**[spring-boot-admin][spring-admin]** 은 Spring Boot 애플리케이션을 심플한 web UI를 통해 모니터링을 할 수 있도록 도와준다. Actuator의 endpoint에서 제공하는 정보를 좀 더 쉽게 확인할 수 있도록 하는 것이다. **[Reference Guide (1.4.0)][spring-admin-ref]** 도 제공하니 참고하도록 하자.
+**[spring-boot-admin][spring-admin]** 은 Spring Boot 애플리케이션을 심플한 web UI를 통해 모니터링을 할 수 있도록 도와준다. Actuator의 endpoint에서 제공하는 정보를 좀 더 쉽게 확인할 수 있도록 하는 것이다. **[Reference Guide (1.4.6)][spring-admin-ref]** 도 제공하니 참고하도록 하자.
 
 먼저 다음과 같이 spring-boot-admin을 사용하기 위해 의존성을 추가하자.
 ~~~xml
