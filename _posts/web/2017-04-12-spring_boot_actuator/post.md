@@ -38,6 +38,7 @@ Spring Boot에서 제공하는 기본 endpoint 리스트는 다음과 같다. �
 | mappings | mapping 된 URL path 및 빈, HTTP request method 등을 확인할 수 있다. |
 | trace | 최근 애플리케이션에 요청된 100개의 HTTP request를 확인할 수 있다. |
 
+<br>
 Endpoint를 통해 확인할 때는 json 형식으로 정보를 리턴하므로, 만약 크롬 브라우저를 사용한다면 **[JSON Viewer][json-viewer]** 를 설치하자. 이 플러그인을 통해 json 형식의 데이터도 쉽게 확인할 수 있을 것이다.
 
 <br>
@@ -59,6 +60,7 @@ HATEOAS는 RESTful API를 사용하는 클라이언트가 전적으로 서버에
 * 요청 URI 정보가 변경되어도 클라이언트에서 동적으로 생성된 URI를 사용한다면, 클라이언트 입장에서는 URI 수정에 따른 코드 변경이 불필요하다.
 * URI 정보를 통해 의존되는 요청을 예측가능하게 한다.
 * 기존 URI 정보가 아니라 resource까지 포함된 URI를 보여주기 때문에 reesource에 대한 확신을 갖게 된다.
+
 ---
 
 actuator endpoint는 actuator URI 요청에 따른 의존되는 URI(즉 다른 endpoint들)의 정보를 제공하기 위해 HATEOAS가 필요한 것이다.
@@ -178,7 +180,7 @@ Actuator에서 제공하는 endpoint들로 애플리케이션을 모니터링할
 </dependency>
 ~~~
 
-그리고 spring.boot.admin.url에 서비스 진행할 Spring Boot 애플리케이션의 주소를 포트번호 포함하여 설정한다. 밑의 예는 yml 파일을 통해 설정한 것이다.
+spring.boot.admin.url에 서비스 진행할 Spring Boot 애플리케이션의 주소를 포트번호 포함하여 설정한다. 밑의 예는 yml 파일을 통해 설정한 것이다.
 ~~~yml
 spring:
   profiles:
@@ -191,6 +193,7 @@ server:
   port: 10080
 ~~~
 
+<br>
 그리고 main 메소드가 있는 Spring Boot 메인클래스에 다음과 같이 **@EnableAdminServer** annotation을 추가한다.
 ~~~java
 import de.codecentric.boot.admin.config.EnableAdminServer;
@@ -205,10 +208,12 @@ public class TemplateApplication {
 }
 ~~~
 
+<br>
 여기까지 진행하였으면 **spring.boot.admin.url** 에 설정된 URI를 통해 다음과 같이 spring-boot-admin page로 접속할 수 있다.
 <br>
 ![12.png](/static/assets/img/blog/web/2017-04-12-spring_boot_actuator/12.png)
 
+<br>
 메인 페이지에서는 현재 실행 중인 애플리케이션의 상태를 확인할 수 있고 다음과 같이 상세 정보도 확인할 수 있다.
 <br>
 ![13.png](/static/assets/img/blog/web/2017-04-12-spring_boot_actuator/13.png)
