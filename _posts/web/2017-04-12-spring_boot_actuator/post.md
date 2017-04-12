@@ -9,7 +9,6 @@ tags: [server programming]
 icon: icon-html
 ---
 
-> 원본글: [How to choose the number of topics / partitions in a Kafka Cluster?][how-many-partition]
 # Monitoring Spring Boot application with Actuator
 
 Spring Boot에서 제공하는, 운영 중인 서버 애플리케이션을 모니터링하고, 관리할 수 있게 해주는 모듈인 Actuator에 대한 간략 설명 및 사용법, 그리고 이를 활용하여 web ui로 확인할 수 있는 **spring-boot-admin** 에 대한 내용을 다룬 포스트이다.
