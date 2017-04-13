@@ -3,9 +3,9 @@ layout: post
 title:  "Monitoring Spring Boot App with Actuator"
 date:   2017-04-12
 desc: "Monitoring Spring Boot App with Actuator"
-keywords: "server programming"
+keywords: "spring, spring boot, server programming"
 categories: [Web]
-tags: [server programming]
+tags: [spring, spring boot]
 icon: icon-html
 ---
 
