@@ -181,7 +181,7 @@ icon: icon-html
     * 표현식 <%= %>
       * **문자열 출력 때** 사용, out.print()의 인자 값으로 복사됨
       * **_jspService** 안에 순서대로 복사
-  * [https://github.com/dhsim86/java_webdev_workbook/commit/e4aff02d5bd4bda61e6c333ec52d7108e484ac8b](https://github.com/dhsim86/java_webdev_workbook/commit/e4aff02d5bd4bda61e6c333ec52d7108e484ac8b)
+  * [[ch05] 5.3, Implemented Hello, Calculator JSP file.](https://github.com/dhsim86/java_webdev_workbook/commit/e4aff02d5bd4bda61e6c333ec52d7108e484ac8b)
 
 <br>
 ### 서블릿에서 뷰 분리하기
@@ -228,8 +228,8 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
       ![06.png](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/06.png)
       <br>
       ![07.png](/static/assets/img/blog/web/2017-01-25-java_web_programming_02/07.png)
-    * [https://github.com/dhsim86/java_webdev_workbook/commit/e0d969a0ead645d8df5f61d38445a77ab5865c87](https://github.com/dhsim86/java_webdev_workbook/commit/e0d969a0ead645d8df5f61d38445a77ab5865c87)
-    * [https://github.com/dhsim86/java_webdev_workbook/commit/75a56320b6268fa3dfc689f748e3283bc9cc4e04](https://github.com/dhsim86/java_webdev_workbook/commit/75a56320b6268fa3dfc689f748e3283bc9cc4e04)
+    * [[ch05] 5.4, Delegated the role of output in MemberListServlet class to MemberList.jsp.](https://github.com/dhsim86/java_webdev_workbook/commit/e0d969a0ead645d8df5f61d38445a77ab5865c87)
+    * [[ch05] 5.5, Forward Error.jsp when exception invoked and include Header / Tail.jsp](https://github.com/dhsim86/java_webdev_workbook/commit/75a56320b6268fa3dfc689f748e3283bc9cc4e04)
 
 <br>
 ### 데이터 보관소
@@ -241,7 +241,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
   * **모든 서블릿이 사용 가능**
   * jsp에서는 **application** 변수를 통해 참조
   * HttpServlet으로 부터 상속 후, init 및 destroy 메서드 오버라이딩 후 보관소 사용
-  * [https://github.com/dhsim86/java_webdev_workbook/commit/7e0cbaf44ef2bb732b4f9838dbba1abc5387da16](https://github.com/dhsim86/java_webdev_workbook/commit/7e0cbaf44ef2bb732b4f9838dbba1abc5387da16)
+  * [[ch05] 5.6, Used the data of ServletContext.](https://github.com/dhsim86/java_webdev_workbook/commit/7e0cbaf44ef2bb732b4f9838dbba1abc5387da16)
 <br>
 * **HttpSession** 보관소
   * 클라이언트 **최초 요청시 생성 후 브라우저를 닫을 때까지** 유지
@@ -249,7 +249,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     * HttpSession 객체는 그 웹브라우저로부터 일정 시간 동안 timeout 요청이 없으면 삭제 됨
   * 로그인할 때 초기화, 로그아웃하면 비움.
   * jsp에서는 **session** 변수를 통해 참조
-  * [https://github.com/dhsim86/java_webdev_workbook/commit/a53bb3830196ccde678f34e73c0c36e2229e659f](https://github.com/dhsim86/java_webdev_workbook/commit/a53bb3830196ccde678f34e73c0c36e2229e659f)
+  * [[ch05] 5.6, Used the data of HttpSession.](https://github.com/dhsim86/java_webdev_workbook/commit/a53bb3830196ccde678f34e73c0c36e2229e659f)
 <br>
 * **ServletRequest** 보관소
   * **요청이 들어올 때 생성 후 응답할 때까지 유지**
@@ -271,10 +271,10 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
   * JSP에서 기본으로 제공하는 태그
   * <jsp:useBean>
     * application, session, request, page 보관소에 저장된 자바 객체를 꺼낼 수 있음
-    * [https://github.com/dhsim86/java_webdev_workbook/commit/216642d0148bf249d6805f05b7ab7305453f14f4](https://github.com/dhsim86/java_webdev_workbook/commit/216642d0148bf249d6805f05b7ab7305453f14f4)
+    * [[ch05] 5.6, Used <jsp:useBean ... />](https://github.com/dhsim86/java_webdev_workbook/commit/216642d0148bf249d6805f05b7ab7305453f14f4)
 
   * 5.7 Exercise
-    * [https://github.com/dhsim86/java_webdev_workbook/commit/efa163c7299540903e5194f7f42d478af27d10b8](https://github.com/dhsim86/java_webdev_workbook/commit/efa163c7299540903e5194f7f42d478af27d10b8)
+    * [[ch05] 5.7, solved exercise.](https://github.com/dhsim86/java_webdev_workbook/commit/efa163c7299540903e5194f7f42d478af27d10b8)
 
 <br>
 ### EL
@@ -291,8 +291,8 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     * Member obj = (Member)request.getAttribute("member");
     int value = ojb.getNo();
   * 보관소를 지정하면 해당 보관소에서만 객체를 찾음.
-* [https://github.com/dhsim86/java_webdev_workbook/commit/5a6fb0f6507ffd6ece0bcc03169bfa428f525774](https://github.com/dhsim86/java_webdev_workbook/commit/5a6fb0f6507ffd6ece0bcc03169bfa428f525774)
-* [https://github.com/dhsim86/java_webdev_workbook/commit/b605749655ad4f563fb388537b360d5399b50855](https://github.com/dhsim86/java_webdev_workbook/commit/b605749655ad4f563fb388537b360d5399b50855)
+* [[ch05] 5.8, Added ELTest.jsp](https://github.com/dhsim86/java_webdev_workbook/commit/5a6fb0f6507ffd6ece0bcc03169bfa428f525774)
+* [[ch05] 5.8, Updated MemberUpdate.jsp using EL.](https://github.com/dhsim86/java_webdev_workbook/commit/b605749655ad4f563fb388537b360d5399b50855)
 
 <br>
 ### JSTL
@@ -315,15 +315,15 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
 
 * JSTL 확장 태그를 사용
   * <%@ taglib uri=“사용할 태그의 라이브러리 URI” prefix=“접두사” %>
-  * [https://github.com/dhsim86/java_webdev_workbook/commit/7a835c8e1c9c7b093782d81e92810c673c6ed04a](https://github.com/dhsim86/java_webdev_workbook/commit/7a835c8e1c9c7b093782d81e92810c673c6ed04a)
-  * [https://github.com/dhsim86/java_webdev_workbook/commit/7fe7f26ea2d0e57f11007cb3d55d41ac4995b9fd](https://github.com/dhsim86/java_webdev_workbook/commit/7fe7f26ea2d0e57f11007cb3d55d41ac4995b9fd)
+  * [[ch05] 5.9, Added JSTLTest.jsp](https://github.com/dhsim86/java_webdev_workbook/commit/7a835c8e1c9c7b093782d81e92810c673c6ed04a)
+  * [[ch05] 5.9, Updated MemberList.jsp using JSTL.](https://github.com/dhsim86/java_webdev_workbook/commit/7fe7f26ea2d0e57f11007cb3d55d41ac4995b9fd)
 
 <br>
 ### DAO
 * **데이터 처리** 를 전문으로 하는 객체 (Data Access Object)
   * DB나 파일 / 메모리 등을 이용, 애플리케이션 데이터를 CRUD 하는 역할
   * 하나의 DB 테이블이나 뷰에 대응
-* [https://github.com/dhsim86/java_webdev_workbook/commit/d616b7a0b1e963dd41611aafb65aaec78dd81486](https://github.com/dhsim86/java_webdev_workbook/commit/d616b7a0b1e963dd41611aafb65aaec78dd81486)
+* [[ch05] 5.10, Added MemberDao and changed servlet classes.](https://github.com/dhsim86/java_webdev_workbook/commit/d616b7a0b1e963dd41611aafb65aaec78dd81486)
 
 <br>
 ### ServletContextListener
@@ -404,7 +404,7 @@ public class ContextLoaderListener implements ServletContextListener {
 ~~~
 
 * 위 코드같이 웹 애플리케이션이 시작되면 **contextInitialized** 가 호출되어 memberDao 객체를 준비할 것이다.
-* [https://github.com/dhsim86/java_webdev_workbook/commit/0f6202d01aac88ed95e3b53e128bdd75fd1771ce](https://github.com/dhsim86/java_webdev_workbook/commit/0f6202d01aac88ed95e3b53e128bdd75fd1771ce)
+* [[ch05] 5.11, Used ServletContextListener.](https://github.com/dhsim86/java_webdev_workbook/commit/0f6202d01aac88ed95e3b53e128bdd75fd1771ce)
 
 <br>
 ### DB Connection Pool
@@ -420,7 +420,7 @@ public class ContextLoaderListener implements ServletContextListener {
 * DB Connection Pool
   * SQL 작업할 때마다 DB Connection을 생성하면 사용자 인증 / 권한 검사 등 실행속도가 느려짐
   * 이를 개선하기 위해 DB Connection Pool 생성
-  * [https://github.com/dhsim86/java_webdev_workbook/commit/1c860a3c3bbaa57728f4685d5213ebb3fc0fbcd0](https://github.com/dhsim86/java_webdev_workbook/commit/1c860a3c3bbaa57728f4685d5213ebb3fc0fbcd0)
+  * [[ch05] 5.12, Used DBConnectionPool.](https://github.com/dhsim86/java_webdev_workbook/commit/1c860a3c3bbaa57728f4685d5213ebb3fc0fbcd0)
 
 ---
 
@@ -464,7 +464,7 @@ java.sql 패키지의 기능을 보조하기 위해 만든 확장 패키지.
 </dependency>
 ~~~
 
-[https://github.com/dhsim86/java_webdev_workbook/commit/8e1934ba0664c087fbbd0f273a18ba8948b9fee5](https://github.com/dhsim86/java_webdev_workbook/commit/8e1934ba0664c087fbbd0f273a18ba8948b9fee5)
+[[ch05] 5.13. Used BasicDataSource.](https://github.com/dhsim86/java_webdev_workbook/commit/8e1934ba0664c087fbbd0f273a18ba8948b9fee5)
 
 * DataSource가 만들어주는 Connection은 DriverManager가 만드는 Connection을 **한 번 랩핑한** 객체
 
