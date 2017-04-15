@@ -106,11 +106,10 @@ icon: icon-html
 * 서블릿 URL 부여
 
 ~~~xml
-<servlet>
+<servlet-mapping>
     <servlet-name>AppInitServlet</servlet-name>
-    <servlet-class>AppInitServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-</servlet>
+    <url-pattern>/AppInit</url-pattern>
+</servlet-mapping>
 ~~~
   * 서블릿을 요청할 때 클라이언트가 사용할 URL 설정
 
