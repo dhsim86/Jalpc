@@ -46,6 +46,7 @@ icon: icon-html
 
 [[ch06] 6.1 Implemented DispatcherServlet.
 ](https://github.com/dhsim86/java_webdev_workbook/commit/6d803f61cd555875806931046701c97d8194d088)
+<br>
 [[ch06] 6.1 Updated servlets according to DispatcherServlet.](https://github.com/dhsim86/java_webdev_workbook/commit/df970742bdb81726048959595023f57ea1873e46)
 
 * HttpServlet 요청 처리 방법
