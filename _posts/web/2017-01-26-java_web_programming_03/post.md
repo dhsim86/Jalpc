@@ -44,8 +44,9 @@ icon: icon-html
 <br>
 ## 구현
 
-[https://github.com/dhsim86/java_webdev_workbook/commit/6d803f61cd555875806931046701c97d8194d088](https://github.com/dhsim86/java_webdev_workbook/commit/6d803f61cd555875806931046701c97d8194d088)
-[https://github.com/dhsim86/java_webdev_workbook/commit/df970742bdb81726048959595023f57ea1873e46](https://github.com/dhsim86/java_webdev_workbook/commit/df970742bdb81726048959595023f57ea1873e46)
+[[ch06] 6.1 Implemented DispatcherServlet.
+](https://github.com/dhsim86/java_webdev_workbook/commit/6d803f61cd555875806931046701c97d8194d088)
+[[ch06] 6.1 Updated servlets according to DispatcherServlet.](https://github.com/dhsim86/java_webdev_workbook/commit/df970742bdb81726048959595023f57ea1873e46)
 
 * HttpServlet 요청 처리 방법
   * HttpServlet의 service 메소드 오버라이딩 (GenericServlet의 service 메소드가 아님)
@@ -81,7 +82,7 @@ icon: icon-html
 * 페이지 컨트롤러를 서블릿으로 만들 필요가 없음
   * 일반 클래스로 전환, 메소드로 호출
   * 프론트 컨트롤러와 일반 클래스로 전환된 컨트롤러 사이에 인터페이스 정의 및 구현
-[https://github.com/dhsim86/java_webdev_workbook/commit/819632323644a2951361b01eb926d373e60dac1d](https://github.com/dhsim86/java_webdev_workbook/commit/819632323644a2951361b01eb926d373e60dac1d)
+[[ch06] 6.2 Implemented controllers.](https://github.com/dhsim86/java_webdev_workbook/commit/819632323644a2951361b01eb926d373e60dac1d)
 
 <br>
 ## DI를 이용한 빈 의존성 관리
@@ -118,7 +119,7 @@ icon: icon-html
 <br>
 ![03.png](/static/assets/img/blog/web/2017-01-26-java_web_programming_03/03.png)
 
-[https://github.com/dhsim86/java_webdev_workbook/commit/aa3e526bb5d73d2a8390e9f2dc32e4bd24ec9551](https://github.com/dhsim86/java_webdev_workbook/commit/aa3e526bb5d73d2a8390e9f2dc32e4bd24ec9551)
+[[ch06] 6.3 Use dependency injection on MemberDao and interface.](https://github.com/dhsim86/java_webdev_workbook/commit/aa3e526bb5d73d2a8390e9f2dc32e4bd24ec9551)
 
 <br>
 ## 리플렉션 API를 이용한 프론트 컨트롤러 개선
@@ -159,7 +160,7 @@ public interface DataBinding {
 * 클래스나 메소드의 내부 구조를 조사할 때 사용
 * 이 API를 사용하여 컨트롤러가 필요한 타입을 조사하여 알맞게 값을 주입시켜줄 수 있음
 
-[https://github.com/dhsim86/java_webdev_workbook/commit/3e216743932df295d0be19ca948aa4ec38e77a55](https://github.com/dhsim86/java_webdev_workbook/commit/3e216743932df295d0be19ca948aa4ec38e77a55)
+[[ch06] 6.4 Used reflection API.](https://github.com/dhsim86/java_webdev_workbook/commit/3e216743932df295d0be19ca948aa4ec38e77a55)
 
 <br>
 ## 프로퍼티를 이용한 객체 관리
@@ -218,7 +219,7 @@ for (Object item : props.keySet()) {
   ...
 ~~~
 
-[https://github.com/dhsim86/java_webdev_workbook/commit/00751f14e53c3647c110cf142237b60c93fac948](https://github.com/dhsim86/java_webdev_workbook/commit/00751f14e53c3647c110cf142237b60c93fac948)
+[[ch06] 6.5 Used ApplicationContext.](https://github.com/dhsim86/java_webdev_workbook/commit/00751f14e53c3647c110cf142237b60c93fac948)
 
 <br>
 ## Annotation을 이용한 객체 관리
@@ -274,4 +275,9 @@ Annotation 정보를 언제까지 유지할 것인지 설정
 </dependency>
 ~~~
 
-[https://github.com/dhsim86/java_webdev_workbook/commit/f1c8738a6a6c859c496508981712ad6fbb3d4cd9](https://github.com/dhsim86/java_webdev_workbook/commit/f1c8738a6a6c859c496508981712ad6fbb3d4cd9)
+[[ch06] 6.6 Use annotation to regiter bean with Reflections library.](https://github.com/dhsim86/java_webdev_workbook/commit/f1c8738a6a6c859c496508981712ad6fbb3d4cd9)
+
+<br>
+## Project 관리 구현
+
+[[ch06] 6.7 Exercise #0, Implemented printing the list of projects.](https://github.com/dhsim86/java_webdev_workbook/commit/52af366be24e86ddd6b2b4d3f714a1dd58a31dc1)
