@@ -42,7 +42,7 @@ public class ExampleController {
 위와 같이 **@Component** 가 선언된 클래스에 대해서 Spring은 자동으로 빈 생성하고 의존관계를 주입할 것이다.
 component-scan에 대한 자세한 내용은 다음 글을 참조하자.
 
-**[스프링 <context:component-scan> 분석][spring-component-scan]**
+**[스프링 \<context:component-scan\> 분석][spring-component-scan]**
 
 ---
 
