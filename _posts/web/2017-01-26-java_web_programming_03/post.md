@@ -282,3 +282,4 @@ Annotation 정보를 언제까지 유지할 것인지 설정
 ## Project 관리 구현
 
 [[ch06] 6.7 Exercise #0, Implemented printing the list of projects.](https://github.com/dhsim86/java_webdev_workbook/commit/52af366be24e86ddd6b2b4d3f714a1dd58a31dc1)
+[[ch06] 6.7 Exercise #1, Implemented the management of projects.](https://github.com/dhsim86/java_webdev_workbook/commit/f23c69a9d1c81f2669278855827763c24d5d6f4d)
