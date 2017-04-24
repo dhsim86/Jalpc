@@ -66,6 +66,7 @@ update projects set
 ---
 
 * 다음과 같이 pom.xml에 MyBatis 의존성 (version: 3.3.1)
+
 ~~~xml
 <dependency>
     <groupId>org.mybatis</groupId>
@@ -238,6 +239,7 @@ Mybatis는 select 결과를 저장하고자, **resultType** 에 선언된 클래
 
 2. \<resultMap\>
 SQL 문에 각 컬럼마다 별명을 붙이는 대신, \<resultMap\> 태그를 통해 컬럼과 연결될 **setter** 메소드 정의
+
 ~~~xml
 <resultMap type="project" id="projectResultMap">
   <id column="PNO" property="no" />
