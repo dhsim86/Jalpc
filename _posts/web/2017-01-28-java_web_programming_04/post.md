@@ -41,6 +41,7 @@ MyBatis는 SQL Mapper를 제공, 개발과 유지보수가 쉽도록 SQL 문장�
 
 ---
 * 일반적인 JDBC 프로그래밍
+
 ~~~java
 stmt = connection.prepareStatement(
   "update projects set " +
@@ -53,6 +54,7 @@ stmt.setString(1, project.getTitle());
 ...
 ~~~
 * MyBatis 사용
+
 ~~~java
 ... // SQL 문을 다루는 문장이 없음
 ~~~
@@ -111,6 +113,7 @@ List<E> selectList(String sqlId, Object parameter)
 * 값이 필요하다면 두 번째 파라미터로 값 객체를 넘김
 
 ---
+
 ~~~java
 ...
 sqlSession.selectList("spms.dao.ProjectDao.selectList")
@@ -157,6 +160,7 @@ sqlSession.delete("spms.dao.ProjectDao.delete", no);
   where pno=#{value}
 </delete>
 ~~~
+
 * Primitive 타입의 경우 각 해당하는 타입의 랩퍼 클래스 객체로 auto-boxing (int -> Integer)
 * SQL mapper에서 사용시, #{}에 들어갈 이름으로 아무 이름이나 사용 가능
 
@@ -171,6 +175,7 @@ DBMS는 insert / update / delete 문을 실행할 때 그 작업 결과를 임�
 * **autocommit**
   * 자동으로 commit 하고 싶을 때 다음과 같이 지정
   * 트랜잭션을 다룰 수는 없음
+
 ~~~java
 SqlSession sqlSession = SqlSessionFactory.openSession(true);
 ~~~
@@ -204,12 +209,14 @@ SqlSession sqlSession = SqlSessionFactory.openSession(true);
 ### resultType
 
 select 문을 실행하면, 결과가 생성되는데 이 결과를 담을 객체를 지정하는 속성
+
 ~~~xml
 <select id="selectList" resultType="spms.vo.Project" >
 ~~~
 * 보통 클래스의 이름 (full qualified name) 이 온다
 
 만약 mybatis 설정 파일에 다음과 같이 alias가 설정되어 있다면 그 alias에 정의된 이름을 사용 가능
+
 ~~~xml
 <typeAliases>
   <typeAlias type="spms.vo.Project" alias="project" />
@@ -229,6 +236,7 @@ Mybatis는 select 결과를 저장하고자, **resultType** 에 선언된 클래
 위에서 해당하는 setter가 없으면 그 컬럼 값은 저장되지 않는데 다음 두 가지 방법으로 해결
 
 1. SQL 문에 as를 통한 별명 사용
+
 ~~~xml
 <select id="selectList" resultType="project" >
   select
@@ -263,6 +271,7 @@ SQL 문에 각 컬럼마다 별명을 붙이는 대신, \<resultMap\> 태그를 
 ### \<select\> 태그에 resultMap 적용
 
 select 결과에 대해 \<resultMap\> 에 정의된 대로 자바 객체를 생성하고 싶다면, 다음과 같이 resultMap 속성에 id 지정
+
 ~~~xml
 <select id="selectList" resultMap="projectResultMap">
   ...
