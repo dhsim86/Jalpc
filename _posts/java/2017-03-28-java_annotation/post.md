@@ -41,7 +41,7 @@ public class Apple{
 # Custom Annotation
 
 Annotation을 직접 정의해서 사용해보기 위해서는 먼저 annotation을 정의하는 것이 필요하다.
-그 후에 원하는 타겟에 붙여서 사용하는 것이다. Annotation이 붙은 타겟을 어떻게 사용할 지에 대해 구현하면, 해당 기능일 수행될 때 타겟에 붙은 annotation에 따라 타겟의 처리 방향이 결정될 것이다.
+그 후에 원하는 타겟에 붙여서 사용하는 것이다. Annotation이 붙은 타겟을 어떻게 사용할 지에 대해 구현하면, 해당 기능을 수행될 때 타겟에 붙은 annotation에 따라 타겟의 처리 방향이 결정될 것이다.
 
 <br>
 ## 효율적인 annotation의 사용 예
