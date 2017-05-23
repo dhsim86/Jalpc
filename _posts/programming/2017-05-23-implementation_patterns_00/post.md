@@ -21,6 +21,7 @@ icon: icon-html
   * 커뮤니케이션이 가능한 코드를 작성
 * 다른 사람을 위한 프로그램을 작성
 
+<br>
 # Patterns
 
 <br>
