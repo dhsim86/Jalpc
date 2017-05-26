@@ -135,7 +135,6 @@ void initialize() {
   }
 }
 ~~~
-
 ~~~java
 void initialize() {
   if (isInitialized()) {
