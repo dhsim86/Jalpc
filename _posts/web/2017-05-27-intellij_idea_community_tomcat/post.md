@@ -121,6 +121,7 @@ Intellij IDEA Community Edition에서는 자체적으로 spring을 지원하지 
 <br>
 * 다음과 같이 디버깅을 시작할 때 target VM에 접속이 되었나는 메시지를 확인할 수 있을 것이다.
   * 이전에 debug 옵션을 준 tomcat이 실행된 상태여야 한다.
+  <br>
   ![06.png](/static/assets/img/blog/web/2017-05-27-intellij_idea_community_tomcat/06.png)
   ![07.png](/static/assets/img/blog/web/2017-05-27-intellij_idea_community_tomcat/07.png)
 
