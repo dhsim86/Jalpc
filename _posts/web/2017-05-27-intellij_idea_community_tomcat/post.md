@@ -17,7 +17,9 @@ icon: icon-html
 Intellij IDEA Community Edition 은 오픈소스로 Apache 2.0 라이센스 하에 무료로 배포된다. 개인용, 상업용으로 누구나 사용할 수 있지만, 지원하는 기능이 적다.
 
 [Intellij IDEA Choose Edition][choose-edition]
+<br>
 [Intellij IDEA Ultimate Edition vs Community Edition][versus-edition]
+<br>
 [Ask about Community Edition License][askabout-edition]
 
 <br>
@@ -116,14 +118,13 @@ Intellij IDEA Community Edition에서는 자체적으로 spring을 지원하지 
   * 다음과 같이 port 번호를 9999로 설정한다.
 ![05.png](/static/assets/img/blog/web/2017-05-27-intellij_idea_community_tomcat/05.png)
 
-
+<br>
 * 다음과 같이 디버깅을 시작할 때 target VM에 접속이 되었나는 메시지를 확인할 수 있을 것이다.
   * 이전에 debug 옵션을 준 tomcat이 실행된 상태여야 한다.
+  ![06.png](/static/assets/img/blog/web/2017-05-27-intellij_idea_community_tomcat/06.png)
+  ![07.png](/static/assets/img/blog/web/2017-05-27-intellij_idea_community_tomcat/07.png)
 
-![06.png](/static/assets/img/blog/web/2017-05-27-intellij_idea_community_tomcat/06.png)
-
-![07.png](/static/assets/img/blog/web/2017-05-27-intellij_idea_community_tomcat/07.png)
-
+<br>
 * 디버깅 진행할 때, 다음과 같이 breakpoint가 걸리고, 변수 값과 스택 프레임도 확인할 수 있을 것이다.
 ![08.png](/static/assets/img/blog/web/2017-05-27-intellij_idea_community_tomcat/08.png)
 
