@@ -158,6 +158,7 @@ Spring은 IoC 컨테이너가 갖추어야 할 기능들을 **ApplicationContext
 </bean>
 ~~~
 위와 같이 정의하면 Score 클래스의 **setName(String name) / setValue(int value)** 가 호출된다.
+
 [[ch08] 8.3 property usage.
 ](https://github.com/dhsim86/java_webdev_workbook_spring/commit/e422e93a27c53f54d09f1c959016662d62076fdb)
 
@@ -483,15 +484,15 @@ Spring 에서는 java.util.Date 처럼 자주 사용하는 타입에 대해 몇 
 * 그외 프로퍼티 에디터는 **org.springframework.beans.propertyeditors** 패키지에 있다.
 
 1. SimpleDateFormat 빈 생성
-  문자열을 java.util.Date 객체를 생성해 줄 SimpleDateFormat 빈 생성
+  * 문자열을 java.util.Date 객체를 생성해 줄 SimpleDateFormat 빈 생성
 2. **CustomDateEditor** 빈 생성
-  날짜 프로퍼티 값을 처리해주는 빈 생성, 생성자로 SimpleDateFormat 빈을 넘김
+  * 날짜 프로퍼티 값을 처리해주는 빈 생성, 생성자로 SimpleDateFormat 빈을 넘김
 3. **CustomPropertyEditorRegistrar** 클래스 정의 및 빈 생성
-  Spring IoC 컨테이너에 CustomDateEditor 를 설치하기 위해 에디터 등록기 정의가 필요
+  * Spring IoC 컨테이너에 CustomDateEditor 를 설치하기 위해 에디터 등록기 정의가 필요
 4. List 객체에 에디터 등록기 add
-  최종적으로는 에디터 등록기 리스트를 넘겨줘야 한다.
+  * 최종적으로는 에디터 등록기 리스트를 넘겨줘야 한다.
 5. **CustomEditorConfigurer** 객체에 리스트를 넘김
-  이 객체는 프로퍼티 에디터 등록기를 싱행하여 IoC 컨테이너에 설치한다.
+  * 이 객체는 프로퍼티 에디터 등록기를 싱행하여 IoC 컨테이너에 설치한다.
 
 <br>
 #### CustomPropertyEditorRegistrar 정의
