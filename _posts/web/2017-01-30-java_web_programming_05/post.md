@@ -516,6 +516,7 @@ public class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
 ~~~
 위의 registerCustomEditors는 java.util.Date 타입에 대해 프로퍼티 에디터를 등록하는데, 이 java.util.Date 타입의 프로퍼티 값을 처리할 때 customDateEditor 가 사용된다.
 
+<br>
 #### xml 설정
 
 다음과 같이 앞서 정의한 **CustomPropertyEditorRegistrar** 타입의 빈에 **CustomDateEditor** 빈을 주입하고, 이 빈을 **CustomEditorConfigurer** 에 리스트로 프로퍼티를 설정한다.
