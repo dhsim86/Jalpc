@@ -89,7 +89,7 @@ update projects set
 | SQL Mapper 파일 | SQL 문을 담고 있는 파일, SqlSession 객체가 참조 |
 
 <br>
-## SqlSessio
+## SqlSession
 
 SqlSession: SQL 문장을 실행하는 도구
 * 직접 생성할 수 없고, SqlSessionFactory를 통해서만 얻을 수 있음.
