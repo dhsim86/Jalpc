@@ -90,6 +90,7 @@ Spring은 IoC 컨테이너가 갖추어야 할 기능들을 **ApplicationContext
 ](https://github.com/dhsim86/java_webdev_workbook_spring/commit/6402c1a91bafc245b43be3c3d01fb380efea13c2)
 
 * 다음과 같이 빈의 이름을 설정하지 않으면 컨테이너에 보관할 때 **패키지 이름 + 클래스 이름 + 인덱스** 로 사용한다.
+
 ~~~xml
 <!-- exam.test01.Score#0 -->
 <!-- exam.test01.Score 는 첫 번째 빈인 exam.test01.Score#0 에 대한 별명이 된다. -->
