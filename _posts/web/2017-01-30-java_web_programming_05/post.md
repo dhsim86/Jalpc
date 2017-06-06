@@ -556,4 +556,143 @@ public class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
 [[ch08] 8.9 Use custom property editor.
 ](https://github.com/dhsim86/java_webdev_workbook_spring/commit/0372edf00055ac79432cf18ac27c1d74002efb60)
 
+<br>
+## Using annotations
+
+<br>
+### @Autowired basic usage
+
+**@Autowired** annotation을 통해 간단히 의존 객체를 주입 가능.
+* 이 기능을 사용하기 위해 다음과 같이 빈 설정 파일에 다음 객체를 선언해야 한다.
+~~~xml
+<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcess" />
+~~~
+
+이 **AutowiredAnnotationBeanPostProcess** 클래스는 빈의 후 처리기 (post processor)로서 빈을 생성 후 @Autowired 로 선언된 setter를 찾아 호출하는 역할을 수행한다. 파라미터 타입과 일치하는 빈을 찾아 주입해준다. 타입 일치하는 빈이 없거나 2개 이상인 경우, 예외를 발생시킨다.
+
+~~~java
+public class Car {
+  ...
+  @Autowired
+  public void setEngine(Engine engine) {
+    this.engine = engine;
+  }
+  ...
+}
+~~~
+~~~xml
+...
+<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+...
+<bean id="hyundaiEngine" class="exam.test17.Engine">
+    <constructor-arg value="Hyundai"/>
+</bean>
+
+<bean id="car1" class="exam.test17.Car">
+    <property name="model" value="Sonata"/>
+</bean>
+~~~
+
+[[ch08] 8.10 Apply @Autowired annotation.
+](https://github.com/dhsim86/java_webdev_workbook_spring/commit/849d977033d88c2bfd6ba311e5af7119809dd1c8)
+
+* AutowiredAnnotationBeanPostProcessor 객체를 선언하는 대신, 다음과 같이 **annotation-config** 를 추가하면 사용할 수 있다.
+~~~xml
+...
+  <context:annotation-config/>
+...
+~~~
+
+<br>
+### @Autowired required
+
+다음과 같이 required 속성을 false로 지정하면 setter에 주입할 빈을 못찾아도 예외가 발생하지 않는다.
+~~~java
+public class Car {
+  ...
+  @Autowired(required = false)
+  public void setEngine(Engine engine) {
+    this.engine = engine;
+  }
+  ...
+}
+~~~
+
+<br>
+### @Qualifier
+
+@Autowired annotation 사용시, 주입할 수 있는 빈 객체가 여러 개일 경우 예외를 발생시킨다. 이 상황에서 적절한 빈을 주입시킬 수 있게 해주기 위해, **@Qualifier** annotation을 사용한다.
+
+* 마찬가지로 이 annotation을 후처리하기 위해 별도의 후처리를 담당하는 클래스를 정의해야 하지만, context:annotation-config 를 통해 사용할 수 있다.
+
+---
+
+| annotation | post processor |
+| ---------- | ---------- |
+| @Autowired, @Value, @Inject (JSR-330) | AutowiredAnnotationBeanPostProcessor |
+| JSR-250 annotation (javax.annotation.*) | CommonAnnotationBeanPostProcessor |
+| @PersistenceUnit, @PsersistenceContext | PersistenceAnnotationBeanPostProcessor |
+| @Required | RequiredAnnotationBeanPostProcessor |
+
+---
+
+**@Qualifier** annotation을 다음과 같이 사용한다. Annotation 에 들어가는 문자열은 주입할 빈의 id 이다. 빈 컨테이너는 이 id 값과 일치하는 이름을 가진 빈을 찾아 주입한다.
+
+~~~java
+public class Car {
+  ...
+  @Autowired(required = false)
+  @Qualifier("kiaEngine")
+  public void setEngine(Engine engine) {
+    this.engine = engine;
+  }
+  ...
+}
+~~~
+
+<br>
+### @Resource
+
+간단히 말해, 이 annotation은 **@Autowired + @Qualifier** 이다. 이름으로 의존 객체를 지정할 경우, 이 annotation을 사용할 것을 권장한다. 단, required 속성이 없으므로 반드시 주입가능한 빈이 있어야 한다.
+
+~~~java
+public class Car {
+  ...
+  @Resource(name="kiaEngine")
+  public void setEngine(Engine engine) {
+    this.engine = engine;
+  }
+  ...
+}
+~~~
+
+<br>
+## 빈 자동 등록
+
+스프링에서는 **@Component** annotation을 사용하여, 이 annotation이 붙은 클래스로부터 객체를 자동 생성하여 빈으로 등록한다. 이 annotation 외에도 클래스의 역할에 따라 붙일 수 있는 annotation을 추가로 제공한다.
+
+| annotation | description |
+| ---------- | ---------- |
+| @Component | 빈 생성 대상이 되는 모든 클래스에 대해 선언 가능 |
+| @Repository | DAO와 같은 persistence 역할을 수행하는 클래스에 선언 |
+| @Service | 서비스 역할, 비즈니스 로직이 들어가는 루틴이 있는 클래스에 선언 |
+| @Controller | MVC 구조에서 Controller 역할을 수행하는 클래스에 선언 |
+
+위의 annotation을 사용하기 위해, 다음과 같은 태그를 빈 설정 파일에 추가해야 한다.
+~~~xml
+...
+  <context:component-scan base-package="kr.co.myproject" />
+...
+~~~
+
+~~~java
+@Component("car")
+public class {
+  ...
+}
+~~~
+
+위 annotation에서 들어가는 문자열은 빈의 이름이다.
+
+
 [factory-bean]: https://spring.io/blog/2011/08/09/what-s-a-factorybean
