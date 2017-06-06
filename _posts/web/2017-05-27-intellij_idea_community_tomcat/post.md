@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Intellij IDEA Community Edition에서 external tomcat 실행"
-date:   2017-05-27
+date:   2017-06-01
 desc: "Intellij IDEA Community Edition에서 external tomcat 실행"
 keywords: "server programming"
 categories: [Web]
