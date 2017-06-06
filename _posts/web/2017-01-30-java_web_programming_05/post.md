@@ -564,6 +564,7 @@ public class CustomPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
 **@Autowired** annotation을 통해 간단히 의존 객체를 주입 가능.
 * 이 기능을 사용하기 위해 다음과 같이 빈 설정 파일에 다음 객체를 선언해야 한다.
+
 ~~~xml
 <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcess" />
 ~~~
@@ -684,6 +685,7 @@ public class Car {
   <context:component-scan base-package="kr.co.myproject" />
 ...
 ~~~
+* 위에서 base package에 정의된 패키지 하위에 @Component가 선언된 클래스를 모두 빈으로 자동 등록한다.
 
 ~~~java
 @Component("car")
