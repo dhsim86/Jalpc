@@ -106,7 +106,7 @@ icon: icon-html
 ### 중복 코드의 메소드 추출
 * Connection 을 가져오는 중복된 코드를 분리. 중복된 DB 연결 코드를 하나의 메소드로 묶는다.
 * [[ch01] Separated the routine of getting DB connection
-](https://github.com/dhsim86/tobys_spring_study/commit/59386df3331b4ea04903c4b585a75cd626211acf)
+](https://github.com/dhsim86/tobys_spring_study/commit/30c1d9b6c6bfa9f0dfc5e2a702e34925f46b0e73)
 
 > 리팩토링: 기존의 코드를 외부의 동작방식에는 변화없이, 내부 구조를 변경해서 재구성하는 작업 또는 기술. 코드 내부의 설계가 개선되어 이해하기가 쉽고 변화에 효율적으로 대응할 수 있다.
 
@@ -158,7 +158,7 @@ public class Sub1 extends Super() {
 
 > 팩토리 메소드 패턴: 서브 클래스에서 구체적인 오브젝트 생성 방법을 위임하는 방식. 슈퍼클래스 코드에서 서브클래스에서 구현하는 메소드를 호출하여 필요한 타입의 오브젝트를 사용한다.
 
-> 디자인 패턴: 특정 상황에서 자주 발생하는 문제를 해결하기 위한, 재사용 가능한 솔루션, 패턴의 핵심이 담긴 목적 또는 의도를 잘 알고 적용할 상황 / 해결해야할 문제 / 각 요소의 역할을 잘 알아야 한다.
+> 디자인 패턴: 특정 상황에서 자주 발생하는 문제를 해결하기 위한, 재사용 가능한 솔루션. 패턴의 핵심이 담긴 목적 또는 의도를 잘 알고 적용할 상황 / 해결해야할 문제 / 각 요소의 역할을 잘 알아야 한다.
 
 * 상속을 통한 확장의 한계점
   * 다중 상속의 문제점
@@ -190,7 +190,7 @@ public class Sub1 extends Super() {
   * 두 개의 클래스가 서로 종속적으로 긴밀하게 연결되지 않도록 인터페이스를 통해 느슨하게 해준다.
   * 인터페이스를 사용하면 구현 클래스가 무엇인지는 관심가질 필요가 없다.
     * 사용하는 쪽에서는 인터페이스를 통해 사용하기만 하면 된다.
-  * [[ch01] Use interface to loose relationship between UserDao and SimpleConnectionMaker ](https://github.com/dhsim86/tobys_spring_study/commit/feac2bdabfd0a25131370d1e4897630a8d2c64ab)
+  * [[ch01] Use interface to loose relationship between UserDao and SimpleConnectionMaker ](https://github.com/dhsim86/tobys_spring_study/commit/dfb01136bf2482878db89eea0774ac79d7b5818d)
 
 <br>
 ![03.png](/static/assets/img/blog/web/2017-06-06-toby_spring_01_object_dependency/03.png)
