@@ -110,10 +110,13 @@ public void function() {
 예외가 발생하는 상황은 다음과 같은 3가지의 경우이다.
 
 * Exceptions due to programming errors (프로그래밍 에러로 인한 예외의 발생)
+
   이 예외들은 프로그래밍적 오류로 인해 발생한다. (NullPointerException과 같은 생성되지 않은 객체의 변수나 메소드 사용하거나 IllegalArgumentException과 같이 파라미터를 잘못 사용한 경우). 이런 원인으로 발생하는 예외는 어떤 조치를 취할 수가 없다.
 * Exceptions due to client code errors (클라이언트 코드들의 에러로 인해 발생하는 예외)
+
   제공되는 API에서 허용되지 않는 것들을 시도하려고 했을 때, 만약 예외가 제공하는 유용한 정보들이 있다면 클라이언트에서는 다른 대안적인 행동을 취할 수 있게 된다.
 * Exceptions due to resource failures (리소스 자체의 문제로 인해 발생하는 예외)
+
   예외들은 프로그램이 사용한 리소스들을 불러들이는데 실패 혹은 리소스 자체의 문제로 인해 발생할 수 있다. 클라이언트는 해당 리소스를 사용하기 위해 일정 시간 후에 다시 시도한다거나, 실패를 로그로 남길 수도 있다.
 
 <br>
