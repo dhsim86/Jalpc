@@ -134,7 +134,7 @@ Checked Exception과 Unchecked Exception 중 어떤 것을 쓸 것인지를 결�
 | 클라이언트가 조치를 취할 수 없음 | Unchecked Exception |
 | 예외가 주는 정보를 통해 어느정도의 예외 복구 조치를 취할 수 있음 | Checked Exception |
 
-
+<br>
 * 모든 프로그래밍 에러에 대해서는 Unchecked Exception 을 사용해야 한다. Unchecked Exception 은 그 예외들을 처리하라고 강요하지 않는 이점이 있으며 자바 API 에서도 NullPointerException, IllegalArgumentException 과 같은 많은 Unchecked Exception 들을 제공한다.
 * 되도록 본인이 직접 만든 사용자 정의 예외 보다는 자바에서 제공하는 표준 예외 사용하는 것이 좋다.
 * 로그만 출력하는 것은 의미있는 복구 작업이 아니다.
