@@ -74,6 +74,7 @@ icon: icon-html
 
 * 자바빈: 다음의 두 가지 관례를 따라 만들어진 오브젝트를 가리킨다.
   * 디폴트 생성자: 파라미터가 없는 디폴트 생성자를 가져야 한다.
+    * 프레임워크에서 리플렉션을 통해 오브젝트를 생성하기 위해 필요하다.
   * 프로퍼티: 자바빈이 노출하는 속성에 접근할 수 있도록 Setter 및 Getter 를 제공한다.
 
 * 초난감 DAO
@@ -170,7 +171,9 @@ public class Sub1 extends Super() {
 ## DAO의 확장
 
 * 변화의 성격
-  * 성격이 다르다는 것은 변화의 이유와 시기, 주기 등이 다르다.
+  * 모든 오브젝트가 다 동일한 방식으로 변하는 것이 아니다.
+  * 변화의 성격이 다르다는 것은 변화의 이유와 시기, 주기 등이 다르다.
+    * 변화의 성격이 다른 것을 분리하는 것이 "관심사의 분리"
 
 * 클래스의 분리
   * DB 커넥션과 관련된 부분을 상속을 통한 서브클래스에서가 아닌, 별도의 클래스에서 구현 후 UserDao가 이를 사용하도록 함
@@ -187,7 +190,7 @@ public class Sub1 extends Super() {
 
 ---
 * 인터페이스를 통한 관심사의 분리
-  * 두 개의 클래스가 서로 종속적으로 긴밀하게 연결되지 않도록 인터페이스를 통해 느슨하게 해준다.
+  * 두 개의 클래스가 서로 종속적으로 긴밀하게 연결되지 않도록 **인터페이스** 를 통해 느슨하게 해준다.
   * 인터페이스를 사용하면 구현 클래스가 무엇인지는 관심가질 필요가 없다.
     * 사용하는 쪽에서는 인터페이스를 통해 사용하기만 하면 된다.
   * [[ch01] Use interface to loose relationship between UserDao and SimpleConnectionMaker ](https://github.com/dhsim86/tobys_spring_study/commit/dfb01136bf2482878db89eea0774ac79d7b5818d)
@@ -305,4 +308,295 @@ SOLID
 > 스프링은 이러한 객체지향적 설계 원칙과 디자인 패턴에 나타난 장점을 개발자들이 활용할 수 있도록 해주는 프레임워크이다.
 
 <br>
-## 제어의 역전 (IOC)
+## 제어의 역전 (IoC)
+
+<br>
+### 오브젝트 팩토리
+
+* 팩토리, factory: 객체 생성 방법을 결정하고 만들어진 오브젝트를 리턴
+  * 오브젝트 생성 및 런타임 의존관계 설정을 팩토리로 위임
+    * UserDao 및 ConnectionMaker는 각기 관심사항에 대한 비즈니스 로직을 담당
+    * DaoFactory는 오브젝트들을 구성하고 관계를 정의하는 책임
+  * [[ch01] Separated the routine for creating UserDao to DaoFactory. ](https://github.com/dhsim86/tobys_spring_study/commit/c7d6fa7ff56382b893a3b1d02050891d192e5cf8)
+
+* 팩토리는 애플리케이션을 구성하는 컴포넌트들의 구조와 관계를 정의한 설계도 같은 역할을 수행한다.
+  * **애플리케이션의 컴포넌트 역할** 을 하는 오브젝트와 **애플리케이션의 구조를 결정** 하는 오브젝트를 분리하느데 의미가 있다.
+
+<br>
+![07.png](/static/assets/img/blog/web/2017-06-06-toby_spring_01_object_dependency/07.png)
+
+
+* 제어의 역전: 프로그램의 제어 흐름 구조가 뒤바뀜
+  * 일반적인 프로그램: 프로그램이 시작되는 지점에서 사용할 오브젝트를 직접 결정, 생성, 메소드 호출하고 결정한다.
+  * 제어의 역전은 이러한 흐름을 뒤집은 것이다.
+    * 사용할 오브젝트를 스스로 선택하지 않으며, 생성하지도 않는다. 모든 제어 권한을 다른 대상에게 위임한다.
+
+> 프레임워크도 제어의 역전 개념이 적용된 기술이다. 프레임워크는 단지 만들어져있거나 확장해서 사용될 수 있도록 준비된 집합이 아니다. 애플리케이션 코드가 프레임워크에 의해 사용되는, 제어의 역전의 개념이 들어가 있다.
+
+* DaoFactory 가 컴포넌트 생성 및 관리의 책임을 지고, 다른 컴포넌트들은 수동적으로 동작하므로 제어의 역전이 적용된 것이다.
+
+> 제어의 역전에서는 프레임워크 또는 컨테이너와 같이 애플리케이션 컴포넌트의 생성과 관계 설정 등을 관리할 존재가 필요하다.
+
+<br>
+## 스프링의 IoC
+
+<br>
+### 애플리케이션 컨텍스트와 설정정보
+
+* 빈 (Bean): 스프링이 제어권을 가지고, 직접 생성하고 관계를 부여하는 오브젝트
+  * 스프링 빈: 스프링 컨테이너가 생성과 관계설정, 사용 등을 제어해주는 제어의 역전이 적용된 오브젝트
+
+* 빈 팩토리, 애플리케이션 컨텍스트: 스프링에서 빈의 생성과 제어를 담당하는 IoC 오브젝트
+
+> 애플리케이션 컨텍스트는 별도의 정보를 참고하여 빈의 생성 및 관계 설정과 같은 제어 작업을 총괄
+
+<br>
+### DaoFactory를 사용하는 애플리케이션 컨텍스트
+
+* DaoFactory를 자바 코드로 만들어진 애플리케이션 컨텍스트의 설정 정보로 활용가능
+  * **@Bean** / **@Configuration** annotation 사용
+
+* **@Configuration** : 빈 팩토리를 위한 오브젝트 설정을 담당하는 클래스로 인식
+* **@Bean** : 오브젝트를 만들어주는 메소드에 정의
+
+[[ch01] Use Spring's application context to management for components. ](https://github.com/dhsim86/tobys_spring_study/commit/1815285309d66fcd2639cf70e9ab2db6bcf9b65d)
+
+~~~java
+package ch01.springbook.user.dao;
+
+@Configuration
+public class DaoFactory {
+
+  @Bean
+  public UserDao userDao() {
+    return new UserDao(connectionMaker());
+  }
+  // 메소드의 이름이 빈의 이름이 된다.
+
+  @Bean
+  public ConnectionMaker connectionMaker() {
+    return new SimpleConnectionMaker();
+  }
+}
+
+...
+public class UserDaoTest {
+
+  public static void main(String[] args) throws ClassNotFoundException, SQLException {
+
+  ApplicationContext applicationContext =
+    new AnnotationConfigApplicationContext(DaoFactory.class);
+  UserDao dao = applicationContext.getBean("userDao", UserDao.class);
+  ...
+}
+~~~
+
+* **AnnotationConfigApplicationContext**: @Configuration annotation을 사용하는, 자바 코드를 설정 정보를 사용할 때 이 애플리케이션 컨택스트를 사용
+* **getBean**: 애플리케이션 컨텍스트가 관리하는 오브젝트를 요청하는 메소드
+
+<br>
+### 애플리케이션 컨텍스트의 동작방식
+
+* 오브젝트 팩토리에 대응되는 것이 스프링의 애플리케이션 컨텍스트
+  * 스프링에서는 IoC 컨테이너라 하기도 하고, 스프링 컨테이너라고 부르기도 한다.
+
+* 애플리케이션 컨텍스트는 **ApplicationContext** 인터페이스를 구현하며, 빈 팩토리가 구현하는 **BeanFactory** 인터페이스를 상속한다.
+  * 애플리케이션에서 IoC를 적용해서 관리할 모든 오브젝트에 대한 생성과 관계설정을 담당
+
+<br>
+![08.jpg](/static/assets/img/blog/web/2017-06-06-toby_spring_01_object_dependency/08.jpg)
+
+* **@Configuration** 이 붙은 DaoFactory를 IoC 설정정보로 활용하며, DaoFactory의 userDao 메소드를 호출해서 오브젝트를 가져온 것을 **getBean** 을 통해 요청될 때 전달해준다.
+  * **@Bean** 이 붙은 메소드의 이름을 가져와 빈 목록을 만들고, 요청시 해당 메소드를 호출하여 오브젝트를 생성 후 전달
+
+<br>
+![09.png](/static/assets/img/blog/web/2017-06-06-toby_spring_01_object_dependency/09.png)
+
+* 애플리케이션 컨택스트를 사용하는 이유는 범용적이고 유연한 방법으로 IoC 기능을 확장하기 위해서이다.
+  * 클라이언트는 구체적인 팩토리 클래스를 알 필요가 없다.
+    * 어떤 팩토리 클래스를 사용할지 알 필요가 없으며, 팩토리 오브젝트를 생성할 필요도 없다.
+    * XML 을 통한 단순한 방법을 통해 설정 정보를 만들 수 있다.
+  * 종합 IoC 서비스 제공
+    * 오브젝트가 만들어지는 방식, 시점과 전략을 유연하게 가져갈 수 있다.
+  * 빈을 검색하는 다양한 방법을 제공
+    * 이름 뿐만 아니라, 타입이나 특별한 annotation 설정이 되어 있는 빈을 찾을 수도 있다.
+
+<br>
+### 스프링 IoC의 용어 정리
+
+* 빈 (Bean): 스프링이 IoC 방식으로 관리하는 오브젝트, 스프링이 직접 그 생성과 제어를 담당하는 오브젝트
+* 빈 팩토리 (Bean Factory): 스프링의 IoC 를 담당하는 핵심 컨테이너, 빈을 등록 / 생성 / 조회 / 전달하며 관리하는 기능을 담당
+* 애플리케이션 컨텍스트 (Application Context): 빈 팩토리를 확장한 IoC 컨테이너. 스프링이 제공하는 각종 부가 서비스를 추가로 제공
+* 설정정보/설정 메타정보 (Configuration Metadata): IoC를 적용하기 위해 사용하는 메타정보. IoC 컨테이너에 의해 관리되는 애플리케이션 오브젝트를 생성하고 구성할 때 사용.
+* 컨테이너, IoC 컨테이너: IoC 방식으로 빈을 관리한다는 의미로 애플리케이션 컨텍스트나 빈 팩토리를 컨테이너 또는 IoC 컨테이너라고도 부른다.
+* 스프링 프레임워크: IoC 컨테이너, 애플리케이션 컨텍스트를 포함해서 스프링이 제공하는 모든 기능을 총칭
+
+<br>
+## 싱글톤 레지스트리와 오브젝트 스코프
+
+* 애플리케이션 컨텍스트를 통해 생성된 빈은 **디폴트로** 몇번 요청하더라도 **동일한** 빈이 전달된다.
+  * 매번 동일한 빈을 돌려준다. (매번 new 메소드를 통해 새로운 빈이 생성되지 않는다.)
+
+* 애플리케이션 컨텍스트는 빈을 **싱글톤** 으로서 저장하고 관리하는 **싱글톤 레지스트리** 이다.
+
+> 스프링이 주로 적용되는 대상이 서버 환경인데, 이 환경은 수많은 요청을 처리해야 하는 높은 성능이 요구된다. 각 요청에 대해 새로운 오브젝트를 생성한다면 부하가 걸리게 되므로, 하나의 오브젝트만 만들어두고 요청을 처리하는 스레드들이 서로 오브젝트를 공유하면서 사용하도록 한다.
+
+> 싱글톤 패턴: 어떤 클래스를 애플리케이션에서 제한된 인스턴스 개수, 주로 하나만 존재하도록 강제하는 패턴.
+
+<br>
+### 싱글톤 패턴의 한계
+
+* 보통 싱글톤을 구현할 때 다음과 같이 구현한다.
+
+~~~java
+public class UserDao {
+  private static UserDao userDao;
+
+  private UserDao(ConnectionMaker connectionMaker) {
+    this.connectionMaker = connectionMaker;
+  }
+
+  public static synchronized UserDao getInstance() {
+    if (userDao == null) {
+      userDao = new userDao(?);
+    }
+    return userDao;
+  }
+}
+~~~
+
+* private 생성자를 가지고 있으므로 상속이 불가능하다.
+  * 싱글톤 패턴은 private로 생성자를 만드는데, 다른 생성자가 없다면 상속이 불가능해진다.
+* 테스트하기가 힘들다.
+  * Mock 오브젝트 등으로 대체하기가 어렵다.
+* 서버환경에서는 싱글톤이 하나만 만들어지는 것을 보장하지 못한다.
+* 싱글톤의 사용은 전역 상태를 만들어버리므로 바람직하지 않다.
+  * 아무곳에서나 static 메소드를 통해 해당 오브젝트를 사용할 수 있다.
+
+<br>
+### 싱글톤 레지스트리
+
+* 스프링은 서버환경에서 오브젝트들이 싱글톤으로 만들어져서 오브젝트 방식으로 만드는 것을 권장하는데, 싱글톤 패턴 구현 방식은 한계가 있으므로 직접 오브젝트를 만들고 관리하는 기능을 제공한다.
+
+* 스프링 컨테이너는 싱글톤을 생성하고 관리하는 싱글톤 관리 컨테이너이다.
+  * 싱글톤 패턴이 아닌 일반 생성자로 구성된 평범한 자바 클래스도 싱글톤으로 활용할 수 있게 해준다.
+  * 일반적인 자바 클래스를 사용할 수 있으므로, 싱글톤 패턴과는 다르게 **객체지향적인 설계 방식과 디자인 패턴을 적용하는데 아무런 제약이 없다.**
+
+<br>
+### 싱글톤과 오브젝트 상태
+
+* 싱글톤은 멀티스레드 환경에서 여러 스레드가 동시에 접근해서 사용할 수 있다.
+  * 따라서 오브젝트 내부적으로 상태 정보를 가지고 있으면 안된다.
+  * 파라미터나 로컬 변수와 같은 것은 스택에 따로 만들어지므로 상관이 없음.
+
+<br>
+### 스프링 빈의 스코프
+* 스코프: 스프링이 관리하는 빈이 생성되고 존재하고, 적용되는 범위
+
+* 싱글톤 스코프: 스프링 빈의 기본 스코프, 한 개의 오브젝트만 생성된다.
+* 프로토타입 스코프: 빈을 요청할 때마다 새로운 빈이 생성된다.
+
+> 그 외 Http 요청이 생길 때마다 생성되닌 요청 스코프 / 웹의 세션과 유사한 세션 스코프도 있다.
+
+<br>
+## 의존관계 주입 (DI)
+
+<br>
+### 제어의 역전과 의존관계 주입
+
+* 스프링 IoC 기능의 대표적인 원리는 의존관계 주입이다.
+
+---
+**의존관계**
+
+<br>
+![10.png](/static/assets/img/blog/web/2017-06-06-toby_spring_01_object_dependency/10.png)
+
+* 의존한다는 것은, 위의 그림을 예로 들때 B가 변하면 A에 영향을 미친다는 뜻이다.
+  * B의 기능이 변화하면 A의 기능이 수행되는 데도 영향이 미친다.
+  * B를 수정할 때, A로 그에 따라 수정되어야 할 수 있다.
+  * 의존관계에는 방향성이 있다.
+
+* UserDao와 같이 인터페이스를 통해서만 의존관계를 만들면 인터페이스 구현 클래스와의 관계는 느슨해지면서 영향을 덜 받게 할 수 있다.
+
+<br>
+![11.png](/static/assets/img/blog/web/2017-06-06-toby_spring_01_object_dependency/11.png)
+
+---
+**의존관계 주입**
+
+* 클래스 모델이나 코드에는 런타임 시점의 의존관계가 드러나지 않는다. 그러기 위해 인터페이스에만 의존하고 있어야 한다.
+* 런타임 시점의 의존관계는 컨테이너나 팩토리 같은 제 3자가 설정한다.
+* 의존관계는 외부에서 오브젝트를 주입해줌으로써 만들어진다.
+
+~~~java
+public UserDao() {
+  connectionMaker = new SimpleConnectionMaker();
+}
+~~~
+
+위 코드의 문제는 코드 상에서 런타임 의존관계가 있다는 것이다.
+
+<br>
+### 메소드를 이용한 의존관계 주입
+
+* 생성자뿐만 아니라 **Setter** 를 통해 의존관계를 주입할 수 있다.
+  * 스프링에서는 XML 과 같은 설정 정보를 사용할 때 **Setter** 를 통해 주입하는 것이 더 편하다.
+
+~~~java
+  package ch01.springbook.user.dao;
+
+  @Configuration
+  public class DaoFactory {
+
+    @Bean
+    public UserDao userDao() {
+      UserDao userDao = new UserDao();
+      userDao.setConnectionMaker(connectionMaker());
+      return userDao;
+    }
+
+    @Bean
+    public ConnectionMaker connectionMaker() {
+      return new SimpleConnectionMaker();
+    }
+  }
+~~~
+
+<br>
+## XML을 이용한 설정
+
+* 스프링에서는 XML 을 통해 DI 의존관계 설정정보를 만들 수 있다.
+  * 자바코드로 만드는 설정정보와는 다르게, 빌드 작업도 필요 없고 빠르게 반영할 수 있다.
+
+|  | 자바 코드 설정 정보 | XML 설정 정보 |
+| ---------- | :--------- | --------- |
+| 빈 설정파일 | @Configuration | \<beans\> |
+| 빈의 이름 | @Bean methodName() | \<bean id="methodName"\> |
+| 빈의 클래스 | return new BeanClass() | class="a.b.c... BeanClass"\> |
+
+~~~xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <bean id="connectionMaker" class="ch01.springbook.user.dao.SimpleConnectionMaker" />
+    <!-- bean 태그는 @Bean에 대응 -->
+    <!-- class 에는 오브젝트 생성시 사용하는 클래스 이름, 패키지까지 모두 포함 -->
+
+    <bean id="userDao" class="ch01.springbook.user.dao.UserDao">
+        <property name="connectionMaker" ref="connectionMaker" />
+        <!-- Setter 를 통한 의존관계 주입, UserDao 클래스에는 setConnectionMaker 이름의 setter가 있어야 한다. -->
+        <!-- name은 Setter의 프로퍼티 이름 -->
+        <!-- ref는 Setter 를 통해 주입할 오브젝트의 빈 ID이다. -->
+    </bean>
+
+</beans>
+~~~
+
+* XML 을 통한 설정정보를 활용하기 위해서는 **GenericXmlApplicationContext** 를 사용한다.
+
+[[ch01] Use XML as bean configurations. ](https://github.com/dhsim86/tobys_spring_study/commit/87cb981e00ee04b084973e38bb2ff28860ba9eff)
+[[ch01] Use DataSource to get connection. ](https://github.com/dhsim86/tobys_spring_study/commit/7045fc54788e8e542a04bdfe3416c190cec69533)
