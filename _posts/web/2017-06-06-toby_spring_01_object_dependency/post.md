@@ -569,7 +569,7 @@ public UserDao() {
 * 스프링에서는 XML 을 통해 DI 의존관계 설정정보를 만들 수 있다.
   * 자바코드로 만드는 설정정보와는 다르게, 빌드 작업도 필요 없고 빠르게 반영할 수 있다.
 
-|  | 자바 코드 설정 정보 | XML 설정 정보 |
+| -- | 자바 코드 설정 정보 | XML 설정 정보 |
 | ---------- | :--------- | --------- |
 | 빈 설정파일 | @Configuration | \<beans\> |
 | 빈의 이름 | @Bean methodName() | \<bean id="methodName"\> |
@@ -599,4 +599,5 @@ public UserDao() {
 * XML 을 통한 설정정보를 활용하기 위해서는 **GenericXmlApplicationContext** 를 사용한다.
 
 [[ch01] Use XML as bean configurations. ](https://github.com/dhsim86/tobys_spring_study/commit/87cb981e00ee04b084973e38bb2ff28860ba9eff)
+
 [[ch01] Use DataSource to get connection. ](https://github.com/dhsim86/tobys_spring_study/commit/7045fc54788e8e542a04bdfe3416c190cec69533)
