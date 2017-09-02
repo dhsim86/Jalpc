@@ -113,7 +113,7 @@ DB를 사용하다가 발생할 수 있는 예외는 다양한데, DB마다 에�
 
 DB 에러코드는 DB에서 직접 제공하는 것이므로 어느 정도는 일관성이 유지된다. 각 DB별로 달라지는 에러코드를 일관성있는 예외로 전달받을 수 있도록 매핑해주는 것이 좋을 수 있다.
 
-스프링은 DataAccessException 뿐만 아니라 서브클래스로 세분화된 예외를 두고 있다. 스프링은 SQLException을 단지 Unchecked 예외은 DataAccessException 으로 단순히 포장하는 것이 아니라, DB 에러코드를 참조하여 DataAccessException 의 서브클래스 예외로 전환해준다.
+스프링은 DataAccessException 뿐만 아니라 서브클래스로 세분화된 예외를 두고 있다. 스프링은 SQLException을 단지 Unchecked 예외를 DataAccessException 으로 단순히 포장하는 것이 아니라, DB 에러코드를 참조하여 DataAccessException 의 서브클래스 예외로 전환해준다.
 
 DataAccessException은 JPA나 ORM, myBatis와 같이 데이터 엑세스 기술은 달라도 의미가 같은 예외라면 일관된 예외가 발생하도록 만들어준다. DataAccessException 은 자바의 주요 데이터 엑세스 기술에서 발생할 수 있는 대부분의 예외를 추상화해주고 있는 것이다.
 
