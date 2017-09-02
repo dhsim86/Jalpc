@@ -115,7 +115,7 @@ DB 에러코드는 DB에서 직접 제공하는 것이므로 어느 정도는 �
 
 스프링은 DataAccessException 뿐만 아니라 서브클래스로 세분화된 예외를 두고 있다. 스프링은 SQLException을 단지 Unchecked 예외를 DataAccessException 으로 단순히 포장하는 것이 아니라, DB 에러코드를 참조하여 DataAccessException 의 서브클래스 예외로 전환해준다.
 
-DataAccessException은 JPA나 ORM, myBatis와 같이 데이터 엑세스 기술은 달라도 의미가 같은 예외라면 일관된 예외가 발생하도록 만들어준다. DataAccessException 은 자바의 주요 데이터 엑세스 기술에서 발생할 수 있는 대부분의 예외를 추상화해주고 있는 것이다.
+DataAccessException은 JPA나 ORM, myBatis와 같이 데이터 엑세스 기술은 달라도 의미가 같은 예외라면 일관된 예외가 발생하도록 만들어준다. 스프링은 자바의 주요 데이터 엑세스 기술에서 발생할 수 있는 대부분의 예외를 DataAccessException 및 그 서브클래스 예외로 추상화해주고 있는 것이다.
 
 같은 상황에서 데이터 엑세스 기술에 따라 달리지는 예외를 스프링은 기술의 종류에 상관없이 드라이버나 DB 메타정보를 참고하여 DB 종류를 확인하고 DB 별로 준비된 매핑정보를 참조하여 적절한 예외 클래스를 선택하여 던진다.
 
