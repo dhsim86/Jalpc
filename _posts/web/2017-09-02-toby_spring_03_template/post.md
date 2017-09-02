@@ -158,4 +158,11 @@ public void deleteAll() throws SQLException {
 
 > 고정된 작업 흐름을 가지고 있으면서 여기저기서 반복되는 코드가 있다면 중복되는 코드를 분리할 방법을 생각하는 습관을 가져야 한다. 중복된 코드를 메소드로 추출하거나 인터페이스를 통한 DI로 전략 패턴을 적용해볼 수 있다. 또한 바뀌는 부분이 여러 종류가 만들어질 수 있다면 템플릿/콜백 패턴을 적용하는 것도 고려해볼 수 있을 것이다.
 
-[Calculator with Template/Callback](https://github.com/dhsim86/tobys_spring_study/commit/2e6c24bdb573f86592348516e9fe9b3d546b5cde)
+[Calculator with Template_Callback](https://github.com/dhsim86/tobys_spring_study/commit/2e6c24bdb573f86592348516e9fe9b3d546b5cde)
+
+<br>
+## 스프링의 JdbcTemplate
+
+스프링에서는 JDBC를 이용하는 DAO에서 사용할 수 있도록 준비된 다양한 템플릿과 콜백을 제공한다.
+
+[Use JdbcTemplate](https://github.com/dhsim86/tobys_spring_study/commit/ab1e0ff81b49b56effe4ed368f1050b961648e2d)
