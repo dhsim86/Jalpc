@@ -11,6 +11,7 @@ icon: icon-html
 
 # HTTP 상태코드
 
+<br>
 ## 상태코드의 역할
 
 클라이언트가 서버를 향해 request를 보낼 때 서버에서 그 request를 어떻게 처리하였는지 알려주는 것이다.
@@ -23,6 +24,7 @@ icon: icon-html
 
 ---
 
+<br>
 ## 상태코드 클래스
 
 상태 코드는 **200 OK** 와 같이 3자리 숫자와 설명으로 나타난다.
@@ -38,6 +40,7 @@ icon: icon-html
 
 > HTTP 상태 코드는 RFC2616 및 WebDAV(RFC4918, 5842) / Additional HTTP Status Code (RFC6585) 등에 정의된 것을 보면 60 종류가 넘지만 실제로 자주 사용되는 것은 일부분이다.
 
+<br>
 ## 1xx, Informational
 
 참고 정보로 서버가 클라이언트의 Request가 접수되었고 현재 처리하고 있다는 의미이다.
@@ -88,7 +91,7 @@ Sec-WebSocket-Protocol: chat
 
 ---
 
-
+<br>
 ## 2xx, Success
 
 서버가 Request를 성공적으로 수신하였고 이해했으며, 정상적으로 처리하였다는 의미이다. 사실 200과 206을 제외하고는 볼 일이 거의 없다.
@@ -127,7 +130,7 @@ Sec-WebSocket-Protocol: chat
 
 이 상태코드는 Range 헤더에 의해 범위가 지정된 Request에 대해 서버가 받았음을 나타낸다. Response에는 Content-Range 헤더를 포함해야 한다.
 
-
+<br>
 ## 3xx, Redirect
 
 3xx 대의 상태코드는 Request를 정상적으로 처리하기 위해 클라이언트 측에서 특별한 처리를 수행해야 함을 나타낸다.
@@ -167,6 +170,7 @@ Sec-WebSocket-Protocol: chat
 
 요청된 리소스의 URI가 일시적으로 옮겨졌다는 것으로 302와 비슷한데 307의 경우에는 브라우저 사양에 따라 POST 메소드에 대해 GET으로 치환하지 않는다.
 
+<br>
 ## 4xx, Client Error
 
 이 상태코드들은 클라이언트의 원인으로 에러가 발생했음을 나타낸다.
@@ -218,6 +222,7 @@ Spring 에서 오브젝트를 JSON으로 변환해서 보내주는 과정에서 
 
 이 상태 코드들은 서버 측의 에러가 있을 경우 사용하는 코드들이다.
 
+<br>
 ### 500, Internal Server Error
 
 서버에서 오류가 발생하 작업을 수행할 수 없을 경우에 볼 수 있다. HTTP Request에 대한 리소스가 JSP, PHP, 서블릿등과 같은 프로그램일 경우 루틴이 동작하다가 에러가 발생할 경우 이 상태코드를 보낸다.
