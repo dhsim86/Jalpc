@@ -183,6 +183,7 @@ try {
 스프링에서 제공하는 트랜잭션 경계설정을 위한 추상 인터페이스는 **PlatformTransactionManager** 이다. JDBC의 로컬 트랜잭션을 사용한다면, **DataSourceTransactionManager** 를 사용할 DB의 DataSource를 생성자 파라미터로 넘겨서 사용한다.
 
 [Use TransactionManager](https://github.com/dhsim86/tobys_spring_study/commit/8730c87083e2bf1aafeac8154a3b950a3bac3790)
+
 [Use TransactionManager with DI](https://github.com/dhsim86/tobys_spring_study/commit/f657e3285712f837f737a6e38b0185e5272e8e8a)
 
 > 스프링의 DI는 관심, 책임, 성격이 다른 코드를 깔끔하게 분리한다. 이렇게 적절하게 분리함으로써, 하나의 모듈은 한 가지 책임을 가져야된다는 "단일 책임 원칙" 에 맞게 코드를 작성할 수 있다. 이 원칙을 잘 지키면 어떠한 수정 작업이 필요할 때 대상이 명확해진다. 이를 위해 인터페이스를 도입하고 DI롤 통해 연결한다. 그 결과로 단일 책임 원칙 뿐만 아니라 개방 폐쇄 원칙도 지킬 수 있고 모듈 간의 결합도가 낮아져서 서로의 변경이 영향을 주지 않고 하나의 모듈은 하나의 관심에만 가질 수 있도록 할 수 있다.
