@@ -81,3 +81,8 @@ private void upgradeLevelsInternal() {
 ![02.png](/static/assets/img/blog/web/2017-09-07-toby_spring_06_aop/02.png)
 
 UserService 테스트의 단위는 UserService 클래스여야 하는데, 위와 같이 의존 오브젝트들이 여러 개 있다면 테스트 준비하기가 힘들고 환경이 조금이라도 달라지면 테스트가 실패할 수 있다. 하고자 하는 테스트는 UserService가 가지고 있는 비즈니스 로직인데 DB 연결이 제대로 안되거나 트랜잭션 서비스가 제대로 수행되지 않으면, UserService 를 목적으로 하는 테스트가 실패할 수 있다는 것이다.
+
+따라서 다음과 같이 테스트의 대상이 환경이나 외부 서버, 다른 클래스의 코드에 의해 종속되고 영향을 받지 않도록 **고립시킬 필요가 있다.** 테스트 대역을 사용하여, 테스트 대상이 의존하는 오브젝트로부터 분리해서 테스트하는 것이다.
+
+<br>
+![03.png](/static/assets/img/blog/web/2017-09-07-toby_spring_06_aop/03.png)
