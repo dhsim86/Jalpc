@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Toby's Spring Chap 06: AOP"
+title:  "Toby's Spring Chap 06: AOP part.1"
 date:   2017-09-07
-desc: "Toby's Spring Chap 06: AOP"
+desc: "Toby's Spring Chap 06: AOP part.1"
 keywords: "spring, spring boot"
 categories: [Web]
 tags: [spring, spring boot]
