@@ -260,3 +260,108 @@ Hello proxyHello = (Hello)Proxy.newProxyInstance(getClass().getClassLoader(), //
 
 [Dynamic Proxy](https://github.com/dhsim86/tobys_spring_study/commit/bc3b6cdef9263cae1f610c873cd31d8e1200f906)
 [UserServiceTx using Dynamic Proxy](https://github.com/dhsim86/tobys_spring_study/commit/249bba7411386d4fcfeb92325f7f21f655bde355)
+
+<br>
+### 다이내믹 프록시를 위한 팩토리 빈
+
+다이내믹 프록시 오브젝트는 일반적인 스프링의 빈으로 등록할 방법이 없다. 스프링 빈은 기본적으로 **미리 정의된 클래스 이름과 프로퍼티를 가지고 해당 클래스의 오브젝트를 생성한다.**
+
+다음과 같이 클래스 이름을 가지고 리플렉션을 이용하여 파라미터가 없는 디폴트 생성자를 호출하고 오브젝트를 생성한다.
+
+~~~java
+Date now = (Date)Class.forName("java.util.Date").newInstance();
+~~~
+
+다이내믹 프록시 오브젝트는 이런 식으로 생성되지 않는다. 다이내믹 프록시 클래스는 **내부적으로 다이내믹하게 새로 정의해서 사용되기 때문에 사전에 애플리케이션 컨텍스트를 이용하여 스프링 빈으로 정의할 방법이 없다.** 다이내믹 프록시 오브젝트는 **Proxy.newProxyInstance()** 를 통해서만 만들 수 있다.
+
+---
+
+스프링은 미리 정의된 클래스 정보를 가지고 디폴트 생성자를 통해 오브젝트를 만드는 방법 외에, 빈을 만들 수 있는 여러가지 방법을 제공하는데 그 중에 하나가 **팩토리 빈** 을 이용한 빈 생성 방법을 들 수 있다.
+
+* 팩토리 빈: 스프링을 대신해서 오브젝트의 생성 로직을 담당하도록 만들어진 특별한 빈
+
+팩토리 빈을 만드는 방법은 여러가지가 있는데 다음과 같은 **FactoryBean** 인터페이스를 구현하는 것이다.
+
+~~~java
+public interface FactoryBean<T> {
+  T getObject() throws Exception; // 빈 오브젝트를 생성해서 리턴
+  Class<? extends T> getObjectType(); // 생성되는 오브젝트의 타입을 리턴
+  boolean isSingleton(); // getObject가 리턴하는 오브젝트가 싱글톤 오브젝트인지를 알려준다.
+}
+~~~
+
+위의 인터페이스를 구현한 클래스를 스프링 빈으로 등록하면 팩토리 빈으로서 동작한다. 스프링 빈으로 등록하기가 힘든 클래스에 대해서는 다음과 같이 FactoryBean을 활용하여 빈으로 사용될 오브젝트를 생성할 수 있다.
+
+~~~java
+import org.springframework.beans.factory.FactoryBean;
+
+public class MessageFactoryBean implements FactoryBean<Message> {
+
+  private String text;
+
+  // 오브젝트 생성시 필요한 정보를 팩토리 빈의 프로퍼티로 설정하여 DI 받을 수 있도록 한다.
+  // 주입된 정보는 실제 사용하고자 하는 클래스의 오브젝트를 생성할 때 사용한다.
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  // 실제 빈으로 사용될 오브젝트를 직접 생성한다. 코드를 이용하므로 복잡한 초기화 방식을 가진 오브젝트도 생성할 수 있다.
+  public Message getObject() throws Exception {
+    return Message.newMessage(this.text);
+  }
+
+  // 빈으로 사용되는 오브젝트의 타입을 리턴한다.
+  public Class<? extends Message> getObjectType() {
+    return Message.class;
+  }
+
+  // getObject 메소드가 돌려주는 오브젝트가 싱글톤인지 알려준다.
+  public boolean isSingleton() {
+    return false;
+  }
+}
+~~~
+
+~~~xml
+<bean id="message" class="ch06.springbook.factorybean.MessageFactoryBean">
+    <property name="text" value="Factory Bean" />
+</bean>
+~~~
+
+~~~java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/applicationContext.xml")
+public class FactoryBeanTest {
+
+  @Autowired
+  private ApplicationContext applicationContext;
+
+  @Test
+  public void getMessageFromFactoryBeanTest() {
+    Object message = applicationContext.getBean("message"); // "message" 라는 이름의 빈의 타입이 Message.class 이다.
+    assertThat(Message.class.isInstance(message), is(true));
+    assertThat(((Message)message).getText(), is("Factory Bean"));
+  }
+
+  @Test
+  public void getFactoryBeanTest() {
+    Object factory = applicationContext.getBean("&message"); // &을 붙이면 팩토리 빈이 리턴된다.
+    assertThat(MessageFactoryBean.class.isInstance(factory), is(true));
+  }
+}
+~~~
+
+위와 같이 FactoryBean을 구현한 클래스가 빈의 클래스로 지정되면, 팩토리 빈 클래스의 오브젝트의 **getObject** 메소드를 통해 오브젝트를 가져오고 이를 빈 오브젝트로 사용한다.
+
+> 스프링은 Private 생성자를 가진 클래스도 빈으로 등록하면 리플렉션을 통해 오브젝트를 만들어주기는 한다. 그러나 Private 생성자를 가진 클래스를 빈으로 등록하는 일은 권장되지 않으며 바르게 동작하지 않을 수 있다. 따라서 이 팩토리 빈을 활용하여 빈으로 등록하는 것이다.
+
+[FactoryBean example](https://github.com/dhsim86/tobys_spring_study/commit/6fdfcdbbecf51152b064a6a648babd5ed6feab43)
+
+---
+
+미리 클래스가 정의되지 않아서 일반적인 방법으로는 스프링 빈으로 등록할 수 없는 다이내믹 프록시 오브젝트를 팩토리 빈을 사용하면 스프링 빈으로 만들어줄 수 있다. 팩토리 빈의 **getObject** 메소드에 다이내믹 프록시 오브젝트를 만들어주는 코드를 넣으면 된다.
+
+<br>
+![10.png](/static/assets/img/blog/web/2017-09-07-toby_spring_06_aop/10.png)
+
+[Dynamic Proxy using FactoryBean](https://github.com/dhsim86/tobys_spring_study/commit/fce3afd31a8c495d5ec4ee88c521bbfa82601332)
