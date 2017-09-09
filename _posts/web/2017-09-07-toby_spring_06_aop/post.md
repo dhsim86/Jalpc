@@ -262,6 +262,8 @@ Hello proxyHello = (Hello)Proxy.newProxyInstance(getClass().getClassLoader(), //
 
 [UserServiceTx using Dynamic Proxy](https://github.com/dhsim86/tobys_spring_study/commit/249bba7411386d4fcfeb92325f7f21f655bde355)
 
+이렇게 다이내믹 프록시를 이용하면 타깃 인터페이스를 일일이 구현해야 하는 번거로움을 피할 수 있고, 하나의 핸들러 메소드를 구현하는 것만으로 수많은 메소드에 부가기능을 추가할 수 있어 코드 중복도 사라진다.
+
 <br>
 ### 다이내믹 프록시를 위한 팩토리 빈
 
@@ -366,3 +368,8 @@ public class FactoryBeanTest {
 ![10.png](/static/assets/img/blog/web/2017-09-07-toby_spring_06_aop/10.png)
 
 [Dynamic Proxy using FactoryBean](https://github.com/dhsim86/tobys_spring_study/commit/fce3afd31a8c495d5ec4ee88c521bbfa82601332)
+
+* 프록시 팩토리 빈의 한계
+  * 하나의 클래스 안에 존재하는 여러 개의 메소드에 부가기능을 한 번에 제공할 수는 있는데 여러 개의 클래스에 공통적인 부가기능을 추가하는 것은 불가능하다. 타깃 클래스에 맞게 여러 팩토리 빈을 추가해줘야 한다.
+  * 하나의 타깃에 여러 개의 부가기능을 추가할 때, 부가기능마다 프록시 팩토리 빈이 추가되는 것을 피할 수 없다.
+  * 타깃 오브젝트마다 부가기능을 담당하고 타깃에 위임하는 **InvocationHandler** 를 구현하는 오브젝트가 팩토리 빈 개수만큼 만들어진다.
