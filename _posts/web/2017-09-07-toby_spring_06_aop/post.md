@@ -259,6 +259,7 @@ Hello proxyHello = (Hello)Proxy.newProxyInstance(getClass().getClassLoader(), //
 위의 코드와 같이 리플렉션 API를 활용하여 타깃 오브젝트의 메소드를 호출한다.
 
 [Dynamic Proxy](https://github.com/dhsim86/tobys_spring_study/commit/bc3b6cdef9263cae1f610c873cd31d8e1200f906)
+
 [UserServiceTx using Dynamic Proxy](https://github.com/dhsim86/tobys_spring_study/commit/249bba7411386d4fcfeb92325f7f21f655bde355)
 
 <br>
