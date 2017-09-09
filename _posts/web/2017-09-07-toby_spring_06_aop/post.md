@@ -412,7 +412,7 @@ public void proxyFactoryBeanTest() {
 
 **즉, MethodInterceptor 는 일종의 템플릿처럼 동작하고, MethodInvocation은 콜백처럼 동작하는 것이다.**
 
-또한 ProxyFactoryBean 을 이용하면 부가기능을 제공하는 MethodInvocation을 구현한 오브젝트를 **여러 개 추가할 수 있다.** 즉 여러 개의 부가기능을 제공하는 프록시를 쉽게 만들 수 있다는 것이다.
+또한 ProxyFactoryBean 을 이용하면 부가기능을 제공하는 MethodInterceptor 구현한 오브젝트를 **여러 개 추가할 수 있다.** 즉 여러 개의 부가기능을 제공하는 프록시를 쉽게 만들 수 있다는 것이다.
 
 그리고 ProxyFactoryBean이 인터페이스 자동 검출 기능을 통해 타깃 오브젝트가 구현하고 있는 인터페이스 정보를 알 수 있으므로, 프록시를 직접 만들거나 JDK 다이내믹 프록시를 만들 때 처럼 인터페이스 정보를 제공할 필요가 없다.
 
