@@ -205,4 +205,58 @@ when(mockUserDao.getAll()).thenReturn(userList);
   * 타깃의 인터페이스를 구현하고 위임하는 코드를 작성하기가 번거롭다. 타깃의 메소드가 추가되거나 변경되면 함께 수정해야 한다.
   * 부가기능 코드가 중복될 가능성이 높다. 보통 부가기능은 일반적인 코드가 많아 여러 곳에서 쓰일 수 있다.
 
+다이내믹 프록시는 **리플렉션** 기능을 활용하여 프록시로 만드는 것이다.
+
+[Reflection Sample Test](https://github.com/dhsim86/tobys_spring_study/commit/cefecb7cb20e1d65d85904000c1fa34e9a1a42c8)
+
 ---
+
+다이내믹 프록시가 동작하는 방식은 다음과 같다.
+
+<br>
+![08.png](/static/assets/img/blog/web/2017-09-07-toby_spring_06_aop/08.png)
+
+다이내믹 프록시는 **프록시 팩토리에 의해** 런타임시 다이내믹하게 만들어진다. 이 프록시는 타깃의 **인터페이스와 같은 타입** 으로 만들어지며 클라이언트는 이 프록시 오브젝트를 타깃 인터페이스를 통해 사용할 수 있다. 따라서 프록시 생성시 인터페이스를 모두 구현할 필요가 없고 프록시 팩토리에게 인터페이스 정보만 알려주면 된다.
+
+다이내믹 프록시가 인터페이스 구현 클래스의 오브젝트로 만들어지긴 하지만, 필요한 부가기능 코드는 직접 작성해야 한다. 부가기능은 프록시와 독립적인 **InvocationHandler** 를 구현한 오브젝트에 담는다. InvocationHandler 인터페이스는 다음과 같이 메소드 하나만 가진 간단한 인터페이스이다.
+
+~~~java
+public Object invoke(Object proxy, Method method, Object[] args);
+~~~
+
+위의 invoke 메소드는 Method 인터페이스 및 메소드를 호출할 때 전달되는 파라미터인 args를 받는다. 다이내믹 프록시 오브젝트는 클라이언트의 **모든 요청을 리플렉션 정보로 변환하여 InvocationHandler 구현 오브젝트의 invoke 메소드로 넘긴다.**
+InvocationHandler 인터페이스 구현체에서는 Method 인터페이스 구현체 및 args를 통해 실제 타깃 오브젝트의 메소드를 호출할 수 있다. 중복되는 부가적인 기능을 InvocationHandler 인터페이스의 구현체를 통해 쉽게 작성할 수 있다.
+
+<br>
+![09.png](/static/assets/img/blog/web/2017-09-07-toby_spring_06_aop/09.png)
+
+~~~java
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
+public class UppercaseHandler implements InvocationHandler {
+
+  private Hello target;
+
+  public UppercaseHandler(Hello target) {
+    this.target = target;
+  }
+
+  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    // 만약 타깃 메소드에 대한 예외발생시 여기에서는 "InvocationTagetException" 으로 잡아야 한다.
+    // 타깃 오브젝트에서 발생하는 예외가 "InvocationTagetException" 으로 한 번 포장되서 전달된다.
+    String ret = (String)method.invoke(target, args);
+    return ret.toUpperCase();
+  }
+}
+
+
+Hello proxyHello = (Hello)Proxy.newProxyInstance(getClass().getClassLoader(), //다이내믹 프록시 클래스의 로딩에 사용할 클래스 로더
+                        new Class[] { Hello.class }, // 구현할 인터페이스, 다이내믹 프록시는 하나이상의 인터페이스를 구현할 수 있다.
+                        new UppercaseHandler(new HelloTarget())); // 부가기능과 위임코드를 담은 InvocationHandler
+~~~
+
+위의 코드와 같이 리플렉션 API를 활용하여 타깃 오브젝트의 메소드를 호출한다.
+
+[Dynamic Proxy](https://github.com/dhsim86/tobys_spring_study/commit/bc3b6cdef9263cae1f610c873cd31d8e1200f906)
+[UserServiceTx using Dynamic Proxy](https://github.com/dhsim86/tobys_spring_study/commit/249bba7411386d4fcfeb92325f7f21f655bde355)
