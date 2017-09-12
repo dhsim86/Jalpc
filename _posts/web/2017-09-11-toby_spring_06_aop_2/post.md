@@ -44,3 +44,39 @@ public interface Pointcut {
   MethodMatcher getMethodMatcher(); // 어드바이스를 적용할 메소드인지 확인.
 }
 ~~~
+
+위와 같이 포인트컷을 통해 **프록시를 적용할 클래스인지 판단** 하고 나서, 적용 대상 클래스인 경우에는 **어드바이스를 적용할 메소드인지 확인** 할 수 있다. DefaultAdvisorAutoProxyCreator 빈 후처리기를 사용하기 위해 클래스와 메소드를 모두 선정하는 포인트컷이 필요하다.
+
+[Pointcut test with ClassFilter](https://github.com/dhsim86/tobys_spring_study/commit/2b662f79f750afe68d70b8e8e601b5dd46997630)
+
+> 포인트컷이 클래스 필터링을 통해 클래스를 걸러버리면, 부가기능이 전혀 적용되지 않는다.
+
+<br>
+### 어드바이저를 이용하는 자동 프록시 생성기 등록
+
+**DefaultAdvisorAutoProxyCreator** 의 동작 방식
+
+1. **Advisor** 인터페이스를 구현한 모든 빈을 찾는다.
+2. 생성되는 모든 빈에 대해서 어드바이저의 포인트컷을 적용해보면서 **프록시 적용 대상을 선정한다.**
+3. 빈 클래스가 프록시 선정 대상이면 **프록시를 만들어 원래 빈 오브젝트가 바꿔치기한다.**
+4. 타깃 빈에 의존하던 다른 빈들은 프록시 오브젝트를 DI 받게 된다.
+
+DefaultAdvisorAutoProxyCreator를 사용하기 위해 다음과 같이 애플리케이션 컨텍스트 xml에 추가한다.
+~~~xml
+<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+~~~
+
+> 다른 빈에서 참조되거나 코드상에서 빈 이름으로 조회할 필요가 없는 빈이라면 빈 아이디를 등록하지 않아도 된다.
+
+[Transaction code using auto proxy](https://github.com/dhsim86/tobys_spring_study/commit/10d946e05be19f56bdfd875f1fac3ec4c47e932f)
+
+[Check proxy class instance](https://github.com/dhsim86/tobys_spring_study/commit/10c3db691e7e78c59ae5e0c8d395459e7f70b5c3)
+
+<br>
+### 포인트컷 표현식을 이용한 포인트컷
+
+스프링에서는 클래스 필터나 메소드 매처를 사용하는 것이 아닌, 정규식과 비슷하게 포인트컷의 클래스와 메소드를 선정할 수 있도록 **포인트컷 표현식** 이라는 방법을 사용할 수 있다.
+
+포인트컷 표현식을 사용하기 위해서는 **AspectJExpressionPointcut** 클래스를 사용한다. 이 클래스를 통해 포인트컷 표현식을 사용해서 클래스와 메소드 선정 방식을 한 번에 지정할 수 있다.
+
+> 스프링이 사용하는 포인트컷 표현식은 AspectJ 프레임워크에서 사용하는 문법을 확장해서 사용한다.
