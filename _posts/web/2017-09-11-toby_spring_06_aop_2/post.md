@@ -80,3 +80,45 @@ DefaultAdvisorAutoProxyCreator를 사용하기 위해 다음과 같이 애플리
 포인트컷 표현식을 사용하기 위해서는 **AspectJExpressionPointcut** 클래스를 사용한다. 이 클래스를 통해 포인트컷 표현식을 사용해서 클래스와 메소드 선정 방식을 한 번에 지정할 수 있다.
 
 > 스프링이 사용하는 포인트컷 표현식은 AspectJ 프레임워크에서 사용하는 문법을 확장해서 사용한다.
+
+---
+
+**포인트컷 표현식 문법**
+
+AspectJ 포인트컷 표현식은 **포인트컷 지시자** 를 이용해 작성한다.
+
+포인트컷 지시자 중 **execution()** 에대한 문법구조는 다음과 같다.
+~~~
+execution([접근제한자 패턴] 리턴값의 타입패턴 [클래스 타입패턴.]메소드 이름패턴 (파라미터 타입패턴 | "..", ...) throws 예외패턴 )
+~~~
+
+* 접근제한자 패턴: public이나 protected, private. 생략 가능하다.
+* 리턴값의 타입패턴: 리턴 값의 타입, **필수 항목**, \* 를 써서 모든 타입에 대해 적용할 수도 있다.
+* 클래스 타입패턴: 패키지와 타입 이름을 포함한 클래스의 타입 패턴, 생략 가능, 생략하면 모든 타입에 대해 적용된다. 이름에 \* 를 사용할 수 있다. 또한 ".." 를 써서 한 번에 여래 개의 패키지를 선택할 수 있다.
+* 메소드 이름패턴: **필수항목**, 모든 메소드에 적용하려면 \* 를 쓴다.
+* 파라미터 타입패턴: **필수항목**, "," 로 구분하면서 메소드 파라미터 타입을 적는다. 파라미터가 없다면 "()" 만 사용하며, 만약 타입과 개수에 상관없이 모두 다 허용하겠다면 ".." 를 사용한다. 만약 앞에는 파라미터가 있고 뒷 부분의 파라미터만 생략하겠다면 "..."를 사용한다.
+* 예외패턴: 예외 이름에 대한 타입 패턴이고 생략 가능하다.
+
+> 패턴 요소를 생략하면 모든 경우를 다 허용하도록 되어 있다.
+
+* **execution(int minus(int, int))**: int 타입의 리턴 값, minus 라는 메소드 이름, 두 개의 int 파라미터를 가지는 메소드
+* **execution(\* minus(int, int))**: 리턴 타입은 상관없이, minus 라는 메소드 이름, 두 개의 int 파라미터를 가지는 메소드
+* **execution(\* minus(..))**: 리턴 타입과 파라미터의 종류 및 개수에 상관없이 minus 이름을 가진 메소드
+* **execution(\* \*(..))**: 리턴 타입, 파라미터, 메소드 이름에 상관없는 모든 메소드
+* **execution(\* \*())**: 리턴 타입, 메소드 이름에 상관없고 파라미터는 없는 모든 메소드
+* **execution(\* springbook.aop.Target.\*(..))**: springbook.aop.Target 클래스의 모든 메소드
+* **execution(\* springbook.aop.\*.\*(..))**: springbook.aop 패키지의 모든 메소드, 단 서브패키지의 클래스는 포함 안된다.
+* **execution(\* springbook.aop..\*.\*(..))**: springbook.aop 패키지의 모든 메소드, 서브패키지의 클래스까지 포함
+* **execution(\* \*..Target.\*(..))**: 패키지에는 상관없이 Target 클래스의 모든 메소드
+
+[Pointcut execution example](https://github.com/dhsim86/tobys_spring_study/commit/a341034dd17964824dc912714f29135f6d490629)
+[Pointcut execution expression test](https://github.com/dhsim86/tobys_spring_study/commit/5e2b189aa79b4f4f8a1aecad4e5effae6bc2cf2c)
+
+---
+
+**AspectJExpressionPointcut** 사용시, 포인트컷 표현식을 다음과 같이 메소드 시그니처를 **execution()** 안에 넣어 expression 프로퍼티에 설정한다.
+
+~~~java
+AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+pointcut.setExpression("execution(* *(..))");
+~~~
