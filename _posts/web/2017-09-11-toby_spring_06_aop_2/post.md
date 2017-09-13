@@ -112,13 +112,57 @@ execution([접근제한자 패턴] 리턴값의 타입패턴 [클래스 타입�
 * **execution(\* \*..Target.\*(..))**: 패키지에는 상관없이 Target 클래스의 모든 메소드
 
 [Pointcut execution example](https://github.com/dhsim86/tobys_spring_study/commit/a341034dd17964824dc912714f29135f6d490629)
+
 [Pointcut execution expression test](https://github.com/dhsim86/tobys_spring_study/commit/5e2b189aa79b4f4f8a1aecad4e5effae6bc2cf2c)
+
+> 포인트컷 표현식은 execution() 말고도, **bean()** 이 있다. bean(\*Service) 라고 지정하면 빈 아이디가 Service로 끝나는 모든 빈을 선택한다.
 
 ---
 
-**AspectJExpressionPointcut** 사용시, 포인트컷 표현식을 다음과 같이 메소드 시그니처를 **execution()** 안에 넣어 expression 프로퍼티에 설정한다.
+**AspectJExpressionPointcut** 직접 사용시, 포인트컷 표현식을 다음과 같이 메소드 시그니처를 **execution()** 안에 넣어 expression 프로퍼티에 설정한다.
 
 ~~~java
 AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
 pointcut.setExpression("execution(* *(..))");
 ~~~
+
+스프링 빈으로 등록하여 사용할 때는 다음과 같이 작성한다.
+
+~~~xml
+<bean id="transactionPointcut" class="org.springframework.aop.aspectj.AspectJExpressionPointcut">
+    <property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))" />
+</bean>
+~~~
+
+[Use AspectJExpressionPointcut](https://github.com/dhsim86/tobys_spring_study/commit/f989cecfa3e8e3fc4d8a8d20e5653d432d68201a)
+
+위의 xml과 같이 expression을 설정하면 패키지에 상관없이 ServiceImpl 로 끝나는 클래스의 upgrade로 시작하는 모든 메소드에 적용될 것이다.
+
+포인트컷 표현식은 클래스 및 메소드를 선정하는 로직이 짧은 문자열에 담기기 때문에 코드와 설정이 단순해진다. 그러나, 문자열로 된 표현식이므로 런타임 시점까지 문법의 검증이나 기능 확인이 되지 않는다는 단점이 있다.
+
+> 포인트컷 표현식을 이용하는 포인트컷이 정확히 원하는 빈, 메소드만 선정했는지 확인하는 것은 어렵다. 스프링 개발팀에서 제공하는 스프링 지원 툴을 사용하면 아주 간단하게 포인트컷이 선정한 빈, 메소드가 무엇인지 한 눈에 알 수 있다.
+
+---
+
+**포인트컷 타입 패턴**
+
+포인트컷 표현식의 클래스 이름에 적용되는 패턴은 클래스 이름에 대한 매칭이 아니라, 타입 패턴이다.
+
+~~~java
+public interface UserService {
+  void add(User user);
+  void upgradeLevels();
+}
+
+public class UserServiceImpl implements UserService {
+  ...
+}
+
+public class TestUserService implements userServiceImpl {
+  ...
+}
+~~~
+
+위와 같이 클래스가 정의되어 있을 때, 포인트컷 표현식을 **execution(\* \*..\*ServiceImpl.upgrade\*(..))** 과 같이 설정하면 TestUserService 까지 매칭된다. 이는 포인트컷 표현식에서 클래스 패턴은 타입에 대한 패턴이기 때문이다.
+
+마찬가지로 인터페이스를 지정하면 그 인터페이스를 구현하는 모든 클래스에 대해 매칭될 것이다. **execution(\* \*..UserService.\*(..))** 같이 지정하면 UserService 인터페이스를 구현하는 모든 클래스에 대해 적용된다.
