@@ -110,7 +110,7 @@ public class HelloSpringBootApplication {
   + @EnableConfiguration
   + @ComponentScan
 
-> @EnableAutoConfiguration
+> **@EnableAutoConfiguration**
    Spring Boot autoconfiguration은 추가된 jar dependency 기반으로 Spring application을 자동으로 설정하는 것을 시도한다. 예를 들어 HSQL DB가 class path에 있으면, DB 연결 빈을 정의하지 않아도 자동적으로 in-memory 데이터베이스에 접근할 것이다.
    자동 설정은 비 침입적으로, DataSource 빈을 추가한다면 디폴트로 자동 설정되는 것은 사라질 것이다.
 
@@ -268,11 +268,11 @@ public class HelloRestController {
 }
 ~~~
 
- > @RestController
+ > **@RestController**
   Spring 4.0에 추가된 annotation으로 **@Controller 및 @ResponseBody** 를 합쳐놓은 기능을 제공한다. @Conroller annotation과는 달리 요청을 처리하는 모든 메소드에 @ResponseBody를 추가할 필요가 없다. 또한 클래스에 속한 메소드들이 **객체**를 리턴할 때 JSON 형태로 직렬화된다. (Jackson2 라이브러리가 있다면.)
 
- > @ResponseBody
- 메소드에 이 annotation이 선언되어 있다면 메소드에서 리턴되는 값은 View를 통해 출력되지 않고, ** HTTP Response Body**에 직접 쓰여지게 된다.
+ > **@ResponseBody**
+ 메소드에 이 annotation이 선언되어 있다면 메소드에서 리턴되는 값은 View를 통해 출력되지 않고, **HTTP Response Body** 에 직접 쓰여지게 된다.
 
 
 <br>
