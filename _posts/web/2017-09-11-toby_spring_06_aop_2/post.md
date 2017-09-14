@@ -188,3 +188,87 @@ public class TestUserService implements userServiceImpl {
 AOP는 객체지향프로그래밍인 OOP를 대체하는 기술은 아니고 OOP를 돕는 보조적인 기술이다. AOP를 통해 애스팩트를 분리하고 애플리케이션 핵심기능에 대해서는 OOP의 가치를 보존할 수 있도록 하는 것이다.
 
 또한 **AOP는 애플리케이션을 다양한 측면에서 독립적으로 모델링하고, 설계하고, 개발할 수 있도록 만들어준다.** 애스팩트를 분리하고 개발할 수 있게 됨으로써 개발자로 하여금, 애플리케이션을 핵심 기능을 담당하는 프로그램이 아닌 부가기능을 설정하는 프로그램이라는 관점에서 바라보고 개발할 수 있다는 점에서 AOP를 **관점 지향 프로그래밍** 이라고도 하는 것이다.
+
+<br>
+### AOP 적용기술
+
+스프링은 IoC/DI 컨테이너와 다이내믹 프록시, 데코레이터 패턴, 프록시 패턴, 자동 프록시 생성 기법, 빈 오브젝트의 후처리 조작 등을 통해 AOP를 지원한다. 그중 가장 핵심적인 것은 **프록시** 이다.
+
+프록시를 통해 DI로 연결된 빈 사이에 적용해 **타깃의 메소드 호출 과정에 참여해서 부가기능을 제공하도록 만들었다.** MethodInterceptor 인터페이스는 프록시로부터 메소드 요청 정보를 전달받아 타깃 오브젝트의 메소드를 호출한다.
+
+> 스프링의 AOP는 프록시 방식의 AOP 이다.
+
+<br>
+### 바이트코드 생성과 조작을 통한 AOP
+
+AOP 기술의 원조이자, 가장 강력한 AOP 프레임워크인 **AspectJ** 는 프록시 방식을 사용하지 않고, **타깃 오브젝트를 뜯어고쳐 부가기능을 직접 넣어주는 직접적인 방식을 사용한다.** 컴파일된 타깃의 클래스 파일 자체를 수정하거나 클래스가 JVM 상에 로딩될 때 바이트코드를 조작하는 복잡한 방법을 사용한다.
+
+이렇게 직접적인 방식을 사용함으로써 스프링 AOP와 같이 **자동 프록시 생성 방식을 사용하지 않아도 AOP를 적용할 수 있다.** 그리고 프록시 방식보다 강력하고 유연한 AOP가 가능해진다.
+
+프록시 방식의 AOP는 부가기능을 부여할 대상이 **타깃의 메소드만으로 한정되지만**, 바이트코드 조작을 통한 AOP에서는 **오브젝트의 생성, 필드 값의 조회와 조작, 스태틱 초기화 등의 다양한 작업에 부가기능을 부여할 수 있다.**
+
+대부분의 부가기능은 프록시 방식을 통해 메소드 호출 시점에 적용하는 것만으로 충분하나, 특별한 AOP 요구사항이 있어 스프링의 프록시 AOP 수준을 넘어서는 기능이 필요하다면 그때 AspectJ를 사용하면 된다.
+
+<br>
+### AOP의 용어
+
+* 타깃: 부가기능을 부여할 대상. 핵심기능을 담은 클래스일 수도 있으나 다른 부가기능을 제공하는 다른 프록시일 수도 있다.
+* 어드바이스: 타깃에게 제공할 부가기능을 담을 모듈.
+* 조인포인트: 어드바이스가 적용될 수 있는 위치, 타깃 오브젝트가 구현한 인터페이스의 모든 메소드는 조인포인트가 된다.
+* 포인트컷: 어드바이스를 적용할 조인포인트를 선별하는 작업 또는 그 기능을 정의한 모듈. 스프링 AOP의 조인포인트는 메소드의 실행이므로 포인트컷 표현식은 메소드의 실행이라는 의미인 **execution** 으로 시작한다.
+* 프록시: 클라이언트와 타깃 사이에 투명하게 존재하면서 부가기능을 제공하는 오브젝트
+* 어드바이저: 포인트컷과 어드바이스를 하나씩 갖고 있는 오브젝트. 스프링 AOP에서만 사용되고 자동 프록시 생성기가 이 어드바이저를 AOP 작업의 정보로 활용한다.
+* 애스팩트: AOP의 기ㄴ 모듈로, 한 개 또는 그 이상의 포인트컷과 어드바이스의 조합으로 만들어지며 싱글톤 형태의 오브젝트로 존재한다.
+
+<br>
+### AOP 네임스페이스
+
+스프링 AOP를 적용하기 위해 추가했던 어드바이저, 포인트컷, 자동 프록시 생성기와 같은 빈들은 다른 애플리케이션 로직을 담은 빈들과는 성격이 다르다. 이런 빈들은 **스프링 컨테이너에 의해 자동으로 인식되어 특별한 작업을 위해 사용된다.**
+
+스프링의 프록시 방식 AOP를 적용하려면 최소한 다음과 같은 네 가지 빈을 등록해야 한다.
+
+* 자동프록시 생성기: 스프링의 **DefaultAdvisorAutoProxyCreator** 클래스를 빈으로 등록한다. 애플리케이션 컨텍스트가 빈을 생성할 때 빈 후처리로 참여한다. 빈으로 등록된 **어드바이저를 이용해서 프록시를 자동으로 생성한다.**
+* 어드바이스: **부가기능을 구현한 클래스** 를 빈으로 등록한다.
+* 포인트컷: 스프링의 **AspectJExpressionPointcut** 을 빈으로 등록하고 **expression** 프로퍼티에 포인트컷 표현식을 넣어주면 된다.
+* 어드바이저: 스프링의 **DefaultPointcutAdvisor** 클래스를 빈으로 등록해서 사용하며 어드바이스와 포인트컷을 프로퍼티로 설정하면 된다. 자동프록시 생성기에 의해 자동 검색되어 사용된다.
+
+스프링에서는 AOP와 관련된 태그를 정의해둔 **aop 스키마** 를 통해 간편하게 빈으로 등록할 수 있다. aop 스키마에 정의된 태그를 사용하려면 설정파일에 다음과 같이 추가한다.
+
+~~~xml
+<beans ...
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xsi:schemaLocation="...
+  http://www.springframework.org/schema/aop
+  http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+~~~
+
+위와 같이 네임스페이스 선언을 추가해준 후, aop 네임스페이스를 통해 기존 AOP 관련 빈 설정을 다음과 같이 변경할 수 있다.
+~~~xml
+<!--    
+    <bean id="transactionPointcut" class="org.springframework.aop.aspectj.AspectJExpressionPointcut">
+        <property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))" />
+    </bean>
+
+    <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice" ref="transactionAdvice"/>
+        <property name="pointcut" ref="transactionPointcut"/>
+    </bean>
+
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+-->
+
+    <!-- AOP 설정을 담는 부모태그로, 필요에 따라 AspectJAdvisorAutoProxyCreator를 빈으로 등록해준다. -->
+    <aop:config>
+        <!-- expression 표현식을 프로퍼티로 가진 AspectJExpressionPointcut을 빈으로 등록해준다. -->
+        <aop:pointcut id="transactionPointcut" expression="execution(* *..*ServiceImpl.upgrade*(..))" />
+
+        <!-- advice와 pointcut의 ref를 프로퍼티로 갖는 DefaultBeanFactoryPointcutAdvisor를 빈으로 등록해준다. -->
+        <aop:advisor advice-ref="transactionAdvice" pointcut-ref="transactionPointcut" />
+    </aop:config>
+~~~
+
+위의 주석처리된 포인트컷 및 어드바이저를 aop 태그를 통해 쉽게 AOP를 적용할 수 있다. 직접 구현한 클래스로 등록하는 어드바이스를 제외한 AOP 관련 빈들은 의미를 잘 드러내는 독립된 전용 태그를 사용하도록 권장된다.
+
+[Use aop namespace](https://github.com/dhsim86/tobys_spring_study/commit/aeb468ad39e5ef0cbd1c61a32ddd23fbf4c90aac)
+
+> 애플리케이션을 구성하는 컴포넌트 빈과 컨테이너에 의해 사용되는 기반 기능을 지원하는 빈은 구분이 되는 것이 좋다.
