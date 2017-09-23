@@ -403,3 +403,54 @@ public class ServiceImpl implements Service {
 > 인터페이스를 사용하는 AOP가 아닌 방식으로 트랜잭션을 적용하면, 인터페이스에 정의된 @Transactional은 무시된다. 인터페이스에 정의하면 인터페이스를 통해 호출할 때만 트랜잭션이 적용된다.
 
 [Use @Transactional](https://github.com/dhsim86/tobys_spring_study/commit/1f4a242f912be99f635f29cb703ccb560054afe2)
+
+<br>
+## 트랜잭션 지원 테스트
+
+트랜잭션 전파 속성은 매우 유용한 개념이다. 예를 들어 **REQUIRED** 로 전파 속성을 지정할 경우, 앞에서 진행 중인 트랜잭션이 있다면 참여하고, 없으면 자동으로 새로운 트랜잭션을 시작한다. **트랜잭션 적용 때문에 불필요한 코드를 중복하는 것도 피할 수 있고 애플리케이션을 작은 기능 단위로 쪼개서 개발할 수 있다.**
+
+<br>
+![03.png](/static/assets/img/blog/web/2017-09-14-toby_spring_06_aop_3/03.png)
+
+AOP를 이용해 코드 외부에서 트랜잭션의 기능을 부여해주고 속성을 지정할 수 있게 하는 방법을 **선언적 트랜잭션 (Declarative Transaction)** 이라고 하고, TransactionTemplate나 개별 데이터 기술의 트랜잭션 API를 사용해 직접 코드 안에서 사용하는 방법을 **프로그램에 의한 트랜잭션 (Programmatic Transaction)** 이라고 한다.
+
+트랜잭션의 자유로운 전파와 그로 인한 유연한 개발이 가능할 수 있었던 기술적인 배경은 **AOP로 프록시를 이용한 트랜잭션 부가기능을 간단하게 애플리케이션 전반에 적용할 수 있다.** 또한 스프링의 트랜잭션 추상화를 통해 데이터 엑세스 기술이나 트랜잭션 기술에 상관없이 DAO에서 일어나는 작업들을 하나의 트랜잭션으로 묶을 수 있었다.
+
+<br>
+### @Rollback
+
+테스트 클래스나 테스트 메소드에 사용하는 @Transactional annotation은 일반적인 애플리케이션 클래스에서 사용할 때와 디폴트 속성은 동일하지만, 한 가지 다른 점은 **자동으로 롤백한다는 것이다.** 테스트에 적용되는 @Transactional 은 테스트가 끝나면 기본적으로 강제 롤백시킨다.
+
+만약 테스트 클래스나 메소드에서 DB 작업 결과를 반영하고 싶다면 **@Rollback** annotation을 사용해야 한다. @Transactional은 기본적으로 롤백에 관한 설정이 없으므로 @Rollback 을 통해 롤백 여부를 지정한다.
+
+~~~java
+@Test
+@Transactional  // 테스트 클래스나 테스트 메소드에서 사용하면 기본적으로 롤백시킨다.
+@Rollback(false)  // false로 지정하면 롤백시키지 않는다.
+public void transactionTest() {
+  ...
+}
+~~~
+
+이 @Rollback 은 메소드 레벨에서만 지정할 수 있으므로 만약 테스트 클래스에 수행하는 모든 테스트 메소드에서 롤백하고 싶지 않다면, 다음과 같이 **@TransactionConfiguration** annotation을 통해 롤백 여부를 지정해야 한다.
+
+~~~java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/applicationContext.xml")
+@Transactional
+@TransactionConfiguration(defaultRollback=false)  // 사용하는 디폴트 트랜잭션 매니저 아이디는 "transactionManager" 이다.
+public class UserServiceTest {
+  ...
+
+  @Test
+  @Rollback // 여기서 @Rollback 을 사용하여 이 테스트 메소드만 롤백시킬 수 있다.
+  public void notRollbackTest() {
+    ...
+  }
+
+  @Test
+  @Transactional(propagation=Propagation.NEVER) // 이 테스트에 한해서 트랜잭션을 시작되지 않도록 할 수 있다.
+  public void notUseTransactionTest() {
+    ...
+  }
+~~~
