@@ -367,12 +367,12 @@ public @interface Transactional {
 <tx:annotation-driven />
 ~~~
 
-**@Transactional** annotation 의 타깃은 메소드와 타입이다. 따라서 메소드나 클래스, 인터페이스에 지정할 수 있다. 스프링은 이 annotation이 부여된 모든 오브젝트를 **자동으로 타깃 오브젝트로 인식한다.** 이 때 사용되는 포인트컷은 **TransactionAttributeSourcePointcut** 인데, annotation이 부여된 모든 빈 오브젝트를 찾아 포인트컷의 선정 결과로 돌려준다.
+**@Transactional** 의 타깃은 메소드와 타입이다. 따라서 메소드나 클래스, 인터페이스에 지정할 수 있다. 스프링은 이 annotation이 부여된 모든 오브젝트를 **자동으로 타깃 오브젝트로 인식한다.** 이 때 사용되는 포인트컷은 **TransactionAttributeSourcePointcut** 인데, annotation이 부여된 모든 빈 오브젝트를 찾아 포인트컷의 선정 결과로 돌려준다.
 
 <br>
 ![02.png](/static/assets/img/blog/web/2017-09-14-toby_spring_06_aop_3/02.png)
 
-위 그림은 @Transactional annotation을 사용했을 때, 어드바이저의 동작방식을 보여준다. **TransactionInterceptor** 는 메소드 이름 패턴을 통해 부여되는 일괄적인 트랜잭션 속성정보 대신에, **@Transactional annotation의 엘리먼트에서 트랜잭션 속성을 가져오는 AnnotationTransactionAttributeSource** 를 가져온다. 포인트컷도 @Transactional을 통해 트랜잭션 속성 정보를 참조하도록 한다. 이를 통해 포인트컷과 트랜잭션 속성을 annotation 하나로 지정할 수 있다.
+위 그림은 @Transactional을 사용했을 때, 어드바이저의 동작방식을 보여준다. **TransactionInterceptor** 는 메소드 이름 패턴을 통해 부여되는 일괄적인 트랜잭션 속성정보 대신에, **@Transactional annotation의 엘리먼트에서 트랜잭션 속성을 가져오는 AnnotationTransactionAttributeSource** 를 가져온다. 포인트컷도 @Transactional을 통해 트랜잭션 속성 정보를 참조하도록 한다. 이를 통해 포인트컷과 트랜잭션 속성을 annotation 하나로 지정할 수 있다.
 
 스프링은 @Transactional을 적용할 때 4단계의 대체(fallback) 정책을 이용한다. 타깃 메소드 -> 타깃 클래스 -> 선언 메소드 -> 선언 타입 (클래스, 인터페이스 순서)의 순서에 따라 @Transactional이 적용됐는지 차례대로 확인하고 **가장 먼저 발견되는 속성 정보를 사용한다.**
 
@@ -414,12 +414,12 @@ public class ServiceImpl implements Service {
 
 AOP를 이용해 코드 외부에서 트랜잭션의 기능을 부여해주고 속성을 지정할 수 있게 하는 방법을 **선언적 트랜잭션 (Declarative Transaction)** 이라고 하고, TransactionTemplate나 개별 데이터 기술의 트랜잭션 API를 사용해 직접 코드 안에서 사용하는 방법을 **프로그램에 의한 트랜잭션 (Programmatic Transaction)** 이라고 한다.
 
-트랜잭션의 자유로운 전파와 그로 인한 유연한 개발이 가능할 수 있었던 기술적인 배경은 **AOP로 프록시를 이용한 트랜잭션 부가기능을 간단하게 애플리케이션 전반에 적용할 수 있다.** 또한 스프링의 트랜잭션 추상화를 통해 데이터 엑세스 기술이나 트랜잭션 기술에 상관없이 DAO에서 일어나는 작업들을 하나의 트랜잭션으로 묶을 수 있었다.
+트랜잭션의 자유로운 전파와 그로 인한 유연한 개발이 가능할 수 있었던 기술적인 배경은 **AOP로, 프록시를 이용한 트랜잭션 부가기능을 간단하게 애플리케이션 전반에 적용할 수 있다.** 또한 스프링의 트랜잭션 추상화를 통해 데이터 엑세스 기술이나 트랜잭션 기술에 상관없이 DAO에서 일어나는 작업들을 하나의 트랜잭션으로 묶을 수 있었다.
 
 <br>
 ### @Rollback
 
-테스트 클래스나 테스트 메소드에 사용하는 @Transactional annotation은 일반적인 애플리케이션 클래스에서 사용할 때와 디폴트 속성은 동일하지만, 한 가지 다른 점은 **자동으로 롤백한다는 것이다.** 테스트에 적용되는 @Transactional 은 테스트가 끝나면 기본적으로 강제 롤백시킨다.
+테스트 클래스나 테스트 메소드에 사용하는 @Transactional은 일반적인 애플리케이션 클래스에서 사용할 때와 디폴트 속성은 동일하지만, 한 가지 다른 점은 **자동으로 롤백한다는 것이다.** 테스트에 적용되는 @Transactional 은 테스트가 끝나면 기본적으로 강제 롤백시킨다.
 
 만약 테스트 클래스나 메소드에서 DB 작업 결과를 반영하고 싶다면 **@Rollback** annotation을 사용해야 한다. @Transactional은 기본적으로 롤백에 관한 설정이 없으므로 @Rollback 을 통해 롤백 여부를 지정한다.
 
