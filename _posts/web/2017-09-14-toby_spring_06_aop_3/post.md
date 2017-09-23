@@ -320,3 +320,86 @@ public void setTransactionAttributes(Properties transactionAttributes) {
 [Spring Document, Using @Transactional](https://docs.spring.io/spring/docs/current/spring-framework-reference/html/transaction.html#transaction-declarative-annotations)
 
 **같은 타깃 오브젝트안에서 메소드 호출이 일어날 경우에는 프록시 AOP를 통해 부여한 부가기능이 적용되지 않음을 주의해야 한다.** 만약 위와 같은 경우에도 부가기능을 적용하고 싶다면 AspectJ 와 같은 프록시 AOP 방식이 아닌 다른 방식으로 AOP를 적용해야 한다.
+
+<br>
+### 트랜잭션 경계설정의 일원화
+
+트랜잭션 경계설정 부가기능을 여러 계층에서 중구난방으로 적용하는 것은 좋지 않다. **특정한 계층의 경계를 트랜잭션 경계와 일치시키는 것이 좋다.** 보통 비즈니스 로직을 담고 있는 서비스 계층의 메소드가 트랜잭션 경계를 설정하기가 적절하다.
+
+**서비스 계층을 트랜잭션 경계로 정했다면, 다른 계층이나 모듈에서 DAO에 직접 접근하는 것은 차단되어야 한다.** 트랜잭션은 보통 서비스 계층의 메소드 조합으로 만들어지므로, 다른 모듈의 DAO에 접근하고자 할 때는 서비스 계층을 거치는게 바람직하다.
+
+[Apply transaction pointcut, advice to UserService. ](https://github.com/dhsim86/tobys_spring_study/commit/ff73da0a3d9089384cd98d06deb88e80f1192810)
+
+<br>
+## 애노테이션 트랜잭션 속성과 포인트컷
+
+보통 트랜잭션 속성을 적용할 때 포인트컷 표현식과 TransactionInterceptor 어드바이스를 통해 일괄적으로 적용하는 방식은 일반적인 상황에 대해서는 잘 들어맞는다. 그러나 클래스나 메소드에 따라서 제각각 속성이 다른 트랜잭션 속성이 필요할 때 앞서 설명한 것처럼 포인트컷과 어드바이스를 계속 추가해나가야 하므로, 이런 경우에는 **메소드 이름 패턴을 통해 일괄적으로 트랜잭션 속성을 적용하는 방식은 적합하지 않다.**
+
+이를 위해 스프링에서는 @Transactional annotation을 통해, 트랜잭션 속성을 정의하는 방법을 제공한다.
+
+~~~java
+@Target({ElementType.METHOD, ElementType.TYPE}) // annotation을 사용할 대상을 지정, 메소드나 타입에 지정할 수 있다.
+@Retention(RetentionPolicy.RUNTIME) // annotation 정보가 언제까지 유지되는지를 지정
+@Inherited // 상속을 통해서도 annotation 정보를 얻을 수 있도록 한다.
+@Documented
+public @interface Transactional {
+  @AliasFor("transactionManager") // transactionManager 이라는 빈 이름을 가진 트랜잭션 매니저를 디폴트로 사용한다.
+  String value() default "";
+
+  @AliasFor("value")
+  String transactionManager() default "";
+
+  Propagation propagation() default Propagation.REQUIRED;
+  Isolation isolation() default Isolation.DEFAULT;
+  int timeout() default -1;
+  boolean readOnly() default false;
+  Class<? extends Throwable>[] rollbackFor() default {};
+  String[] rollbackForClassName() default {};
+  Class<? extends Throwable>[] noRollbackFor() default {};
+  String[] noRollbackForClassName() default {};
+
+  // 트랜잭션 속성의 모든 항목을 지정할 수 있고, 디폴트 값이 설정되어 있으므로 생략 가능하다.
+}
+~~~
+
+위의 annotation을 사용하기 위해 다음과 같이 애플리케이션 컨텍스트에 추가한다.
+~~~xml
+<tx:annotation-driven />
+~~~
+
+**@Transactional** annotation 의 타깃은 메소드와 타입이다. 따라서 메소드나 클래스, 인터페이스에 지정할 수 있다. 스프링은 이 annotation이 부여된 모든 오브젝트를 **자동으로 타깃 오브젝트로 인식한다.** 이 때 사용되는 포인트컷은 **TransactionAttributeSourcePointcut** 인데, annotation이 부여된 모든 빈 오브젝트를 찾아 포인트컷의 선정 결과로 돌려준다.
+
+<br>
+![02.png](/static/assets/img/blog/web/2017-09-14-toby_spring_06_aop_3/02.png)
+
+위 그림은 @Transactional annotation을 사용했을 때, 어드바이저의 동작방식을 보여준다. **TransactionInterceptor** 는 메소드 이름 패턴을 통해 부여되는 일괄적인 트랜잭션 속성정보 대신에, **@Transactional annotation의 엘리먼트에서 트랜잭션 속성을 가져오는 AnnotationTransactionAttributeSource** 를 가져온다. 포인트컷도 @Transactional을 통해 트랜잭션 속성 정보를 참조하도록 한다. 이를 통해 포인트컷과 트랜잭션 속성을 annotation 하나로 지정할 수 있다.
+
+스프링은 @Transactional을 적용할 때 4단계의 대체(fallback) 정책을 이용한다. 타깃 메소드 -> 타깃 클래스 -> 선언 메소드 -> 선언 타입 (클래스, 인터페이스 순서)의 순서에 따라 @Transactional이 적용됐는지 차례대로 확인하고 **가장 먼저 발견되는 속성 정보를 사용한다.**
+
+~~~java
+@Transactional
+public interface Service {
+  @Transactional
+  void method1();
+
+  void method2();
+}
+
+@Transactional
+public class ServiceImpl implements Service {
+  @Transactional
+  public void method1();
+
+  public void method2();
+}
+~~~
+
+위와 같이 코드가 정의되어 있을 때, ServiceImpl의 method1에 대해서는 **메소드에 정의된 속성을 사용한다.** ServiceImpl의 **method2에 대해서는 ServiceImpl 클래스에 정의된 속성을 사용할 것이다.**
+
+따라서 **클래스 레벨에서 @Transactional을 붙여 모든 메소드에 공통 트랜잭션 속성이 적용되게 하고, 특수한 속성이 필요한 메소드에 대해서 추가적으로 @Transactional 을 붙이는 것이 좋다.** 그러면 그 메소드에 대해서는 메소드에 붙인 @Transactional 속성을 사용할 것이다.
+
+타깃 클래스에 대해서 @Transactional 을 발견하지 못하면 스프링은 인터페이스에 대해서도 조사한다.
+
+> 인터페이스를 사용하는 AOP가 아닌 방식으로 트랜잭션을 적용하면, 인터페이스에 정의된 @Transactional은 무시된다. 인터페이스에 정의하면 인터페이스를 통해 호출할 때만 트랜잭션이 적용된다.
+
+[Use @Transactional](https://github.com/dhsim86/tobys_spring_study/commit/1f4a242f912be99f635f29cb703ccb560054afe2)
