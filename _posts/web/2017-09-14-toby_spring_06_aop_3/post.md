@@ -33,6 +33,30 @@ public Object invoke(MethodInvocation invocation) throws Throwable {
 
 위 코드에서 **DefaultTransactionDefinition** 은 **TransactionDefinition** 인터페이스를 구현하는 객체로 **트랜잭션의 동작방식에 영향을 주는 네 가지 속성을 정의한다.**
 
+~~~java
+public interface TransactionDefinition {
+    int PROPAGATION_REQUIRED = 0;
+    int PROPAGATION_SUPPORTS = 1;
+    int PROPAGATION_MANDATORY = 2;
+    int PROPAGATION_REQUIRES_NEW = 3;
+    int PROPAGATION_NOT_SUPPORTED = 4;
+    int PROPAGATION_NEVER = 5;
+    int PROPAGATION_NESTED = 6;
+    int ISOLATION_DEFAULT = -1;
+    int ISOLATION_READ_UNCOMMITTED = 1;
+    int ISOLATION_READ_COMMITTED = 2;
+    int ISOLATION_REPEATABLE_READ = 4;
+    int ISOLATION_SERIALIZABLE = 8;
+    int TIMEOUT_DEFAULT = -1;
+
+    int getPropagationBehavior();
+    int getIsolationLevel();
+    int getTimeout();
+    boolean isReadOnly();
+    String getName();
+}
+~~~
+
 <br>
 ### 트랜잭션 전파 (Transaction Propagation)
 
@@ -44,7 +68,7 @@ public Object invoke(MethodInvocation invocation) throws Throwable {
 위와 같이 각각 독립적인 2개의 트랜잭션이 있을 때, B 트랜잭션의 동작 방식을 결정할 수 있다.
 
 B 트랜잭션이 A 트랜잭션에 참여시킬 경우, (2)에서 예외가 발생했을 때 B 트랜잭션 내용도 롤백시킬 수 있다.
-반면에 B 트랜잭션을 A 트랜잭션에 독립적인 트랜잭션으로 만들 경우, A 트랜잭션은 B 트랜잭션 상황에 무관하게 진행될 수도 있다. 반대로 (2)에서 예외가 발생하더라도 B 트랜잭션의 결과는 영향을 받지 않는다.
+반면에 B 트랜잭션을 A 트랜잭션에 독립적인 트랜잭션으로 만들 경우, A 트랜잭션은 B 트랜잭션 상황에 무관하게 진행될 수도 있다. 즉, B의 트랜잭션 경계를 빠져나오면 A 트랜잭션과는 무관하게 커밋되거나 롤백될 수 있다. 반대로 (2)에서 예외가 발생하더라도 B 트랜잭션의 결과는 영향을 받지 않는다.
 
 대표적으로 다음과 같은 트랜잭션 전파 속성이 있다.
 
@@ -80,7 +104,7 @@ TransactionStatus status = transactionManager.getTransaction(new DefaultTransact
 
 모든 DB 트랜잭션은 격리수준을 가져야 한다. 서버 환경에서는 여러 개의 트랜잭션이 동시에 진행될 수 있는데 모든 트랜잭션이 순차적으로 진행되어 서로 독립적인 것이 좋겠지만 그러면 성능이 크게 떨어진다. **적절하게 격리수준을 조정하여 가능한 많은 트랜잭션을 동시에 수행하면서도 문제가 발생하지 않도록 제어가 필요하다.**
 
-격리수준은 기본적으로 DB에 설정되어 있으나, JDBC 드라이버나 DataSource 등에서 재설정 가능하고 필요에 따라 트랜잭션 단위로 격리수준을 조정할 수 있다. **DefaultTransactionDefinition** 의 기본 격리수준은 **ISOLATION_DEFAULT** 이다. 이는 DataSource에 설정된 디폴트 격리수준을 그대로 따른다는 것이다.
+격리수준은 기본적으로 DB에 설정되어 있으나, JDBC 드라이버나 DataSource 등에서 재설정 가능하고 필요에 따라 트랜잭션 단위로 격리수준을 조정할 수 있다. **DefaultTransactionDefinition** 의 기본 격리수준은 **ISOLATION_DEFAULT** 이다. 이는 DataSource에 설정된 디폴트 격리수준을 그대로 따른다는 것이다. 특별한 작업을 수행하는 메소드의 경우에는 독자적인 격리수준을 지정할 필요가 있다.
 
 <br>
 ### 제한시간
@@ -91,6 +115,8 @@ TransactionStatus status = transactionManager.getTransaction(new DefaultTransact
 ### 읽기전용
 
 트랜잭션 내에서 데이터를 조작하는 시도를 막는다. 또한 데이터 엑세스 기술에 따라 성능이 향상될 수도 있다.
+
+> 제한시간(timeout) 및 읽기전용(readOnly) 속성은 트랜잭션이 처음 시작할 때가 아니라면 적용되지 않는다. 즉 트랜잭션에 참여할 때, 참여하는 트랜잭션 속성과 충돌하지 않는다.
 
 <br>
 ## TransactionInterceptor
@@ -138,6 +164,21 @@ public class TransactionAdvice implements MethodInterceptor {
 </bean>
 ~~~
 
+xml에서 트랜잭션 속성을 정의할 때 **메소드 이름 패턴을 키로 잡고, 문자열로써 트랜잭션 속성을 정의하면 된다.**
+
+> 메소드 이름이 하나 이상의 패턴과 일치할 때는, 등록된 이름 패턴 중에서 가장 정확히 일치하는 것이 적용된다.
+
+**PROPAGATION_NAME, ISOLATION_NAME, readOnly, timeout_NNNN, -Exception1, +Exception2**
+
+* PROPAGATION_NAME: 트랜잭션 전파 방식, PROPAGATION_ 으로 시작한다.
+* ISOLATION_NAME: 격리 수준, ISOLATION_ 으로 시작한다.
+* readOnly: 읽기 전용 설정
+* timeout_NNNN: timeout_ 으로 시작한다.
+* -Exception1: 롤백 대상으로 추가할 것을 **"-"** 로 붙인다.
+* +Exception2: **"+"** 를 통해 해당 예외에 대해서도 롤백하지 않고 커밋시키게 할 수 있다.
+
+이 속성들중 트랜잭션 전파 항목만 필수사항이고 나머지는 모두 생략가능하며 순서는 바뀌어도 상관없다.
+
 위 xml 설정과 같이 트랜잭션 매니저를 설정하는 것 외에 **transactionAttributes** 프로퍼티를 통해 각 메소드 패턴별로 적용할 트랜잭션 속성을 정의할 수 있다.
 
 ---
@@ -146,32 +187,6 @@ public class TransactionAdvice implements MethodInterceptor {
 transactionAttributes 프로퍼티는 **TransactionAttribute** 인터페이스를 구현한 클래스의 오브젝트로 트랜잭션 네 가지 속성 말고도 **어떤 예외가 발생하면 롤백을 할 것인가를 결정하는 메소드를 추가적으로 가지고 있다.** 이 프로퍼티를 통해 트랜잭션 부가기능의 모든 동작방식을 제어할 수 있다.
 
 ~~~java
-public interface TransactionDefinition {
-    int PROPAGATION_REQUIRED = 0;
-    int PROPAGATION_SUPPORTS = 1;
-    int PROPAGATION_MANDATORY = 2;
-    int PROPAGATION_REQUIRES_NEW = 3;
-    int PROPAGATION_NOT_SUPPORTED = 4;
-    int PROPAGATION_NEVER = 5;
-    int PROPAGATION_NESTED = 6;
-    int ISOLATION_DEFAULT = -1;
-    int ISOLATION_READ_UNCOMMITTED = 1;
-    int ISOLATION_READ_COMMITTED = 2;
-    int ISOLATION_REPEATABLE_READ = 4;
-    int ISOLATION_SERIALIZABLE = 8;
-    int TIMEOUT_DEFAULT = -1;
-
-    int getPropagationBehavior();
-
-    int getIsolationLevel();
-
-    int getTimeout();
-
-    boolean isReadOnly();
-
-    String getName();
-}
-
 public interface TransactionAttribute extends TransactionDefinition {
     String getQualifier();
     boolean rollbackOn(Throwable var1);
@@ -196,3 +211,40 @@ public void setTransactionAttributes(Properties transactionAttributes) {
     this.transactionAttributeSource = tas;
 }
 ~~~
+
+[Use TransactionInterceptor](https://github.com/dhsim86/tobys_spring_study/commit/5ee66c82588cba009b74a3a6daaaf9d4c9fd1fb2)
+
+<br>
+### tx 네임스페이스를 통한 등록
+
+**TransactionInterceptor** 및 **TransactionAttribute** 타입의 속성 정보도 **tx 스키마 전용 태그** 를 이용해 정의가능하다.
+
+~~~xml
+<beans ...
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="...
+  http://www.springframework.org/schema/tx
+  http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+...
+
+<!-- advice 태그에 의해, TransactionInterceptor 빈이 등록된다 -->
+<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+  <!-- 트랜잭션 매니저의 빈 아이디가 "transactionManager" 라면 생략 가능하다. -->
+    <tx:attributes>
+        <tx:method name="get*" propagation="REQUIRED" read-only="true" timeout="30"/>
+        <tx:method name="upgrade*" propagation="REQUIRES_NEW" isolation="SERIALIZABLE" />
+        <tx:method name="*" propagation="REQUIRED" />
+        <!-- 디폴트 값이 스키마에 정의되어 있어 속성이 REQUIRED 라면 생략 가능하다. -->
+    </tx:attributes>
+</tx:advice>
+
+<aop:config>
+    <aop:pointcut id="transactionPointcut" expression="execution(* *..*ServiceImpl.upgrade*(..))" />
+    <aop:advisor advice-ref="transactionAdvice" pointcut-ref="transactionPointcut" />
+</aop:config>
+~~~
+
+트랜잭션 속성을 개별 애트리뷰트를 통해 지정할 수 있어 읽기가 쉽고, XML 에디터의 자동 완성을 통해 편하게 작성가능하다.
+
+[Use tx schema](https://github.com/dhsim86/tobys_spring_study/commit/5a0a08560baa6bfc97a206c8a06069659a714235)
