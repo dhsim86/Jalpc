@@ -266,7 +266,7 @@ public void setTransactionAttributes(Properties transactionAttributes) {
 스프링의 빈 이름을 사용하는 **bean()** 표현식을 사용하는 것도 고려해볼 수 있다.
 
 <br>
-### 공통된 메소드 이름 규칙을 통해 최소환의 트랜잭션 어드바이스와 속성을 정의
+### 공통된 메소드 이름 규칙을 통해 최소한의 트랜잭션 어드바이스와 속성을 정의
 
 기준이 되는 몇 가지 트랜잭션 속성을 정의하고 그에 따라 **적절한 메소드 명명 규칙을 만들어두는 것이 좋다.**
 다음과 같이 디폴트로 트랜잭션 속성을 정의하고, DB 조회 전용 메소드들은 **get / find** 로 시작하는 이름으로 만들고 트랜잭션 속성에 readOnly를 추가한다.
@@ -319,6 +319,4 @@ public void setTransactionAttributes(Properties transactionAttributes) {
 
 [Spring Document, Using @Transactional](https://docs.spring.io/spring/docs/current/spring-framework-reference/html/transaction.html#transaction-declarative-annotations)
 
-**같은 타깃 오브젝트안에서 메소드 호출이 일어날 경우에는 프록시 AOP를 통해 부여한 부가기능이 적용되지 않음을 주의해야 한다.**
-
-만약 위와 같은 경우에도 부가기능을 적용하고 싶다면 **AspectJ 와 같은 프록시 AOP 방식이 아닌 다른 방식으로 AOP를 적용해야 한다.**
+**같은 타깃 오브젝트안에서 메소드 호출이 일어날 경우에는 프록시 AOP를 통해 부여한 부가기능이 적용되지 않음을 주의해야 한다.** 만약 위와 같은 경우에도 부가기능을 적용하고 싶다면 AspectJ 와 같은 프록시 AOP 방식이 아닌 다른 방식으로 AOP를 적용해야 한다.
