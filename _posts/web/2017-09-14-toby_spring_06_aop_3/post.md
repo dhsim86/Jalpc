@@ -319,6 +319,10 @@ public void setTransactionAttributes(Properties transactionAttributes) {
 
 [Spring Document, Using @Transactional](https://docs.spring.io/spring/docs/current/spring-framework-reference/html/transaction.html#transaction-declarative-annotations)
 
+> When using proxies, you should apply the @Transactional annotation only to methods with public visibility. If you do annotate protected, private or package-visible methods with the @Transactional annotation, no error is raised, but the annotated method does not exhibit the configured transactional settings. Consider the use of AspectJ (see below) if you need to annotate non-public methods.
+
+> In proxy mode (which is the default), only external method calls coming in through the proxy are intercepted. This means that self-invocation, in effect, a method within the target object calling another method of the target object, will not lead to an actual transaction at runtime even if the invoked method is marked with @Transactional. Also, the proxy must be fully initialized to provide the expected behaviour so you should not rely on this feature in your initialization code, i.e. @PostConstruct.
+
 **같은 타깃 오브젝트안에서 메소드 호출이 일어날 경우에는 프록시 AOP를 통해 부여한 부가기능이 적용되지 않음을 주의해야 한다.** 만약 위와 같은 경우에도 부가기능을 적용하고 싶다면 AspectJ 와 같은 프록시 AOP 방식이 아닌 다른 방식으로 AOP를 적용해야 한다.
 
 <br>
