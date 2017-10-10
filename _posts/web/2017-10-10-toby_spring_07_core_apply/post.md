@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Toby's Spring Chap 07: 스프링 핵심 기술의 응용
+title:  "Toby's Spring Chap 07: 스프링 핵심 기술의 응용 part.1"
 date:   2017-10-10
-desc: "Toby's Spring Chap 07: 스프링 핵심 기술의 응용
+desc: "Toby's Spring Chap 07: 스프링 핵심 기술의 응용 part.1"
 keywords: "spring, spring boot"
 categories: [Web]
 tags: [spring, spring boot]
