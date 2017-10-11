@@ -30,7 +30,7 @@ SQL 문장을 기존 프로퍼티를 설정하는 것과 같이 애플리케이�
 <br>
 ## 인터페이스의 분리와 자기참조 빈
 
-애플리케이션 컨텍스트와 같은 스프링의 XML 설정 파일에서 SQL 정보를 넣어놓고 활용하는 것은 좋은 방법이 아니다. SQL을 저장해두는 독립적인 파일을 사용하는 것이 바람직하다. 따로 SQL 정보만 정의한 XML 파일을 통해 DAO에게 필요한 SQL 문장을 제공해주는 서비스를 만들 수 있을 것이다.
+하지만 앞서 언급하였듯이, 애플리케이션 컨텍스트와 같은 스프링의 XML 설정 파일에서 SQL 정보를 넣어놓고 활용하는 것은 좋은 방법이 아니다. SQL을 저장해두는 독립적인 파일을 사용하는 것이 바람직하다. 따로 SQL 정보만 정의한 XML 파일을 통해 DAO에게 필요한 SQL 문장을 제공해주는 서비스를 만들 수 있을 것이다.
 
 <br>
 ### JAXB
@@ -70,6 +70,13 @@ JAXB는 XML 문서의 구조를 정의한 **스키마를 통해 매핑할 오브
     </complexType>
 </schema>
 ~~~
+
+다음과 같이 JAXB 컴파일러로 컴파일하면 다음 절에 나오는 클래스들이 생성될 것이다.
+
+<br>
+![01.png](/static/assets/img/blog/web/2017-10-10-toby_spring_07_core_apply/01.png)
+
+컴파일을 진행할 때는 생성되는 클래스들이 위치할 패키지 이름을 제공해야 한다.
 
 ---
 
@@ -119,3 +126,22 @@ public class SqlType {
   }
 }
 ~~~
+
+**SQL map XML**
+
+~~~xml
+<sqlmap>
+  <sql key="add">insert</sql>
+  <sql key="get">select</sql>
+  <sql key="delete">delete</sql>
+</sqlmap>
+~~~
+
+\<sql\> 태그는 각 SqlType 클래스 오브젝트로 매핑되며, @XmlAttribute 및 @XmlValue로 지정한 필드들에 각 키 값 및 sql 문장이 할당된다. @XmlElement에 의해 매핑된 SqlType 클래스 오브젝트들이 Sqlmap의 sql 리스트에 매핑될 것이다.
+
+* 언마샬링(unmarshalling): JAXB에서 XML 문서를 읽어 자바의 오브젝트로 변환
+* 마샬링(marshalling): 바인딩 오브젝트를 XML 문서로 변환
+
+[Test JAXB for sqlmap](https://github.com/dhsim86/tobys_spring_study/commit/bc9e65532026894f18ea2e35c3b5dde46c3bb209)
+<br>
+[Use XmlSqlService for getting sql statement by key.](https://github.com/dhsim86/tobys_spring_study/commit/f7ab4532d04fddae7f348a3e689fb5801289fc58)
