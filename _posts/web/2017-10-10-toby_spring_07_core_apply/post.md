@@ -145,3 +145,33 @@ public class SqlType {
 [Test JAXB for sqlmap](https://github.com/dhsim86/tobys_spring_study/commit/bc9e65532026894f18ea2e35c3b5dde46c3bb209)
 <br>
 [Use XmlSqlService for getting sql statement by key.](https://github.com/dhsim86/tobys_spring_study/commit/f7ab4532d04fddae7f348a3e689fb5801289fc58)
+
+<br>
+### 빈의 초기화 작업
+
+다음과 같이 스프링 빈으로 등록되는 클래스의 생성자에서 복잡한 초기화 작업을 다루는 것은 좋지 않다.
+
+~~~java
+public class XmlSqlService implements SqlService {
+  private Map<String, String> sqlMap = new HashMap<>();
+
+  public XmlSqlService() {
+    String contextPath = Sqlmap.class.getPackage().getName();
+
+    try {
+      JAXBContext context = JAXBContext.newInstance(contextPath);
+      Unmarshaller unmarshaller = context.createUnmarshaller();
+      InputStream inputStream = UserDao.class.getResourceAsStream("/sql/sqlmap.xml");
+      Sqlmap sqlmap = (Sqlmap)unmarshaller.unmarshal(inputStream);
+
+      for (SqlType sql : sqlmap.getSql()) {
+        sqlMap.put(sql.getKey(), sql.getValue());
+      }
+    } catch (JAXBException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  ...
+~~~
+
+오브젝트 생성 중에 발생하는 예외는 다루기가 힘들고, 상속하기에도 불편하며 보안에도 문제가 발생할 수 있다. **초기상태를 가지는 오브젝트를 만들어놓고, 별도의 초기화 메소드를 통해 사용하는 방법이 바람직하다.** 또한 코드 상에서 읽어들일 파일의 위치와 이름이 고정되어 있다. 코드와 다르게 바뀔 가능성이 있는 내용은 외부에서 DI 해주는 것이 좋다.
