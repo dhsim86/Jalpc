@@ -154,7 +154,7 @@ public interface ResourceLoader {
 다음 표는 ResourceLoader가 인식하는 접두어와 이를 이용해 리소스를 표현한 예를 나타낸 것이다.
 
 | 접두어 | 예 | 설명 |
-| ---------- | :--------- | :----------: |
+| ---------- | :--------- | :---------- |
 | file: | file:/C:/temp/file.txt | 파일 시스템의 C:/temp 폴더에 있는 file.txt를 Resource로 만들어준다. |
 | classpath: | classpath:file.txt | 클래스패스의 루트에 있는 file.txt에 접근할 수 있도록 한다. |
 | 없음 | WEB-INF/test.dat | 접두어가 없는 경우, ResourceLoader의 구현에 따라 리소스의 위치가 결정된다. ServletResourceLoader 이면 서블릿 컨텍스트의 루트를 기준으로 해석한다. |
