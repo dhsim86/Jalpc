@@ -291,3 +291,32 @@ sqlReader.readSql(SqlRegistry);
 
 <br>
 ![03.png](/static/assets/img/blog/web/2017-10-10-toby_spring_07_core_apply/03.png)
+
+다음 **use self-reference to separate responsibility.** 커밋로그처럼, **자기 참조 빈** 을 통해 책임 분리가 필요한 클래스를 유연한 구조로 만들고자 할 때 처음 시도해볼 수 있는 방법이 있다. 책임과 관심사가 복잡하게 얽혀 있는 것을 유연하게 만들 때 사용해 볼만한 방법이다.
+
+[use self-reference to separate responsibility.](https://github.com/dhsim86/tobys_spring_study/commit/523a7ed0ee946ecb3dfdfe36347ab32da7ffb3a8)
+<br>
+[use independent beans implements SqlService, SqlReader, SqlRegistry.](https://github.com/dhsim86/tobys_spring_study/commit/fc567d7fee215706bcfe7954ec8d386a3b94a669)
+
+---
+
+**디폴트 의존관계를 갖는 빈**
+
+확장을 고려해서 기능을 분리하고, 인터페이스와 전략 패턴을 도입하고, DI를 적용해나간다면 늘어난 클래스와 인터페이스 구현과 의존관계 설정에 대한 부담은 감수해야 한다.
+
+특정 의존 오브젝트가 대부분의 환경에서 거의 디폴트로 사용된다면 디폴트 의존관계를 갖는 빈을 만드는 것을 고려해볼 필요가 있다. **DI 를 사용한다고 해서 항상 모든 프로퍼티 설정을 둘 필요가 없으며, 자주 사용되는 의존 오브젝트는 별도의 설정이 없으면 디폴트로 사용하게 하는 것도 좋은 방법이다.**
+
+~~~java
+public class DefaultSqlService extends BaseSqlService {
+  public DefaultSqlService() {
+    setSqlReader(new JaxbXmlSqlReader());
+    setSqlRegistry(new HashMapSqlRegistry());
+  }
+}
+~~~
+
+위 코드와 같이 거의 대부분의 상황에서 JAXB를 통해 SQL 문장을 XML 포맷으로 읽거나, HashMap을 통해 SQL 문장을 저장한다면 디폴트 의존 오브젝트를 사용하는 빈을 만들 수 있다.
+
+> 위의 DefaultSqlService 가 BaseSqlService 를 상속하였다는 것이 중요하다. sqlReader와 sqlRegistry 를 설정하기 위한 setter 메소드를 그대로 갖고 있어서 설정 파일에서 얼마든지 변경할 수 있으므로, 디폴트가 아닌 다른 기술을 사용하는 오브젝트를 사용하고자할 때는 설정 파일에서 해당 프로퍼티를 설정해주면 된다.
+
+[use DefaultSqlService.](https://github.com/dhsim86/tobys_spring_study/commit/1ba668a7e9bce4faecb22334a8c9a9fd5eb9e206)
