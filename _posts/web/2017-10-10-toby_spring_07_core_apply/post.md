@@ -175,3 +175,91 @@ public class XmlSqlService implements SqlService {
 ~~~
 
 오브젝트 생성 중에 발생하는 예외는 다루기가 힘들고, 상속하기에도 불편하며 보안에도 문제가 발생할 수 있다. **초기상태를 가지는 오브젝트를 만들어놓고, 별도의 초기화 메소드를 통해 사용하는 방법이 바람직하다.** 또한 코드 상에서 읽어들일 파일의 위치와 이름이 고정되어 있다. 코드와 다르게 바뀔 가능성이 있는 내용은 외부에서 DI 해주는 것이 좋다.
+
+스프링에서는 빈 오브젝트를 생성하고 DI 작업을 수행해서 프로퍼티들을 모두 주입해준 뒤에 **미리 지정한 초기화 메소드를 호출해주는 기능을 갖고있다.**
+
+
+> 스프링은 스프링 컨테이너가 빈을 생성한 뒤에 부가적인 작업을 수행할 수 있게 해주는 "빈 후처리기, BeanPostProcessor" 를 제공하는데, AOP를 위한 프록시 자동생성기 (ex: DefaultAdvisorAutoProxyCreator)가 대표적이다. 이 뿐만 아니라 annotation을 활용한 빈 설정을 지원하는 몇 가지 빈 후처리기가 있다.
+
+다음과 같이 애플리케이션 컨텍스트 설정 파일에 \<context:annotation-config\> 를 추가하면, 빈 설정 기능에 사용할 수 있는 특별한 annotation을 사용할 수 있게 해주는 빈 후처리기들이 등록된다.
+
+~~~xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                 http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                 http://www.springframework.org/schema/context
+                 http://www.springframework.org/schema/context/spring-context-4.3.xsd
+                 http://www.springframework.org/schema/tx
+                 http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+    <tx:annotation-driven/>
+    <context:annotation-config/>
+~~~
+
+스프링에서는 **@PostConstruct** 라는 annotation이 지정된 메소드가 있으면, 해당 빈의 오브젝트를 생성하고 DI 작업을 마친 뒤에 해당 메소드를 자동으로 실행시켜준다. 따라서 빈 오브젝트의 초기화 메소드를 지정하는데 사용할 수 있다.
+
+> @PostConstruct 는 java.lang.annotation 패키지에 포함된 JavaEE 5나 JDK 6에 포함된 표준 annotation 이다.
+
+[Use @PostConstruct to load sqlmap.xml file.](https://github.com/dhsim86/tobys_spring_study/commit/58e341f983e30d32bad932e4c28bc8d92d68b2f8)
+
+<br>
+### 인터페이스 분리
+
+~~~java
+public class XmlSqlService implements SqlService {
+	private Map<String, String> sqlMap = new HashMap<>();
+	private String sqlMapFile;
+
+	public void setSqlMapFile(String sqlMapFile) {
+		this.sqlMapFile = sqlMapFile;
+	}
+
+	@PostConstruct
+	public void loadSql() {
+		String contextPath = Sqlmap.class.getPackage().getName();
+
+		try {
+			JAXBContext context = JAXBContext.newInstance(contextPath);
+			Unmarshaller unmarshaller = context.createUnmarshaller();
+			InputStream inputStream = UserDao.class.getResourceAsStream(sqlMapFile);
+			Sqlmap sqlmap = (Sqlmap)unmarshaller.unmarshal(inputStream);
+
+			for (SqlType sql : sqlmap.getSql()) {
+				sqlMap.put(sql.getKey(), sql.getValue());
+			}
+
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public String getSql(String key) throws SqlRetrievalFailureException {
+		String sql = sqlMap.get(key);
+
+		if (sql == null) {
+			throw new SqlRetrievalFailureException("Can not find appropriate sql statement, key: " + key);
+		}
+
+		return sql;
+	}
+}
+~~~
+
+위와 같이 XmlSqlService 클래스는 XML 포맷의 SQL 구문을 읽어와서 HasMap 타입의 컬렉션에 저장해두는 방식으로 **고정되어 있다.** 만약 다른 포맷의 SQL 정보를 읽어와야 하거나 다른 방식으로 SQL 문장을 저장해둘려면 코드가 직접 수정되어야 한다. 이는 **단일 책임의 원칙**을 위반한 것으로 기술의 변화가 코드의 수정을 초래한다.
+
+**"SQL을 가져오는 것"** 과 **"SQL을 보관하고 사용하는 것"** 은 서로 다른 이유로 변경될 수 있는 독립적인 **전략** 이다. 따라서 서로 관심이 다른 코드들을 분리하고, 유연하게 확장 가능하도록 DI를 적용해볼 수 있다.
+
+---
+
+**책임에 따른 인터페이스 정의**
+
+XmlSqlService 는 다음과 같은 독립적으로 변경가능한 책임이 있다.
+
+* SQL 정보를 외부의 리소스로부터 로드
+  * XML이든 다른 포맷의 리소스이든 애플리케이션에서 SQL을 사용할 수 있도록 메모리로 로드하는 책임
+* SQL을 보관해두고 있다가 필요할 때 제공
+  * 어떤 방식으로 저장하든 애플리케이션에서 정해진 인터페이스를 통해 SQL을 제공해주는 책임
