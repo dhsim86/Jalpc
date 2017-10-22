@@ -263,3 +263,31 @@ XmlSqlService 는 다음과 같은 독립적으로 변경가능한 책임이 있
   * XML이든 다른 포맷의 리소스이든 애플리케이션에서 SQL을 사용할 수 있도록 메모리로 로드하는 책임
 * SQL을 보관해두고 있다가 필요할 때 제공
   * 어떤 방식으로 저장하든 애플리케이션에서 정해진 인터페이스를 통해 SQL을 제공해주는 책임
+
+DAO에 SQL을 제공해주는 "SqlService" 인터페이스를 제공하는 오브젝트는 다음과 같이 위의 두 가지 책임을 가진 오브젝트와 협력해서 동작하도록 해야 한다.
+
+<br>
+![02.png](/static/assets/img/blog/web/2017-10-10-toby_spring_07_core_apply/02.png)
+
+위 그림과 같이 **SqlReader** 와 **SqlRegistry** 두 가지 타입의 오브젝트를 사용하여 DAO에서 필요한 SQL 을 제공하는 기능을 구현한다. SqlRegistry의 일부 인터페이스는 런타임에 등록된 SQL 문장을 변경할 수 있도록 **SqlUpdater** 와 같이 다른 곳에서 사용하게 할 수도 있다.
+
+그런데 다음과 같이 SqlReader 및 SqlRegistry 를 사용하는 SqlService 에서 SqlReader로부터 SqlRegistry로 데이터를 전달하는 코드가 필요할 수 있다.
+
+~~~java
+Map<String, String> sqls = SqlReader.readSql();
+SqlRegistry.addSqls(sqls);
+~~~
+
+SqlService 에서는 단순히 SQL 정보를 활용하는 것이 아닌, 그냥 전달하는 것이 전부라면 위 코드와 같이 작성될 필요가 없다. 위 코드는 **Map** 이라는 오브젝트로 서로 다른 두 타입(SqlReader, SqlRegistry)의 인터페이스의 파라미터를 불필요하게 강제하기 때문이다.
+
+위 코드와 같이 작성하기보다는, 다음과 같이 SqlReader 에게 SqlRegistry **전략** 을 제공하면서 읽은 Sql 정보를 SqlRegistry에 등록하라고 요청하는 것이 좋다.
+~~~java
+sqlReader.readSql(SqlRegistry);
+~~~
+
+그러면 외부에서 특정 포맷으로 변환한 Sql 정보를 주고받을 필요없이, SqlReader가 SqlRegistry에 Sql 정보를 직접 등록하게 함으로써, **서로 각자의 구현 방식을 독립적으로 유지하면서 필요한 관계만 가지고 협력해서 일을 하는 구조가 된다.**
+
+> 자바의 오브젝트는 데이터를 가질 수 있는데, 자신이 가진 데이터를 이용해 어떻게 작업할지는 자기 자신이 가장 잘 알고 있다. 꼭 필요하지 않은 이상, 오브젝트 내부의 데이터를 외부로 노출시킬 필요가 없다.
+
+<br>
+![03.png](/static/assets/img/blog/web/2017-10-10-toby_spring_07_core_apply/03.png)
