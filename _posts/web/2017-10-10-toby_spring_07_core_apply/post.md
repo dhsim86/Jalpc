@@ -183,6 +183,8 @@ public class XmlSqlService implements SqlService {
 
 다음과 같이 애플리케이션 컨텍스트 설정 파일에 \<context:annotation-config\> 를 추가하면, 빈 설정 기능에 사용할 수 있는 특별한 annotation을 사용할 수 있게 해주는 빈 후처리기들이 등록된다.
 
+[context:annotation-config](https://dhsim86.github.io/web/2017/03/28/spring_annotations_01-post.html)
+
 ~~~xml
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
