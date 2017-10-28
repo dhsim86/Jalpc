@@ -65,4 +65,68 @@ Annotation 이나 XML을 메타정보로 활용하는 프로그래밍 방식은,
 
 이러한 스타일의 프로그래밍 방식은 자바 코드로 직접 모든 내용을 표현했을 때보다 **작성해야할 코드의 양이 줄어든다는 장점이 있다.** 반면에 **미리 정의돤 관례나 규칙을 알아야하고, 메타정보를 보고 프로그램이 어떻게 동작할지 이해해야 하는 부담이 되기도 한다.**
 
-스프링은 annotation 으로 메타정보를 작성하고, 미리 정해진 정책과 관례를 통해 간결한 코드에 많은 내용을 담을 수 있는 방식을 적극 도입하고 있다. 
+스프링은 annotation 으로 메타정보를 작성하고, 미리 정해진 정책과 관례를 통해 간결한 코드에 많은 내용을 담을 수 있는 방식을 적극 도입하고 있다.
+
+<br>
+## 자바 코드를 이용한 빈 설정
+
+**@Configuration 사용**
+
+다음과 같이 **@ContextConfiguration** annotation 은 스프링이 DI 정보를 어디서 가져와야 하는지 지정할 때 쓰인다. **locations** 엘리먼트는 DI 설정정보를 담은 XML 파일의 위치를 가리킨다.
+
+~~~java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/applicationContext.xml")
+public class UserDaoTest {
+  ...
+}
+~~~
+
+다음과 같이 **@Configuration** 클래스를 통해, XML 대신에 클래스를 통해 DI 정보로 사용할 수도 있다. DI 설정정보를 담은 클래스는 평범한 자바 클래스이 이 annotation을 다는 것으로 만들 수 있다.
+
+~~~java
+@Configuration
+@ImportResource(locations = "/applicationContext.xml")  // XML의 설정정보를 가져올 수 있다.
+public class ApplicationContext {
+  ...
+}
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = ApplicationContext.class)
+public class UserDaoTest {
+  ...
+}
+~~~
+
+[Use @Configuration class instead of applicationContext.xml](https://github.com/dhsim86/tobys_spring_study/commit/e9b563672604f451935bd41d41d1fe20939285a2)
+
+> 위와 같이 @Configuration 클래스를 사용하게 되면 더 이상 \<context:annotation-config /\> 태그를 XML에 사용할 필요가 없다. 컨테이너가 알아서 @PostConstruct annotation을 처리하는 빈 후처리기를 등록해준다.
+
+> @Configuration 클래스에서 정의한 빈과 XML 에서 정의한 빈은 얼마든지 서로 참조가 가능하다.
+
+---
+
+**\<bean\>의 전환**
+
+\<bean\> 으로 정의된 DI 정보는 **@Bean** annotation과 정확하게 1:1 매핑된다. 즉 @Configuration 이 정의된 DI 설정 정보용 클래스에서 빈 오브젝트를 생성할 때 이 annotation을 사용할 수 있다.
+
+보통 다음과 같이 **@Bean** 이 붙은 public 메소드를 통해 빈 오브젝트를 생성한다.
+
+~~~java
+@Bean
+public DataSource dataSource() {
+  ...
+}
+~~~
+
+위에서 **메소드 이름은 빈의 아이디로 지정된다.** 이 메소드 안에서 실제 빈 오브젝트를 생성하는 코드와 프로퍼티 설정을 담으면 된다.
+
+> @Bean annotation을 활용하여 빈 오브젝트를 생성할 때, 클래스는 반드시 public 접근 제한자를 가져야 한다. XML로 설정할 때는 내부적으로 리플렉션 API를 사용하므로 굳이 public 일 필요는 없지만, 자바 코드에서 참조할 때는 public 이어야 한다.
+
+다음과 같이 parent 속성을 통해 프로퍼티 정의를 상속받는 것은, 클래스를 통한 DI 설정에서는 활용할 수 없다. 모든 프로퍼티 값을 일일이 넣어주어야 한다.
+
+~~~xml
+<bean id="testUserService" class="ch01.springbook.user.UserServiceTest$TestUserService" parent="userService" />
+~~~
+
+[Replace XML application context using @Configuration class.](https://github.com/dhsim86/tobys_spring_study/commit/99a6acad9f8795d322de7c16bfffcea5da209eff)
