@@ -277,3 +277,25 @@ public class classTest {
   ...
 }
 ~~~
+
+<br>
+### 컨테이너의 빈 등록 정보 확인
+
+스프링 컨테이너는 **BeanFactory** 라는 인터페이스를 구현한다. 보통 **DefaultListableBeanFactory** 를 이용해 빈을 등록하고 관리하는데, 이 클래스에는 **getBeanDefinitionNames** 라는 메소드가 있어 컨테이너에 등록된 모든 빈 이름을 조회할 수 있고, 빈 이름을 사용하여 실제 빈과 빈 클래스 정보 등도 조회해볼 수 있다.
+
+~~~java
+@Autowired
+private DefaultListableBeanFactory beanFactory;
+
+@Test
+public void beanListTest() {
+  for (String beanName : beanFactory.getBeanDefinitionNames()) {
+    System.out.println(beanName + " \t" + beanFactory.getBean(beanName).getClass().getName());
+  }
+}
+~~~
+
+그럼 다음과 같이 빈 정보를 출력해볼 수 있다.
+
+<br>
+![00.png](/static/assets/img/blog/web/2017-10-28-toby_spring_07_core_apply_3/00.png)
