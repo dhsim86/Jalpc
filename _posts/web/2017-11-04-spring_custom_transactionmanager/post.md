@@ -134,7 +134,7 @@ public final TransactionStatus getTransaction(TransactionDefinition definition) 
 
 스프링 트랜잭션 추상화 레이어에서 사용하는 클래스 중의 하나로, 이 클래스와 다음에 설명할 **TransactionSynchronizationManager**과 함께 **트랜잭션과 관련된 리소스를 관리한다.**
 
-타임아웃을 걸거나 리소스의 레퍼런스 카운트를 증감시키는 등의 메소드가 구현되어 있으며 이 클래스를 구현할 때는 자신이 구현하는 트랜잭션 기술에서 사용하는 리소스 (Connection이나 기타 자원들)를 여기서 두면 된다.
+타임아웃을 걸거나 리소스의 레퍼런스 카운트를 증감시키는 등의 메소드가 구현되어 있으며 이 클래스를 구현할 때는 자신이 구현하는 트랜잭션 기술에서 사용하는 리소스 (Connection이나 기타 자원들)를 여기에 두면 된다.
 
 리소스를 관리하는데에 있어서 필요한 디폴트 로직은 이미 ResourceHolderSupport 클래스에 구현되어 있다. 단 연결 해제와 같은 리소스 해제와 같은 로직이 필요하다면 **clear()** 메소드를 오버라이드하는 것이 좋다.
 
