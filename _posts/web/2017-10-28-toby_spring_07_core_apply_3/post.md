@@ -26,7 +26,7 @@ icon: icon-html
 
 이런 스타일의 프로그래밍에서 가장 많이 사용되는 것은 annotation 이다. 원래는 자바 코드를 실행하는데 직접 참여하지 않고 리플렉션 API를 통해 annotation의 메타정보를 조회하고 설정된 값을 가져와 참고하는 것이 전부인데, 이를 이용하는 프레임워크나 표준기술이 많이 늘고 있다.
 
-Annotation 은 애플리케이션을 핵심로직을 담은 **자바코드** 와 이를 지원하는 IoC 방식의 **프레임워크**, 그리고 프레임워크가 참조하는 **메타정보** 라는 세 가지로 구성하는 방식에 어울린다. 이 annotation을 프레임워크가 사용하는 메타정보로 사용할 때 유리한 점이 많다.
+Annotation 은 애플리케이션을, 핵심로직을 담은 **자바코드** 와 이를 지원하는 IoC 방식의 **프레임워크**, 그리고 프레임워크가 참조하는 **메타정보** 라는 세 가지로 구성하는 방식에 어울린다. 이 annotation을 프레임워크가 사용하는 메타정보로 사용할 때 유리한 점이 많다.
 
 DI를 위해 애플리케이션을 구성하는 많은 오브젝트들 간의 관계를 자바 코드를 통해 설정하면 코드 양이 많을 뿐만 아니라, 불편하다. 따라서 스프링은 초창기에는 **XML** 을 활용하여 오브젝트 관계 설정용 DI 메타정보로 활용해왔다.
 
@@ -218,6 +218,8 @@ public class AppContext {
 
 [Use @Import annotation.](https://github.com/dhsim86/tobys_spring_study/commit/21679a2c36a6878e4e3ab10ac31522c592adb7d5)
 
+> @Import annotation에서 설정할 클래스가 static 중첩 클래스라면 명시적으로 설정하지 않아도 된다. @Configuration 클래스안에서 다시 @Configuration static 중첩 클래스가 있다면 스프링이 자동으로 추가해준다.
+
 <br>
 ### 프로파일
 
@@ -299,3 +301,6 @@ public void beanListTest() {
 
 <br>
 ![00.png](/static/assets/img/blog/web/2017-10-28-toby_spring_07_core_apply_3/00.png)
+
+<br>
+[ListBeanNameTest.](https://github.com/dhsim86/tobys_spring_study/commit/2255262d57cae783462e340e053f2b83876840cb)

@@ -253,7 +253,7 @@ public class Client1 {
 <br>
 ### ConcurrentHashMap 사용
 
-만약 데이터가 Collection 일 경우, **Collections.synchronizedMap()** 을 통해 동기화를 해줄 수 있지만 성능에 문제가 생긴다. 따라서 HashMap 일 경우, 동기화된 헤시 데이터 조작에 최적화된 **ConcurrentHashMap** 을 사용하는 것이 권장된다. 이 Collection은 데이터 조작시 전체 데이터에 대해서는 락을 걸지 않고, 조회시에는 아예 락을 걸지 않는다. 따라서 어느 정도 동시성 문제를 해결하면서 성능이 보장되는 동기화된 HashMap으로 사용하기에 적절하다.
+만약 데이터가 Collection 일 경우, **Collections.synchronizedMap()** 을 통해 동기화를 해줄 수 있지만 성능에 문제가 생긴다. 따라서 HashMap 일 경우, 동기화된 해시 데이터 조작에 최적화된 **ConcurrentHashMap** 을 사용하는 것이 권장된다. 이 Collection은 데이터 조작시 전체 데이터에 대해서는 락을 걸지 않고, 조회시에는 아예 락을 걸지 않는다. 따라서 어느 정도 동시성 문제를 해결하면서 성능이 보장되는 동기화된 HashMap으로 사용하기에 적절하다.
 
 [Implemented ConcurrentHashMapSqlRegistry.](https://github.com/dhsim86/tobys_spring_study/commit/310dd7fb0d36736b809c23f5f55d9ef1e4eb936f)
 
