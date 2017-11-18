@@ -204,3 +204,5 @@ public interface SmartTransactionObject extends Flushable {
 [Toby's Spring Chap 05: 서비스 추상화](https://dhsim86.github.io/web/2017/09/04/toby_spring_05_service_abstraction-post.html) 에서 나왔듯이, 이 클래스를 사용하기 위해서는 **initSynchronization()** 이나 **clearSynchronization()** 메소드를 트랜잭션 코드 전후로 반드시 호출해야 했지만, AbstractPlatformTransactionManager 클래스를 사용하면 이 것이 자동으로 호출되므로 신경 쓸 필요가 없다.
 
 이 클래스를 통해 트랜잭션에서 필요한 리소스에 트랜잭션 동기화를 수행한다.
+
+[CustomTransactionManager 구현 소스](https://github.com/dhsim86/custom_transactionmanager_sample)
