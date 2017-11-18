@@ -52,7 +52,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 이 클래스는 PlatformTransactionManager 를 구현하는 추상 클래스로서, 스프링의 **기본적인 트랜잭션 흐름** 을 구현하고 있는 클래스이다. 현재 수행 중인 트랜잭션이 있는지를 체크하는 것부터 시작해서 트랜잭션 전파에 대한 로직이나 트랜잭션 중단, 재시작 등과 같은 **디폴트 로직** 을 구현하고 있다.
 
-스프링이 제공하는 **완전한** 트랜잭션 매니저들도 이 추상 클래스를 상속받아 구현하였다.
+스프링이 제공하는 **완전한** 트랜잭션 매니저들도 이 추상 클래스를 상속받아 구현하였다. 다음과 같이 DataSourceTransactionManager도 AbstractTransactionManager를 상속하는 것을 알 수 있다.
 ~~~java
 public class DataSourceTransactionManager extends AbstractPlatformTransactionManager
   implements ResourceTransactionManager, InitializingBean {
@@ -61,6 +61,8 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
     private boolean enforceReadOnly = false;
   ...
 ~~~
+
+---
 
 스프링의 기본 트랜잭션 흐름을 따르지 않고, 순수한 자신만의 트랜잭션 매니저를 구현할려면 **PlatformTransactionManager** 인터페이스를 바로 구현해도 되지만, 스프링의 강력한 트랜잭션 추상화 서비스를 서비스 받으려면(?) 이 **AbstractPlatformTransactionManager** 를 사용하는 것도 나쁘지 않다.
 
@@ -86,11 +88,34 @@ protected void doCleanupAfterCompletion(Object transaction);
 
 **스프링의 트랜잭션 흐름**
 
-스프링의 트랜잭션의 흐름은 간략하게 나타내면 다음과 같다. 밑의 그림에서 볼드체로 표기된 메소드는 자신이 트랜잭션 매니저를 구현할 때, 반드시 구현해야하는 추상 메소드들이다. (**isExistingTransaction** 메소드는 제외)
+스프링의 트랜잭션의 흐름은 간략하게 나타내면 다음과 같다. 밑의 그림에서 볼드체로 표기된 메소드는 자신이 트랜잭션 매니저를 구현할 때, 반드시 구현해야하는 추상 메소드들이다. (**isExistingTransaction, doCleanupAfterCompletion** 메소드는 제외)
 
 <br>
 ![00.png](/static/assets/img/blog/web/2017-11-04-spring_custom_transactionmanager/00.png)
 
+TransactionInterceptor의 **invokeWithinTransaction** 메소드는 **@Transactional** annotation이 선언된 메소드가 수행될 때, 자동으로 호출되는데 스프링의 TransactionManager 를 활용하여 트랜잭션을 시작하고 종료하는 매쉬업 코드가 구현되어 있다.
+
+~~~java
+protected Object invokeWithinTransaction(Method method, Class<?> targetClass, final InvocationCallback invocation)
+    throws Throwable {
+  ...
+  if (txAttr == null || !(tm instanceof CallbackPreferringPlatformTransactionManager)) {
+    TransactionInfo txInfo = createTransactionIfNecessary(tm, txAttr, joinpointIdentification);
+    Object retVal = null;
+    try {
+      retVal = invocation.proceedWithInvocation(); // 타깃 오브젝트의 메소드를 호출하여 비즈니스 로직 실행
+    }
+    catch (Throwable ex) {
+      completeTransactionAfterThrowing(txInfo, ex);
+      throw ex;
+    }
+    finally {
+      cleanupTransactionInfo(txInfo);
+    }
+    commitTransactionAfterReturning(txInfo);
+    return retVal;
+  }
+~~~
 
 **@Transactional** annotation이 설정된 메소드가 실행될 때, 스프링에 의해 **[TransactionInterceptor](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/transaction/interceptor/TransactionInterceptor.html)** 및 **[TransactionAspectSupport](https://docs.spring.io/spring/docs/current/javadoc-api//org/springframework/transaction/interceptor/TransactionAspectSupport.html)** 를 통해 AbstractPlatformTransactionManager 클래스의 **getTransaction** 메소드가 처음으로 호출된다.
 
