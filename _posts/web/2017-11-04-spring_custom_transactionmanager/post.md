@@ -205,4 +205,5 @@ public interface SmartTransactionObject extends Flushable {
 
 이 클래스를 통해 트랜잭션에서 필요한 리소스에 트랜잭션 동기화를 수행한다.
 
-[CustomTransactionManager 구현 소스](https://github.com/dhsim86/custom_transactionmanager_sample)
+<br>
+## **[CustomTransactionManager 구현 소스](https://github.com/dhsim86/custom_transactionmanager_sample)**
