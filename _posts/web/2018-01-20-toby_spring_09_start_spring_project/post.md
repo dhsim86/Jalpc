@@ -28,7 +28,7 @@ icon: icon-html
 > 그렇다고 해서 꼭 클라이언트가 웹 브라우저여야 하며, 백엔드 시스템은 DB를 이용해야 하는 것은 아니다. 자바가 받아들일 수 있는 요청이나 제공하는 접속 방식을 사용한다면 클라이언트나 백엔드 시스템은 무엇이든 사용할 수 있다.
 
 <br>
-![01.png](/static/assets/img/blog/web/2018-01-20-toby_spring_09_start_spring_project/01.png)
+![00.png](/static/assets/img/blog/web/2018-01-20-toby_spring_09_start_spring_project/00.png)
 
 <br>
 ### 애플리케이션 서버
