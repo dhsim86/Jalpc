@@ -165,7 +165,7 @@ import square from './lib';
 console.log(square(3));
 ```
 
-> 아직까지 대부분의 브라우저에서는 ES6의 모듈을 지원하지 않으므로 ES6 모듈을 브라우저에서 사용하기 위해서는 앞서 언급한  **SystemJS[https://github.com/systemjs/systemjs]**나 **RequireJS[http://requirejs.org/]** 등의 모듈 로더 또는, **Webpack[https://webpack.js.org/]** 등의 모듈 번들러를 사용해야 한다.
+> 아직까지 대부분의 브라우저에서는 ES6의 모듈을 지원하지 않으므로 ES6 모듈을 브라우저에서 사용하기 위해서는 앞서 언급한  **[SystemJS](https://github.com/systemjs/systemjs)**나 **[RequireJS](http://requirejs.org/)** 등의 모듈 로더 또는, **[Webpack](https://webpack.js.org/)** 등의 모듈 번들러를 사용해야 한다.
 
 ## Reference
 
