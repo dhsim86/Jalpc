@@ -3,9 +3,9 @@ layout: post
 title:  "Spring Boot Reference Guide Review 01 : Part 1 / 2"
 date:   2017-03-16
 desc: "Spring Boot Reference Guide Review 01 : Part 1 / 2"
-keywords: "spring boot, spring, server programming"
+keywords: "spring"
 categories: [Web]
-tags: [spring boot, spring]
+tags: [spring]
 icon: icon-html
 ---
 

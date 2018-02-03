@@ -3,9 +3,9 @@ layout: post
 title:  "Toby's Spring Chap 01: 오브젝트와 의존관계"
 date:   2017-07-29
 desc: "Toby's Spring Chap 01: 오브젝트와 의존관계"
-keywords: "spring, spring boot"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

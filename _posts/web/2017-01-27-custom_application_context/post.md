@@ -3,9 +3,9 @@ layout: post
 title:  "Java Web Programming: Custom ApplicationContext"
 date:   2017-01-27
 desc: "Java Web Programming: Custom ApplicationContext"
-keywords: "java, web, server programming, spring, spring boot"
+keywords: "java, web, spring"
 categories: [Web]
-tags: [java, web, server programming, spring, spring boot]
+tags: [java, web, spring]
 icon: icon-html
 ---
 

@@ -3,9 +3,9 @@ layout: post
 title:  "Toby's Spring Chap 05: 서비스 추상화"
 date:   2017-09-04
 desc: "Toby's Spring Chap 05: 서비스 추상화"
-keywords: "spring, spring boot"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

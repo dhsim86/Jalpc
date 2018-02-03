@@ -3,9 +3,9 @@ layout: post
 title:  "Toby's Spring Chap 08: 스프링이란 무엇인가?"
 date:   2017-11-18
 desc: "Toby's Spring Chap 08: 스프링이란 무엇인가?"
-keywords: "spring, spring boot"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

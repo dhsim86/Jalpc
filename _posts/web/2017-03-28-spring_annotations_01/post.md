@@ -3,9 +3,9 @@ layout: post
 title:  "Spring annotations: 01"
 date:   2017-03-28
 desc: "Spring annotations: 01"
-keywords: "spring, spring boot, server programming"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

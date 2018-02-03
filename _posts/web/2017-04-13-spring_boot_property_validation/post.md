@@ -3,9 +3,9 @@ layout: post
 title:  "Spring Boot Property Validation"
 date:   2017-04-13
 desc: "Spring Boot Property Validation"
-keywords: "spring, spring boot, server programming"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

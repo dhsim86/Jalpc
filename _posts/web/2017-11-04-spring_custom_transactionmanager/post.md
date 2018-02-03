@@ -3,9 +3,9 @@ layout: post
 title:  "스프링 Custom TransactionManager 구현"
 date:   2017-11-04
 desc: "스프링 Custom TransactionManager 구현"
-keywords: "spring, spring boot"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

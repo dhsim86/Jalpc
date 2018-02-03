@@ -3,9 +3,9 @@ layout: post
 title:  "Java Web Programming Summary Note 04: Persistence Framework"
 date:   2017-01-28
 desc: "Java Web Programming Summary Note 04: Persistence Framework"
-keywords: "java, web, server programming"
+keywords: "java, web"
 categories: [Web]
-tags: [java, web, server programming]
+tags: [java, web]
 icon: icon-html
 ---
 

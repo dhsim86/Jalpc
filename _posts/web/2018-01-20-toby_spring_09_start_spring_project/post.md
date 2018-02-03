@@ -3,9 +3,9 @@ layout: post
 title:  "Toby's Spring Chap 09: 스프링 프로젝트 시작하기"
 date:   2018-01-20
 desc: "Toby's Spring Chap 09: 스프링 프로젝트 시작하기"
-keywords: "spring, spring boot"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

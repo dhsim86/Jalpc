@@ -3,9 +3,9 @@ layout: post
 title:  "Toby's Spring Chap 03: 템플릿"
 date:   2017-09-02
 desc: "Toby's Spring Chap 03: 템플릿"
-keywords: "spring, spring boot"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

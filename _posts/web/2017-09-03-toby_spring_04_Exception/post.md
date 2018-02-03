@@ -3,9 +3,9 @@ layout: post
 title:  "Toby's Spring Chap 04: 예외"
 date:   2017-09-03
 desc: "Toby's Spring Chap 04: 예외"
-keywords: "spring, spring boot"
+keywords: "spring"
 categories: [Web]
-tags: [spring, spring boot]
+tags: [spring]
 icon: icon-html
 ---
 

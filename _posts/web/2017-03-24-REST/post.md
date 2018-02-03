@@ -3,7 +3,7 @@ layout: post
 title:  "REST (REpresentational State Transfer)"
 date:   2017-03-24
 desc: "REST (REpresentational State Transfer)"
-keywords: "web, server programming"
+keywords: "web"
 categories: [Web]
 tags: [web]
 icon: icon-html

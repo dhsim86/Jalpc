@@ -3,9 +3,9 @@ layout: post
 title:  "Spring Boot Reference Guide Review 10 : Spring Boot Actuator / Remote Shell"
 date:   2017-03-24
 desc: "Spring Boot Reference Guide Review 10 : Spring Boot Actuator / Remote Shell"
-keywords: "spring boot, spring, server programming"
+keywords: "spring"
 categories: [Web]
-tags: [spring boot, spring]
+tags: [spring]
 icon: icon-html
 ---
 
