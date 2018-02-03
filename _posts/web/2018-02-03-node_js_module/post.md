@@ -19,7 +19,7 @@ Node.js는 CommonJS 방식을 따라 모듈 기능을 지원하고 있다. [Node
 
 > Node.js에서도 ES2015 방식의 모듈 시스템을 v8.5.0 부터 지원한다. [Node v8.5.0 changes](https://nodejs.org/en/blog/release/v8.5.0/) / [Node commit log: "module: Allow runMain to be ESM"](https://github.com/nodejs/node/commit/c8a389e19f172edbada83f59944cad7cc802d9d5)
 
-Node.js는 모듈 단위로 각 기능을 분할할 수 있는데, 모듈은 파일과 1:1 대응 관계를 가지며 각각의 모듈은 **자신만의 독립적인 실행 영역(Scope) 를 가진다. 따라서 client-side 자바스크립트와는 다르게 전역변수의 중복 문제가 발생하지 않는다.
+Node.js는 모듈 단위로 각 기능을 분할할 수 있는데, 모듈은 파일과 1:1 대응 관계를 가지며 각각의 모듈은 **만의 독립적인 실행 영역(Scope) 를 가진다.** 따라서 client-side 자바스크립트와는 다르게 전역변수의 중복 문제가 발생하지 않는다.
 
 모듈은 **module.exports 또는 exports** 객체를 통해 외부로 공개한다. 그리고 공개한 모듈은 **require** 함수를 이용하여 import 시킨다.
 
