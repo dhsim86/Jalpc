@@ -132,3 +132,12 @@ module.exports = {
 ```
 
 즉, 어느 특정 모듈이 의존성을 가지는 다른 모듈들까지 검색하여 수동으로 delete를 해주어야 완벽하게 언로드시킬 수 있는 것이다. 따라서 모듈 오브젝트의 children 배열에 있는, 모듈이 require 함수를 통해 로드한 다른 모듈들의 레퍼런스도 삭제해야 한다.
+
+<br>
+## Reference
+
+[Deleting Objects in JavaScript](https://stackoverflow.com/questions/742623/deleting-objects-in-javascript)<br>
+[node.js require() cache - possible to invalidate?](https://stackoverflow.com/questions/9210542/node-js-require-cache-possible-to-invalidate)<br>
+[Is Node's require cache garbage collected?](https://stackoverflow.com/questions/37620697/is-nodes-require-cache-garbage-collected)<br>
+[unloading code/modules](https://stackoverflow.com/questions/6676612/unloading-code-modules)<br>
+[decache - An easy way to delete a cached module.](https://github.com/dwyl/decache)<br>
