@@ -203,3 +203,24 @@ JVM은 **card-marking** 를 통해 해결한다. 여기서는 Old 영역에 있�
 
 GC 대상인지를 식별하는 Mark 단계가 끝나면, **Eden 영역의 살아있는 모든 객체들은 두 개의 Survivor 영역 중 하나의 영역으로 이동하며 Eden 영역은 완전히 비워지게 된다.** 이를 **"Mark and Copy"** 라고 부른다.
 
+<br>
+### Survivor spaces
+
+<br>
+### Old Generation
+
+<br>
+### PermGen
+
+<br>
+### Metaspace
+
+<br>
+# Minor GC vs Major GC vs Full GC
+
+<br>
+## Minor GC
+
+<br>
+## Major GC vs Full GC
+
