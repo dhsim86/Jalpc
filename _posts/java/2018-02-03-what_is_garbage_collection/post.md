@@ -136,3 +136,70 @@ JVM에서 구현된 Garbage Collection 알고리즘(Parall GC나 CMS, G1)마다 
 ### Stop The World
 
 Garbage Collection이 일어나면 돌고 있던 애플리케이션 스레드들은 잠시 하던 일을 멈추어야 한다. 이를 STW(Stop-The-World) 라 부르며, JVM에서는 여러가지 이유로 발생하지만 보통 GC 때문에 발생한다.
+
+<br>
+# Garbage Collection in Java
+
+## Fragmenting and Compacting
+
+메모리를 정리하는 작업인 Sweep 단계에서 JVM은 닿을 수 없는 객체들을 정리하여 그 객체들이 사용하던 메모리를 회수해야 한다. 그런데 이 메모리를 정리하는 단계에서 메모리 단편화(Memory Fragmentation)가 필연적으로 발생하게 되며 다음과 같은 문제를 일으킨다.
+
+* Write operation과 같은 작업들은 사용하기에 적절한 **다음 메모리 블록**을 찾기 위해 시간을 더 소모하게 된다.
+* 보통 객체를 새로 생성할 때는 그 객체들이 점유할 메모리 공간은 반드시 연속적이어야 한다. 따라서 메모리 단편화가 발생하면, 전체 free 메모리 공간은 여유로운데도 불구하고 객체 생성에 실패할 수가 있다.
+
+이 문제를 피하기 위해 JVM은 메모리 단편화를 없애기 위해 추가적인 작업을 수행한다. 이 작업이 바로 **Compaction** 이며 닿을 수 있는 객체, 즉 현재 사용 중인 객체들을 한 곳으로 모으는 일이다.
+
+<br>
+![03.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/03.png)
+
+<br>
+## Generational Hypothesis
+
+앞서 설명했지만, Garbage Collection이 발생하면 현재 running하고 있던 애플리케이션 스레드를 멈춘다. 이 멈추게 되는 시간을 줄이기 위한 방법으로 많은 연구가 진행되었다.
+
+David ungar 라는 사람이 1984년에 ['Generation Scavenging: A Non-disruptive High Performance Storage Reclamation Algorithm'](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.122.4295) 라는 논문을 발표했는데, 여기서 가설을 하나 제시하면서 **Generational GC** 를 소개한다.
+
+* 대부분의 객체들은 보통 사용하고 **바로 버려진다.**
+
+<br>
+![04.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/04.png)
+
+실졔 통계로도 생성된 객체의 98%는 곧바로 사용되지 않고 바로 버려진다고 한다. 이 가설을 베이스로 JVM에서 관리하는 메모리 영역은 크게 **Young 영역 및 Old 영역으로 나누었다.**
+
+메모리 공간을 이 두개의 영역으로 나눈뒤 **새로 생성하는 객체들은 Young 영역에서만 할당하고, 상대적으로 오래 살아남는 객체들은 Old 영역으로 보낸다. 그리고 Young 영역 위주로 청소해주는 것이 기본 아이디어이다.** 따라서 GC가 일어날 때마다 전체 메모리 공간을 다 살펴볼 필요없이 Young 영역 위주로 청소하면 되므로 STW 시간이 줄어들게 된다.
+
+> 자주 GC가 일어나게 되겠지만 STW로 길게 한 번 멈추는 것보다는 짧게 여러 번 멈추는 것이 더 이익이다.
+
+그리고 JVM은 Young 영역을 청소할 때, 한 번에 다 비우기 때문에 GC 일어난 후에 Young 영역은 연속된 여유공간이 만들어지게 되므로 메모리 단편화를 완화시킬 수 있다.
+
+> 이렇게 두 개의 영역을 나눔으로써 한 가지 문제가 발생하게 되는데, **어떤 객체가 서로 다른 영역의 객체를 바라보고 있다면 어떻게 할 것인가에 대한 문제가 발생한다.** 가령 Old 영역에 있는 객체가 Young 영역의 객체를 참조하고 있을 경우를 고려해야 되기 때문이다.
+
+<br>
+## Memory Pools
+
+다음 그림은 JVM에서 관리하는 메모리 영역을 나타낸 것이다. GC 알고리즘마다 세부 동작은 다르긴 하지만 메모리 공간의 영역을 공통적으로 이렇게 나누고 동작한다.
+
+<br>
+![05.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/05.png)
+
+<br>
+### Eden
+
+Eden 영역에서는 보통 객체가 새로 생성될 때 할당받는 공간이다. 애플리케이션 스레드는 보통 여러 개이므로, 당연히 객체 생성도 동시에 발생할 수 있다. 따라서 보통 Eden 영역도 **Thread Local Allocation Buffer (TLAB)** 라는 여러 영역으로 나뉜다. 이를 통해 동기화가 필요없이 각 애플리케이션 스레드들은 자신이 필요한 공간을 할당받을 수 있다.
+
+만약 스레드들이 자신의 TLAB로부터 메모리 공간을 할당받지 못하면, 메모리 할당은 스레드들에게 공유되는 Eden 영역에서 일어나게 된다. 만약 이 영역에서도 새로 할당할 충분한 여유 공간이 없다면, Eden 영역을 포함하는 Young 영역에서 GC가 발생하게 된다. 그런데 GC가 발생했는데도 충분한 메모리를 확보하지 못한다면 Old 영역에 대해서도 GC를 수행하게 될 것이다.
+
+Eden 영역에서 GC가 수행될 때, 앞서 언급했듯이 **GC ROOTS라 불리는 객체로부터 시작하여 닿을 수 있는 객체들을 식별하여 Mark하게 된다.**
+
+앞서 언급한, 특정 객체가 서로 다른 영역의 객체를 참조하고 있을 때의 문제가 여기서 발생한다. 
+기껏 전체 메모리 공간을 Young 영역과 Old 영역으로 나누어 Young 영역에 대해서만 청소를 함으로써 GC에 걸리는 시간을 줄여보려고 했더니, Old 영역도 검사를 해야 되기 때문이다. 
+
+JVM은 **card-marking** 를 통해 해결한다. 여기서는 Old 영역에 있는 객체가 Young 영역의 객체를 참조하고 있을 경우 Mark 해두었다가 GC 대상인지 식별하는 것이다.
+
+[The JVM Write Barrier - Card Marking](http://psy-lob-saw.blogspot.kr/2014/10/the-jvm-write-barrier-card-marking.html)<br>
+
+<br>
+![06.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/06.png)
+
+GC 대상인지를 식별하는 Mark 단계가 끝나면, **Eden 영역의 살아있는 모든 객체들은 두 개의 Survivor 영역 중 하나의 영역으로 이동하며 Eden 영역은 완전히 비워지게 된다.** 이를 **"Mark and Copy"** 라고 부른다.
+
