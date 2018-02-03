@@ -50,9 +50,20 @@ for (let i = 0; i < mod.parent.children.length; i++) {
         break;
     }
 }
+
+Object.keys(module.constructor._pathCache).forEach(function(cacheKey) {
+    if (cacheKey.indexOf('moduleName')>0) {
+        delete module.constructor._pathCache[cacheKey];
+    }
+});
 ```
 
 이렇게 require.cache 배열에서 지워주고, 자신을 로드한 부모 모듈 오브젝트의 children 배열에서 자신을 가리키는 레퍼런스도 삭제해야 한다.
+
+또한 Node.js 가 모듈을 위해 모듈 파일이 위치하는 path도 캐싱하는데, 여기에 있는 레퍼런스들도 삭제해주어야 한다.
+
+<br>
+![02.png](/static/assets/img/blog/web/2018-02-03-node_js_unload_module/02.png)
 
 > 위 코드는 모듈 그 자체를 지우는 것이 아니라, 캐싱된 모듈을 가리키는 레퍼런스를 delete 함으로써 자바스크립트 garbage collection의 대상이 되게 하는 것이다. 
 
@@ -94,6 +105,12 @@ for (let i = 0; i < mod.parent.children.length; i++) {
         break;
     }
 }
+
+Object.keys(module.constructor._pathCache).forEach(function(cacheKey) {
+    if (cacheKey.indexOf(moduleName)>0) {
+        delete module.constructor._pathCache[cacheKey];
+    }
+});
 
 userCodes = require('./userCodes');
 console.log(userCodes.value);   // test, require.cache 에서 지웠으므로 다시 리로드된다.
