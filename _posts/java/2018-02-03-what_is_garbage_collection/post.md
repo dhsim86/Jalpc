@@ -9,10 +9,13 @@ tags: [java]
 icon: icon-html
 ---
 
+# Garbage Collection Background 개념
+
 자바에서 garbage collection 은 어떤 오브젝트를 계속 사용할 수 있을지, 아니면 버려야할지를 추적하고 각 알고리즘별로 필요한 일을 하는 것이다. 
 
 먼저 JVM에 구현된, 자동 메모리 청소기인 **Garbage Collection** 에 대해 알아보기 위해 몇가지 개념을 알아두어야 한다.
 
+<br>
 ## Manual Memory Management
 
 먼저 Garbage Collection 을 설명하기 전에 앞서 자동으로 메모리를 청소하지 않는, 즉 C나 C++ 언어에서는 메모리 관리를 개발자 입장에서 수동으로 해주어야 한다. (스마트 포인터 같은 것은 생각하지 말고)
@@ -72,8 +75,8 @@ void foo()
 }
 ```
 
-[C++ shared_ptr](http://en.cppreference.com/w/cpp/memory/shared_ptr)
-[C++ weak_ptr](http://en.cppreference.com/w/cpp/memory/weak_ptr)
+[C++ shared_ptr](http://en.cppreference.com/w/cpp/memory/shared_ptr)<br>
+[C++ weak_ptr](http://en.cppreference.com/w/cpp/memory/weak_ptr)<br>
 [C++ unique_ptr](http://en.cppreference.com/w/cpp/memory/unique_ptr)
 
 <br>
