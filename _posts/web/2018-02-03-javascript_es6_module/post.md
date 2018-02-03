@@ -52,7 +52,7 @@ icon: icon-html
 
 결국 자바스크립트 모듈화는 크게 CommonJS 진영과 AMD 진영으로 나뉘게 되었고, 브라우저에서 모듈을 사용하기 위해서는 CommonJS 또는 AMD를 구현한 모듈 로더 라이브러리를 사용해야 하는 상황이 되었다.
 
-ES6에서는 client-side 자바스크립트에서도 동작하는 모듈 기능을 추가하였지만, 대부분의 브라우저가 ES6의 모듈을 지원하지 않으므로 ES6 모듈을 사용하기 위해서는 **SystemJS[https://github.com/systemjs/systemjs]**나 **RequireJS[http://requirejs.org/]** 등의 모듈 로더 또는, **Webpack[https://webpack.js.org/]** 등의 모듈 번들러를 사용해야 한다.
+ES6에서는 client-side 자바스크립트에서도 동작하는 모듈 기능을 추가하였지만, 대부분의 브라우저가 ES6의 모듈을 지원하지 않으므로 ES6 모듈을 사용하기 위해서는 **[SystemJS](https://github.com/systemjs/systemjs)**나 **[RequireJS](http://requirejs.org/)** 등의 모듈 로더 또는, **[Webpack](https://webpack.js.org/)** 등의 모듈 번들러를 사용해야 한다.
 
 > Server-side 의 node.js 는 모듈 시스템의 사실상 표준 (de facto standard)인 CommonJS를 채택하였고,  현재는 100% 동일하지 않지만 기본적으로 CommonJS 방식을 통해 모듈 기능을 제공한다.
 
@@ -169,8 +169,8 @@ console.log(square(3));
 
 ## Reference
 
-[JavaScript 표준을 위한 움직임: CommonJS와 AMD](http://d2.naver.com/helloworld/12864)
-[ECMAScript6 - Babel + Webpack](http://poiemaweb.com/es6-babel)
-[RequireJS – JavaScript 파일 및 모듈 로더](http://blog.javarouka.me/2013/04/requirejs-javascript.html)
+[JavaScript 표준을 위한 움직임: CommonJS와 AMD](http://d2.naver.com/helloworld/12864)<br>
+[ECMAScript6 - Babel + Webpack](http://poiemaweb.com/es6-babel)<br>
+[RequireJS – JavaScript 파일 및 모듈 로더](http://blog.javarouka.me/2013/04/requirejs-javascript.html)<br>
 [Webpack 적용기 1 : 왜 필요한가?](https://hjlog.me/post/117)
 
