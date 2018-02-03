@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "What is Garbage Collection?"
+title:  "Garbage Collection 기본 개념"
 date:   2018-02-03
-desc: "What is Garbage Collection?"
+desc: "Garbage Collection 기본 개념"
 keywords: "java"
 categories: [Java]
 tags: [java]
