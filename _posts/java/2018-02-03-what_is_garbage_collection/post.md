@@ -160,7 +160,7 @@ Garbage Collection이 일어나면 돌고 있던 애플리케이션 스레드들
 
 David ungar 라는 사람이 1984년에 ['Generation Scavenging: A Non-disruptive High Performance Storage Reclamation Algorithm'](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.122.4295) 라는 논문을 발표했는데, 여기서 가설을 하나 제시하면서 **Generational GC** 를 소개한다.
 
-* 대부분의 객체들은 보통 사용하고 **바로 버려진다.**
+> 대부분의 객체들은 보통 사용하고 **바로 버려진다.**
 
 <br>
 ![04.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/04.png)
