@@ -180,6 +180,8 @@ David ungar 라는 사람이 1984년에 ['Generation Scavenging: A Non-disruptiv
 
 다음 그림은 JVM에서 관리하는 메모리 영역을 나타낸 것이다. GC 알고리즘마다 세부 동작은 다르긴 하지만 메모리 공간의 영역을 공통적으로 이렇게 나누고 동작한다.
 
+다음 그림과 같이 Young 영역은 Eden과 두 개의 Survivor 영역으로 이루어져 있다.
+
 <br>
 ![05.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/05.png)
 
@@ -202,10 +204,33 @@ JVM은 **card-marking** 를 통해 해결한다. 여기서는 Old 영역에 있�
 <br>
 ![06.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/06.png)
 
-GC 대상인지를 식별하는 Mark 단계가 끝나면, **Eden 영역의 살아있는 모든 객체들은 두 개의 Survivor 영역 중 하나의 영역으로 이동하며 Eden 영역은 완전히 비워지게 된다.** 이를 **"Mark and Copy"** 라고 부른다.
+GC 대상인지를 식별하는 Mark 단계가 끝나면, **Eden 영역의 살아있는 모든 객체들은 두 개의 Survivor 영역 중 하나의 영역으로 복사되며 Eden 영역은 완전히 비워지게 된다.** 이를 **"Mark and Copy"** 라고 부른다.
 
 <br>
 ### Survivor spaces
+
+JVM에서는 Survivor space에 해당하는 두 개의 분리된 영역을 관리하는데 "from" / "to"로 나뉜다. 여기서 중요한 것은 **반드시 두 영역 중 하나는 비어있는 상태여야 하는 것이다.**
+
+비워져 있는 Survivor 영역(to)은 **다음 Young 영역의 GC가 발생할 때, Eden 영역 및 다른 Survivor 영역(from)에 있던 객체가 이사오는 곳이다.** 그리고 이 GC가 끝난 후, "from"에 해당하는 Survivor 영역은 비워지게 되며 각 영역의 역할은 바뀌게 된다.
+
+<br>
+![07.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/07.png)
+
+이렇게 Survivor 영역 사이에서 일어나는 객체들의 복사 과정은 여러 번에 걸쳐서 일어나게 되는데, Young 영역에서의 GC가 일정 수준 이상으로 발생하였고 그 때까지도 살아남는 객체가 있다면 이 객체는 장수하는 객체로 분류된다.
+
+장수하는 객체로 분류되면, **다음 Young 영역의 GC가 발생했을 때 다른 Survivor 영역으로 이동하는 것이 아니라 Old 영역으로 이동하게 된다.**
+
+이렇게 장수하는 객체를 분류하기 위해서 JVM은 각 객체마다 age라는 값을 관리한다. GC가 일어날 때마다 살아남은 객체의 age 값은 증가하게 되며, 일정 수준 이상 도달했을 경우 그 객체는 Old 영역으로 이동하게 된다.
+
+JVM에서 자바 애플리케이션을 실행시킬 때, 이 한계 값을 정할 수 있다.
+
+```
+XX:+MaxTenuringThreshold=값
+```
+
+위의 값을 0으로 설정하면 아예 Survivor 영역을 사용하지 않는다는 것이고 (바로 Old 영역으로 이동하게 되므로), 기본 값은 15이다.
+
+> Survivor 영역의 공간이 살아있는 모든 Young 영역의 객체를 수용할 수 없을 경우에도 Old 영역으로의 객체 이동이 일어난다.
 
 <br>
 ### Old Generation
