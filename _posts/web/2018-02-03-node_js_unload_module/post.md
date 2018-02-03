@@ -133,6 +133,11 @@ module.exports = {
 
 즉, 어느 특정 모듈이 의존성을 가지는 다른 모듈들까지 검색하여 수동으로 delete를 해주어야 완벽하게 언로드시킬 수 있는 것이다. 따라서 모듈 오브젝트의 children 배열에 있는, 모듈이 require 함수를 통해 로드한 다른 모듈들의 레퍼런스도 삭제해야 한다.
 
+---
+
+이 포스트에서 언급한 모듈 언로드 방법말고, Node.js 에서 제공하는 VM 모듈을 활용하면 런타임에 코드가 담긴 모듈을 실행시키고 종료시킬 수 있다. [Node.js VM Module](https://nodejs.org/api/vm.html)
+
+
 <br>
 ## Reference
 
