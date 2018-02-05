@@ -53,7 +53,7 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 더 이상 사용되지 않는 객체의 메모리를 회수하는 일은 GC 알고리즘마다 구현이 다르긴 하지만, 보통 **Mark and Sweep, Mark-Sweep-Compact, Mark and Copy 중의 하나에 들어간다.**
 
 <br>
-**Sweep**
+### Sweep
 
 **Mark and Sweep**에서 이 Sweep 단계는 Marking 단계가 끝난 후, GC Roots 및 살아있는 객체로 표현되는 그래프에 포함되지 않는 객체들의 **메모리 영역을 회수한다.** 회수된 메모리 영역은 내부적으로 이 영역을 관리하는 **free-list** 라는 자료구조를 통해 관리한다. 아마도 이 자료구조는 다시 사용할 수 있는 영역과 그 것의 크기를 기록해두었을 것이다.
 
@@ -63,7 +63,7 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 > 메모리 단편화 여부에 따라, 전체 메모리 공간은 충분하나 실제 객체 생성에 실패하여 OOM이 발생할 수도 있다.
 
 <br>
-**Compact**
+### Compact
 
 **Mark-Sweep-Compact**의 Compact 단계에서는 실제로 살아있는, **Marking 된 객체들을 메모리 영역의 처음부터 몰아넣는다.** 이는 실제 객체를 복사하고 이 객체들의 참조 정보를 업데이트함으로써 이루어지는데, GC의 시간을 증가시킨다. 하지만 이 것을 얻을 수 있는 이익은 여러 가지가 있다.
 
@@ -75,7 +75,7 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 ![02.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/02.png)
 
 <br>
-**Copy**
+### Copy
 
 **Mark and Copy**의 Copy 단계는 메모리 영역을 여러 영역으로 나누고, **살아있는 객체를 다른 영역으로 복사한다는 것을 의미한다.** (Eden -> Survivor / From survivor -> To survivor / Survivor -> Old)
 
@@ -83,3 +83,6 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 ![03.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/03.png)
 
 다른 영역으로 살아있는 객체를 옮기는 것이므로, Marking과 Copy 단계를 동시에 할 수 있다는 이점이 있다.
+
+---
+
