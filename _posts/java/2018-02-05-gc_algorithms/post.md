@@ -65,7 +65,7 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 <br>
 ### Compact
 
-**Mark-Sweep-Compact**의 Compact 단계에서는 실제로 살아있는, **Marking 된 객체들을 메모리 영역의 처음부터 몰아넣는다.** 이는 실제 객체를 복사하고 이 객체들의 참조 정보를 업데이트함으로써 이루어지는데, GC의 시간을 증가시킨다. 하지만 이 것을 얻을 수 있는 이익은 여러 가지가 있다.
+**Mark-Sweep-Compact**의 Compact 단계에서는 실제로 살아있는, **Marking 된 객체들을 메모리 영역의 처음부터 몰아넣는다.** 이는 실제 객체를 복사하고 이 객체들의 참조 정보를 업데이트함으로써 이루어지는데, GC의 시간을 증가시킨다. 하지만 이 것을 통해 얻을 수 있는 이익은 여러 가지가 있다.
 
 * 메모리 단편화를 줄임으로써 발생하는 문제를 해결할 수 있다. (메모리 생성 실패 문제와 같은)
 * 연속적인 공간에서 객체 생성을 하는 것은 아주 적은 연산을 필요로 한다.
@@ -77,7 +77,8 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 <br>
 ### Copy
 
-**Mark and Copy**의 Copy 단계는 메모리 영역을 여러 영역으로 나누고, **살아있는 객체를 다른 영역으로 복사한다는 것을 의미한다.** (Eden -> Survivor / From survivor -> To survivor / Survivor -> Old)
+**Mark and Copy**의 Copy 단계는 메모리 영역을 여러 영역으로 나누고, **살아있는 객체를 다른 영역으로 복사한다는 것을 의미한다.** 
+(ex. Eden -> Survivor / From survivor -> To survivor / Survivor -> Old)
 
 <br>
 ![03.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/03.png)
