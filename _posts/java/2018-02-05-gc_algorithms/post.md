@@ -86,3 +86,43 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 
 ---
 
+<br>
+## Java 에서의 GC 알고리즘들
+
+JVM 에서는 Generational Hypothesis 개념에 따라 **Young 영역 및 Old 영역으로 메모리 공간을 나누고, 각 영역에 대한 GC 알고리즘도 다르게 적용한다.**
+
+JVM에서 제공하는 GC 알고리즘은 옵션을 통해 선택할 수 있으며, 선택하지 않으면 디폴트로 지정된 GC 알고리즘을 사용학 ㅔ된다.
+
+다음 표는 옵션에 따라 적용되는 GC 알고리즘을 나타낸 표이다.
+
+| Young GC | Old GC | JVM Options |
+| --- | --- | --- |
+| Incremental | Incremental | -Xincgc |
+| **Serial** | **Serial** | **-XX:+UseSerialGC** |
+| Parallel Scavenge | Serial | -XX:+UseParallelGC -XX:-UseParallelOldGC |
+| Parallel New | Serial | N/A |
+| Serial | Parallel Old | N/A |
+| **Parallel Scavenge** | **Parallel Old** | **-XX:+UseParallelGC -XX:+UseParallelOldGC** |
+| Parallel New | Parallel Old | N/A |
+| Serial | CMS | -XX:-UseParNewGC -XX:+UseConcMarkSweepGC |
+| Parallel Scavenge | CMS | N/A |
+| **Parallel New** | **CMS** | **-XX:+UseParNewGC -XX:+UseConcMarkSweepGC** |
+| **G1** | **G1** | **-XX:+UseG1GC** |
+
+복잡하게 보이지만, 다음 4가지 케이스만 알아두면 된다. JVM Option이 없는 것들은 deprecated 된 알고리즘들이며 더 이상 지원되지 않는다.
+
+* Serial GC (Young 영역 / Old 영역 모두 적용)
+* Parallel GC (Young 영역 / Old 영역 모두 적용)
+* Parallel New (Young 영역) + Concurrent Mark and Sweep (CMS, Old 영역)
+* G1 (Young / Old 를 나타내는 바둑판(?) 영역)
+
+<br>
+## Serial GC
+
+<br>
+## Parallel GC
+
+<br>
+## Concurrent Mark and Sweep
+
+## G1
