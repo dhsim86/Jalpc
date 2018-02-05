@@ -92,9 +92,9 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 
 JVM 에서는 Generational Hypothesis 개념에 따라 **Young 영역 및 Old 영역으로 메모리 공간을 나누고, 각 영역에 대한 GC 알고리즘도 다르게 적용한다.**
 
-JVM에서 제공하는 GC 알고리즘은 옵션을 통해 선택할 수 있으며, 선택하지 않으면 디폴트로 지정된 GC 알고리즘을 사용학 ㅔ된다.
+JVM에서 제공하는 GC 알고리즘은 옵션을 통해 선택할 수 있으며, 선택하지 않으면 디폴트로 지정된 GC 알고리즘을 사용하게 된다.
 
-다음 표는 옵션에 따라 적용되는 GC 알고리즘을 나타낸 표이다.
+다음은 옵션에 따라 적용되는 GC 알고리즘을 나타낸 것이다.
 
 | Young GC | Old GC | JVM Options |
 | --- | --- | --- |
@@ -110,6 +110,7 @@ JVM에서 제공하는 GC 알고리즘은 옵션을 통해 선택할 수 있으�
 | **Parallel New** | **CMS** | **-XX:+UseParNewGC -XX:+UseConcMarkSweepGC** |
 | **G1** | **G1** | **-XX:+UseG1GC** |
 
+<br>
 복잡하게 보이지만, 다음 4가지 케이스만 알아두면 된다. JVM Option이 없는 것들은 deprecated 된 알고리즘들이며 더 이상 지원되지 않는다.
 
 * Serial GC (Young 영역 / Old 영역 모두 적용)
