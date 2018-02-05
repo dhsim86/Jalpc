@@ -216,13 +216,13 @@ JVM에서는 Survivor space에 해당하는 두 개의 분리된 영역을 관�
 <br>
 ![07.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/07.png)
 
-이렇게 Survivor 영역 사이에서 일어나는 객체들의 복사 과정은 여러 번에 걸쳐서 일어나게 되는데, Young 영역에서의 GC가 일정 수준 이상으로 발생하였고 그 때까지도 살아남는 객체가 있다면 이 객체는 장수하는 객체로 분류된다.
+이렇게 Survivor 영역 사이에서 일어나는 객체들의 복사 과정은 여러 번에 걸쳐서 일어나게 되는데, Young 영역에서의 GC가 일정 수준 이상으로 발생하였고 그 때까지도 살아남는 객체가 있다면 이 객체는 앞으로도 계속 사용되는 것으로 간주되는, 장수하는 객체로 분류된다.
 
 장수하는 객체로 분류되면, **다음 Young 영역의 GC가 발생했을 때 다른 Survivor 영역으로 이동하는 것이 아니라 Old 영역으로 이동하게 된다.**
 
 이렇게 장수하는 객체를 분류하기 위해서 JVM은 각 객체마다 age라는 값을 관리한다. GC가 일어날 때마다 살아남은 객체의 age 값은 증가하게 되며, 일정 수준 이상 도달했을 경우 그 객체는 Old 영역으로 이동하게 된다.
 
-JVM에서 자바 애플리케이션을 실행시킬 때, 이 한계 값을 정할 수 있다.
+JVM에서 자바 애플리케이션을 실행시킬 때, 이 threshold를 정할 수 있다.
 
 ```
 XX:+MaxTenuringThreshold=값
@@ -235,11 +235,56 @@ XX:+MaxTenuringThreshold=값
 <br>
 ### Old Generation
 
+Old 영역에 대한 GC 구현은 Young 영역에 대한 GC 보다 더 복잡하다. Old 영역의 GC는 Young 영역의 GC보다 빈번하게 발생하지도 않고 (자바 애플리케이션을 이상하게 구현하지 않았다면), Old 영역의 객체들은 참조되고 있어 계속 살아있는 객체로 간주된다.
+
+Old 영역에 대한 GC 알고리즘은 세부 GC 구현에 따라 다르긴 하지만, 보통 다음과 같이 수행한다.
+
+* 특별히 reserved 된 bit를 통해 GC Roots로부터 닿을 수 있는(reachable) 객체들을 Marking한다.
+* 닿지 않는(Unreachable) 객체들은 삭제한다.
+* 메모리 단편화를 피하기 위해, Old 영역의 시작점부터 살아 있는 객체들을 모은다. (이 때 객체 복사가 발생한다.)
+
+> Old 영역에 대한 GC는 어떻게 구현되었던 간에, 객체 할당에 실패할 정도의 메모리 단편화는 피해야 한다. (Compaction을 하지 않는 CMS GC도 메모리 단편화가 심해지면 Full GC를 수행한다.)
+
+
 <br>
 ### PermGen
 
+Java 8 이전 버전에서는 **"Permanent Generation**이라는 특수한 영역이 있었는데, 여기에는 class와 같은 메타데이터나 문자열과 같은 값들이 이 곳에 위치해 있었다. 
+
+* Class의 meta 정보
+* Method의 meta 정보
+* Static 객체
+* 상수화된 String 객체
+* Class와 관련된 배열 객체 meta 정보
+* JVM 내부적인 객체들과 JIT 컴파일러의 최적화 정보
+
+이 영역의 크기가 얼마나 적당할지를 예상하는 것은 매우 어려운 것이라 자바 개발자에게 많은 고민을 안겨주었다. 이 영역이 부족해지면 Permgen space에 대한 OOM이 발생하기 때문이었다. 아무 생각없이 Collection 객체를 static 으로 선언하고 계속 값을 추가하다보면 OOM이 발생한다. 또한 메모리에 로딩된 클래스와 클래스 로더가 종료되었을 때 GC가 되지 않을 경우 메모리 누수가 발생하였다.
+
+따라서 OOM이 발생하면, 이 문제를 해결하기 위한 방법으로 이 영역에 대한 크기를 늘려줌으로써 해결하였다. (최대 사이즈는 256MB 이다.)
+
+```
+java -XX:MaxPermSize=256m com.mycompany.MyApplication
+```
+
 <br>
 ### Metaspace
+
+이렇게 필요한 PermGen 영역 크기를 예상하는 것은 어려운 것이었기 때문에, Java 8에서는 이 영역을 없애고, Metaspace 라는 새로운 영역이 생겼다. PermGen 영역에 저장하던 값들 중에 static 객체와 같은 값들은 다 일반 heap 영역에 저장하여 최대한 GC 대상이 되도록 하였다.
+
+* Class의 meta 정보 -> Metaspace
+* Method의 meta 정보 -> Metaspace
+* Static 객체 -> Heap (Young or Old)
+* 상수화된 String 객체 -> Heap (Young or Old)
+* Class와 관련된 배열 객체 meta 정보 -> Metaspace
+* JVM 내부적인 객체들과 JIT 컴파일러의 최적화 정보 -> Metaspace
+
+Class 관련 meta 정보는 그대로 Metaspace 영역에 로드된다. 그리고 이 영역의 크기 제한은 오직 JVM의 native 메모리 크기에 제한되며 JVM이 필요에 따라 리사이징할 수 있는 구조로 개선되었다. 따라서 개발자들은 자바 클래스를 계속 추가함으로써 발생하는 PermGen 영역에 대한 OOM을 피할 수 있게되었다. 하지만 Metaspace 영역이 계속 커지게 되면 가상 메모리 부족으로 인한 swap이 많이 발생하게 될 것이다.
+
+따라서 JVM은 Metaspace 영역의 크기를 제한할 수 있도록 옵션을 제공한다. 
+
+```
+java -XX:MaxMetaspaceSize=256m com.mycompany.MyApplication
+```
 
 <br>
 # Minor GC vs Major GC vs Full GC
