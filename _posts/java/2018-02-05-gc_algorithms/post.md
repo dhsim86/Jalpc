@@ -21,9 +21,8 @@ icon: icon-html
 
 GC에 구현된 살아있는 객체를 조사하는 첫 번째 일은 **Marking**이라 부른다.
 
----
-
-## Marking Reachable Objects
+<br>
+### Marking Reachable Objects
 
 JVM에서 사용할 수 있는 모든 GC 알고리즘은 **어느 객체가 살아있는지 조사하는 것부터 시작한다.** 이 컨셉은 다음 그림에서 보여주는 JVM의 메모리 레이아웃을 통해 설명할 수 있다.
 
@@ -47,3 +46,40 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 * 이 단계에서 걸리는 시간은 heap 영역에 있는 전체 객체의 수가 아니라, **살아있는 객체의 수에 비례한다.** 따라서 heap 영역 사이즈를 늘린다고 이 단계에서 걸리는 시간에 직접적인 영향을 주지는 않는다.
 
 이 단계가 끝나면 GC는 다음 단계인, 사용되지 않는 객체를 정리하는 단계로 넘어갈 수 있다.
+
+<br>
+### Removing Unused Objects
+
+더 이상 사용되지 않는 객체의 메모리를 회수하는 일은 GC 알고리즘마다 구현이 다르긴 하지만, 보통 **Mark and Sweep, Mark-Sweep-Compact, Mark and Copy 중의 하나에 들어간다.**
+
+<br>
+**Sweep**
+
+**Mark and Sweep**에서 이 Sweep 단계는 Marking 단계가 끝난 후, GC Roots 및 살아있는 객체로 표현되는 그래프에 포함되지 않는 객체들의 **메모리 영역을 회수한다.** 회수된 메모리 영역은 내부적으로 이 영역을 관리하는 **free-list** 라는 자료구조를 통해 관리한다. 아마도 이 자료구조는 다시 사용할 수 있는 영역과 그 것의 크기를 기록해두었을 것이다.
+
+<br>
+![01.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/01.png)
+
+> 메모리 단편화 여부에 따라, 전체 메모리 공간은 충분하나 실제 객체 생성에 실패하여 OOM이 발생할 수도 있다.
+
+<br>
+**Compact**
+
+**Mark-Sweep-Compact**의 Compact 단계에서는 실제로 살아있는, **Marking 된 객체들을 메모리 영역의 처음부터 몰아넣는다.** 이는 실제 객체를 복사하고 이 객체들의 참조 정보를 업데이트함으로써 이루어지는데, GC의 시간을 증가시킨다. 하지만 이 것을 얻을 수 있는 이익은 여러 가지가 있다.
+
+* 메모리 단편화를 줄임으로써 발생하는 문제를 해결할 수 있다. (메모리 생성 실패 문제와 같은)
+* 연속적인 공간에서 객체 생성을 하는 것은 아주 적은 연산을 필요로 한다.
+    * 즉, 새로 객체를 생성하기 위해 적절한 메모리를 찾는 연산을 동반하는 파편화된 메모리 공간에서 할당하는 것보다 빠르다.
+
+<br>
+![02.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/02.png)
+
+<br>
+**Copy**
+
+**Mark and Copy**의 Copy 단계는 메모리 영역을 여러 영역으로 나누고, **살아있는 객체를 다른 영역으로 복사한다는 것을 의미한다.** (Eden -> Survivor / From survivor -> To survivor / Survivor -> Old)
+
+<br>
+![03.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/03.png)
+
+다른 영역으로 살아있는 객체를 옮기는 것이므로, Marking과 Copy 단계를 동시에 할 수 있다는 이점이 있다.
