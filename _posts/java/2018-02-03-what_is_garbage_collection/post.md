@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Garbage Collection 기본 개념"
-date:   2018-02-03
+date:   2018-02-04
 desc: "Garbage Collection 기본 개념"
 keywords: "java"
 categories: [Java]
