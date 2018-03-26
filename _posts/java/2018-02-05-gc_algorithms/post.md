@@ -111,7 +111,7 @@ JVM에서 제공하는 GC 알고리즘은 옵션을 통해 선택할 수 있으�
 | **G1** | **G1** | **-XX:+UseG1GC** |
 
 <br>
-복잡하게 보이지만, 다음 4가지 케이스만 알아두면 된다. JVM Option이 없는 것들은 deprecated 된 알고리즘들이며 더 이상 지원되지 않는다.
+복잡하게 보이지만, 다음 4가지 케이스만 알아두면 된다. JVM Option이 없는 것들은 deprecated 되었거나, 실제 사용에 있어서 사용하기에는 적절하지 않은 알고리즘들이다.
 
 * Serial GC (Young 영역 / Old 영역 모두 적용)
 * Parallel GC (Young 영역 / Old 영역 모두 적용)
