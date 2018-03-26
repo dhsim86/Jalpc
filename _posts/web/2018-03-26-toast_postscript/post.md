@@ -203,14 +203,30 @@ VPC에서 Load Balancer를 다음과 같이 생성한다.
 ![21.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/21.png)
 
 <br>
-### Auto Scale 설정 - 1. 인스턴스 템플릿 생성
+### Auto Scale 설정 - 2. 인스턴스 템플릿 생성
 
-인스턴스 템플릿을 생성하는 것은 어렵지 않다. 아까 미리 생성해둔 이미지를 선택하고, 인스턴스를 만들 때처럼 설정하면 된다.
+인스턴스 템플릿을 생성하는 것은 어렵지 않다. 아까 미리 생성해둔 이미지를 선택하고, 인스턴스를 만들 때처럼 Key Pair 및 Security Group을 설정하면 된다.
 
 <br>
 ![22.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/22.png)
 
+그럼 다음과 같이 인스턴스 템플릿이 생성되는 것을 확인할 수 있다.
 
+<br>
+![23.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/23.png)
 
 <br>
 ### Auto Scale 설정 - 3. Scaling Group 설정
+
+이제 Scaling Group 설정을 통해, 자원 사용율에 따라 자동으로 scale in / out 되는 서버들을 사용할 수 있다.
+Scaling Group 생성시 서버 인스턴스의 최소 / 최대 개수 및 scale in / out 되는 조건을 지정할 수 있다.
+
+다음과 같이 최소 / 최대 인스턴스 개수 및 Scaling Group 시작시 실행될 인스턴스 개수를 지정한다. 여기서는 최소 3개 / 최대 10개까지의 서버들이 생성될 것이다.
+
+<br>
+![24.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/24.png)
+
+다음으로 scale in / out 조건을 지정한다. CPU 사용율뿐만 아니라 메모리 사용량, Disk I/O, 네트워크 bandwidth 등을 지정할 수 있다. Judge 사이트는 CPU 사용율에 따라 scale in / out 할 것이므로 다음과 같이 CPU 사용율에 따라 서버 수를 조정하도록 한다. CPU 사용율이 85%가 넘어가면 인스턴스를 새로 생성하도록 하고, 30% 이하일 경우에는 인스턴스를 삭제하도록 지정하였다.
+
+<br>
+![25.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/25.png)
