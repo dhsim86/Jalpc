@@ -66,3 +66,10 @@ TOAST 에서는 **[RDS for MySQL](https://toast.com/service/database/rds_for_mys
 ![05.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/05.png)
 
 위와 같이 DB 인스턴스에 대해서 MySQL 설정을 지정할 수가 있었다.
+
+DB 인스턴스를 생성하면 다음과 같은 화면을 볼 수 있는데 모니터링 및 로그 확인 기능도 제공하는 것을 알 수 있었다.
+
+<br>
+![06.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/06.png)
+
+그림에서는 보이지 않지만 접속 정보에는 DB에 접속하기 위한 IP 및 지정한 Port 번호가 뜬다. 이 정보를 통해 해당 DB에 접속할 수 있다. DB 인스턴스를 생성해놓았으니 사이트를 본격적으로 구축한다.
