@@ -186,10 +186,31 @@ DB에 이상없이 연결이 되었는 것을 확인 후, 필요한 테이블 �
 이미지를 생성하면 상태가 **"Queued"** 상태인 것을 확인할 수 있는데, 인스턴스로부터 이미지를 생성하는 중으로 **"Active"** 상태가 될 때까지 기다려야 한다.
 
 <br>
-### Auto Scale 설정 - 1. 인스턴스 템플릿 생성
+### Auto Scale 설정 - 1. Load Balancer 설정
+
+Auto Scale 설정의 처음 작업으로 Load Balancer를 설정해야 한다. Auto Scale을 진행하면 여러 대의 서버로 사용자들의 요청을 고르게 분배할 필요가 있다. TOAST에서는 이를 위해 Load Balancer 라는 기능을 제공한다.
+
+VPC에서 Load Balancer를 다음과 같이 생성한다.
 
 <br>
-### Auto Scale 설정 - 2. Load Balancer 설정
+![20.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/20.png)
+
+위의 그림을 보면 알 수 있겠지만, 네트워크 요청에 대해서 어떻게 서버들로 분배할 것인지 지정할 수 있고 health check 기능도 제공하는 것을 알 수 있다. Auto Scale의 Scaling Group에서 이 Load Balancer를 선택할 것이므로 Instance registration 에서 인스턴스는 추가하지 않는다.
+
+그리고 다음과 같이 Floating IP를 아까 추가한 Load Balancer에 연결한다.
+
+<br>
+![21.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/21.png)
+
+<br>
+### Auto Scale 설정 - 1. 인스턴스 템플릿 생성
+
+인스턴스 템플릿을 생성하는 것은 어렵지 않다. 아까 미리 생성해둔 이미지를 선택하고, 인스턴스를 만들 때처럼 설정하면 된다.
+
+<br>
+![22.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/22.png)
+
+
 
 <br>
 ### Auto Scale 설정 - 3. Scaling Group 설정
