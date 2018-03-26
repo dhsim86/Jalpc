@@ -34,7 +34,7 @@ icon: icon-html
 나는 Judge 서버를 구축하면서 [TOAST](https://toast.com/) 를 사용하기로 했다. AWS를 사용하면서 인스턴스를 잘못 설정했다가 요금 폭탄을 맞은 적도 있고(물론 잘 해결해서 넘어가기는 했지만), 새로운 클라우드 서비스를 써보는 것도 나쁘지 않다고 생각했다.
 
 <br>
-## TOAST 사용
+## **TOAST 사용**
 
 TOAST 클라우드에서도 많은 서비스를 다음과 같이 제공하고 있다.
 
@@ -44,7 +44,7 @@ TOAST 클라우드에서도 많은 서비스를 다음과 같이 제공하고 �
 앞서도 언급했듯이 Judge 서버를 구축하기 위해 필요한 것은 사용자들의 수에 따라 유동적으로 서버의 수가 결정되는 **Auto Scaling** 이다. TOAST에서는 **[Auto Scale](https://toast.com/service/compute/auto_scale)** 이라는 이름으로 서비스를 하고 있다.
 
 <br>
-## RDS for MySQL
+## **RDS for MySQL**
 
 이번에 구축하고자 하는 Judge 사이트도 회원 정보나 문제들을 저장할 DB가 필요하다. 물론 서버에서 직접 DB를 설치하고 사용할 수도 있겠지만 Auto Scale 때문에 사이트가 운영될 서버와는 별도의 서버에서 돌아가야 했다.
 
@@ -57,10 +57,14 @@ TOAST 에서는 **[RDS for MySQL](https://toast.com/service/database/rds_for_mys
 
 **생성** 버튼을 누르면 DB 인스턴스를 생성하기 위한 화면이 나오는데 위와 같이 필요한 정보를 입력한 후 **다음** 버튼을 누른다. 
 
+---
+
 <br>
 ![04.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/04.png)
 
 위의 그림은 백업 & Access 제어 화면인데 자동적으로 DB를 백업해주는 용도로 보인다.
+
+---
 
 <br>
 ![05.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/05.png)
@@ -68,13 +72,15 @@ TOAST 에서는 **[RDS for MySQL](https://toast.com/service/database/rds_for_mys
 위와 같이 DB 인스턴스에 대해서 MySQL 설정을 지정할 수가 있었다.
 DB 인스턴스를 생성하면 다음과 같은 화면을 볼 수 있는데 모니터링 및 로그 확인 기능도 제공하는 것을 알 수 있었다.
 
+---
+
 <br>
 ![06.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/06.png)
 
 그림에서는 보이지 않지만 접속 정보에는 DB에 접속하기 위한 IP 및 지정한 Port 번호가 뜬다. 이 정보를 통해 해당 DB에 접속할 수 있다. DB 인스턴스를 생성해놓았으니 사이트를 본격적으로 구축한다.
 
 <br>
-## Auto Scale
+## **Auto Scale**
 
 TOAST의 Auto Scale를 사용하기 위해서는 먼저 **인스턴스 템플릿**이라는 것을 만들어야 하는데, Auto Scale 진행시 자동으로 생성되는 인스턴스의 속성이라고 나와있다. 
 
@@ -90,6 +96,8 @@ Auto Scale 진행될 때마다 OS가 미리 설치되어 있는 이미지를 통
 
 이를 위해 인스턴스를 하나 생성해서 서버를 구축해놓았다가 이 서버의 이미지를 뜬 다음에, 이 이미지를 통해 인스턴스 템플릿을 만들어야 한다. 그래야 Auto Scale 진행시 이 이미지를 통해 서버를 자동 생성하고 바로 서비스를 할 수 있다.
 
+---
+
 <br>
 ### 서버 이미지 생성 - 1. Key Pair 생성
 
@@ -103,6 +111,8 @@ Auto Scale 진행될 때마다 OS가 미리 설치되어 있는 이미지를 통
 ![08.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/08.png)
 
 Key Pair를 생성하면 .pem 파일을 자동으로 다운로드받게 되는데 인스턴스 접속시 이 파일을 가지고 접속을 하게 된다.
+
+---
 
 <br>
 ### 서버 이미지 생성 - 2. Security Group 설정
@@ -119,6 +129,8 @@ VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 
 
 이제 서버 인스턴스 생성시에 이 Security Group을 지정하면 HTTP 요청 및 SSH 접속을 할 수 있을 것이다.
 
+---
+
 <br>
 ### 서버 이미지 생성 - 3. Floating IP 추가 / 연결
 
@@ -126,6 +138,8 @@ VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 
 
 <br>
 ![11.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/11.png)
+
+---
 
 <br>
 ### 서버 이미지 생성 - 4. 인스턴스 생성 및 사이트 구축
@@ -137,15 +151,21 @@ VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 
 <br>
 ![12.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/12.png)
 
+---
+
 다음과 같이 아까 설정 및 만들어 둔 Security Group 및 Key Pair를 지정한다. 그러면 아까 지정한대로 외부에서 80포트 및 22포트를 통해 HTTP 요청 및 SSH 접속을 할 수 있다. SSH 접속을 할 때는 Key Pair 생성시 다운로드 받은 .pem 파일을 통해 접속한다.
 
 <br>
 ![13.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/13.png)
 
+---
+
 인스턴스를 생성하고 나면 다음과 같이 인스턴스들의 상태를 확인할 수 있다.
 
 <br>
 ![14.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/14.png)
+
+---
 
 인스턴스 생성 확인 후, 외부에서 해당 인스턴스에 접속하기 위해 미리 추가해둔 Floating IP를 연결한다. 다음과 같이 Floating IP 메뉴에서 특정 인스턴스와 IP를 매핑시킬 수 있다.
 
@@ -161,15 +181,21 @@ VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 
 ssh -i judge.pem ubuntu@IP_ADDRESS
 ```
 
+---
+
 Judge 시스템 및 서버 설정을 하기에 앞서서, RDS for MySQL 서비스를 통해 만들어두었던 DB 인스턴스에 접속을 할 수 있는지 테스트하였다.
 
 <br>
 ![17.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/17.png)
 
+---
+
 DB에 이상없이 연결이 되었는 것을 확인 후, 필요한 테이블 생성 후 Judge 시스템을 구축하였다. 다음은 지금까지 작업을 한 결과로 브라우저에서 구축한 Judge 사이트에 접속한 결과이다.
 
 <br>
 ![18.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/18.png)
+
+---
 
 <br>
 ### 서버 이미지 생성 - 5. 서버 이미지 생성
@@ -182,6 +208,8 @@ DB에 이상없이 연결이 되었는 것을 확인 후, 필요한 테이블 �
 ![19.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/19.png)
 
 이미지를 생성하면 상태가 **"Queued"** 상태인 것을 확인할 수 있는데, 인스턴스로부터 이미지를 생성하는 중으로 **"Active"** 상태가 될 때까지 기다려야 한다.
+
+---
 
 <br>
 ### Auto Scale 설정 - 1. Load Balancer 설정
@@ -200,6 +228,8 @@ VPC에서 Load Balancer를 다음과 같이 생성한다.
 <br>
 ![21.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/21.png)
 
+---
+
 <br>
 ### Auto Scale 설정 - 2. 인스턴스 템플릿 생성
 
@@ -212,6 +242,8 @@ VPC에서 Load Balancer를 다음과 같이 생성한다.
 
 <br>
 ![23.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/23.png)
+
+---
 
 <br>
 ### Auto Scale 설정 - 3. Scaling Group 설정
@@ -239,6 +271,8 @@ Scaling Group을 생성하면 자동으로 서버 인스턴스들이 생성되�
 <br>
 ![27.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/27.png)
 
+---
+
 <br>
 ### Auto Scale 설정 - 4. Monitoring
 
@@ -247,8 +281,10 @@ Scaling Group을 생성하면 자동으로 서버 인스턴스들이 생성되�
 <br>
 ![29.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/29.png)
 
+---
+
 <br>
-## Auto Scale 테스트
+## **Auto Scale 테스트**
 
 이제 생성된 인스턴스들에 대해 Auto Scaling이 제대로 되는지, Load Balancer는 요청을 분배하는지 테스트 진행하였다.
 
@@ -276,6 +312,6 @@ Scaling Group을 생성하면 자동으로 서버 인스턴스들이 생성되�
 Scaling Group에서 미리 지정한 조건들에 의해 생성된 인스턴스들을 확인할 수 있으며, 구축한 Judge 사이트에 많은 사용자들의 요청이 들어오면 서버 자원 사용율에 따라 자동으로 Auto Scaling이 진행되는 것을 예상할 수 있다.
 
 <br>
-## 사용 후기
+## **사용 후기**
 
 TOAST 클라우드에서 제공하는 인프라 서비스를 통해 내가 구축하고자 하는 사이트의 용도에 맞게 쉽게 설정할 수 있었다. 콘솔에서 서버 인스턴스에 대한 포괄적인 제어권을 제공하며, 간단한 Auto Scale 설정을 통해 컴퓨팅 요구 사항 변화에 따라, 내가 신경 쓸 필요없이 자동으로 서버 자원을 확장하거나 축소할 수 있었다.
