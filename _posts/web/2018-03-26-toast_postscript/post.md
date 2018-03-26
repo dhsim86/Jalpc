@@ -53,7 +53,16 @@ TOAST 에서는 **[RDS for MySQL](https://toast.com/service/database/rds_for_mys
 서비스를 enable 하면 다음과 같은 화면이 뜬다. 이 콘솔에서 DB 인스턴스를 생성하고 사용하는 것으로 보인다.
 
 <br>
-![02.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/02.png)
+![03.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/03.png)
 
-**생성** 버튼을 누르면 DB 인스턴스를 생성하기 위한 화면이 나오는데 다음과 같이 필요한 정보를 입력한 후 **다음** 버튼을 누른다.
+**생성** 버튼을 누르면 DB 인스턴스를 생성하기 위한 화면이 나오는데 위와 같이 필요한 정보를 입력한 후 **다음** 버튼을 누른다. 
 
+<br>
+![04.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/04.png)
+
+위의 그림은 백업 & Access 제어 화면인데 자동적으로 DB를 백업해주는 용도로 보인다.
+
+<br>
+![05.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/05.png)
+
+위와 같이 DB 인스턴스에 대해서 MySQL 설정을 지정할 수가 있었다.
