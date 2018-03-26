@@ -1,15 +1,15 @@
 ---
 layout: post
-title:  "Judge Server 구축기"
-date:   2018-03-26
-desc: "Judge Server 구축기"
+title:  "TOAST 클라우드를 이용한 Judge 서버 구축기"
+date:   2018-03-25
+desc: "TOAST 클라우드를 이용한 Judge 서버 구축기"
 keywords: "judge, toast cloud"
 categories: [Web]
 tags: [judge]
 icon: icon-html
 ---
 
-## Judge 서버 구축기
+## TOAST 클라우드를 이용한 Judge 서버 구축기
 
 [BOJ](https://www.acmicpc.net/)나 [알고스팟](https://algospot.com/)과 같은 사이트에서 알고리즘 문제들을 풀어보면서, 직접 문제도 만들어보기도 하고 지인들과 소규모 대회를 열어보기 위해 Online Judge 시스템을 구축하고자 하였다.
 
@@ -279,4 +279,3 @@ Scaling Group에서 미리 지정한 조건들에 의해 생성된 인스턴스�
 ## 사용 후기
 
 TOAST 클라우드에서 제공하는 인프라 서비스를 통해 내가 구축하고자 하는 사이트의 용도에 맞게 쉽게 설정할 수 있었다. 콘솔에서 서버 인스턴스에 대한 포괄적인 제어권을 제공하며, 간단한 Auto Scale 설정을 통해 컴퓨팅 요구 사항 변화에 따라, 내가 신경 쓸 필요없이 자동으로 서버 자원을 확장하거나 축소할 수 있었다.
-
