@@ -144,6 +144,16 @@ VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 
 <br>
 ![13.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/13.png)
 
+인스턴스를 생성하고 나면 다음과 같이 인스턴스들의 상태를 확인할 수 있다.
+
+<br>
+![14.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/14.png)
+
+인스턴스 생성 확인 후, 외부에서 해당 인스턴스에 접속하기 위해 미리 추가해둔 Floating IP를 연결한다. 다음과 같이 Floating IP 메뉴에서 특정 인스턴스와 IP를 매핑시킬 수 있다.
+
+<br>
+![15.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/15.png)
+
 
 
 <br>
