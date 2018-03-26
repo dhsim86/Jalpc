@@ -154,7 +154,14 @@ VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 
 <br>
 ![15.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/15.png)
 
+<br>
+![16.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/16.png)
 
+위와 같이 ssh를 통해 어떻게 접속하는지 안내를 보여준다. 이제 다음과 같이 Key Pair를 가지고 서버 인스턴스에 접속한다.
+
+```shell
+ssh -i judge.pem ubuntu@133.186.239.50
+```
 
 <br>
 ### 서버 이미지 생성 - 5. 서버 이미지 생성
