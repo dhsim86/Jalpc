@@ -105,7 +105,7 @@ Key Pair를 생성하면 .pem 파일을 자동으로 다운로드받게 되는�
 <br>
 ### 서버 이미지 생성 - 2. Security Group 설정
 
-Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 서버 인스턴스 사이에 통신 가능한 port 및 protocol을 지정하는 것이다. 사이트를 구축할 것이므로 80번 포트 및 ssh 접속을 위한 22번 포트를 사용할 것인데, 이렇게 자주 사용되는 포트들은 미리 Rule이 정의되어 있어 사용할 수 있게 해놓았다.
+VPC 메뉴에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 서버 인스턴스 사이에 통신 가능한 port 및 protocol을 지정하는 것이다. 사이트를 구축할 것이므로 80번 포트 및 ssh 접속을 위한 22번 포트를 사용할 것인데, 이렇게 자주 사용되는 포트들은 미리 Rule이 정의되어 있어 사용할 수 있게 해놓았다.
 
 <br>
 ![09.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/09.png)
@@ -119,6 +119,11 @@ Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 서버 인
 
 <br>
 ### 서버 이미지 생성 - 3. Floating IP 추가 / 연결
+
+생성될 인스턴스에 SSH 접속을 위해 Floating IP를 추가해야 한다. TOAST에서 제공하는 서버 인스턴스에 외부에서 엑세스하기 위해서는 Floating IP 기능을 사용해야 한다. 다음과 같이 VPC 메뉴에서 Floating IP를 생성할 수 있다.
+
+<br>
+![11.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/11.png)
 
 <br>
 ### 서버 이미지 생성 - 4. 인스턴스 생성 및 사이트 구축
