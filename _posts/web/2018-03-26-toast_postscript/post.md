@@ -41,10 +41,10 @@ TOAST 클라우드에서도 많은 서비스를 다음과 같이 제공하고 �
 <br>
 ![01.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/01.png)
 
-앞서도 언급했듯이 Judge 서버를 구축하기 위해 필요한 것은 사용자들의 수에 따라 유동적으로 서버의 수가 결정되는 **Auto Scaling** 이다. TOAST에서는 **[Auto Scale](https://toast.com/service/compute/auto_scale)** 이라는 이름으로 서비스를 하고 있었다.
+앞서도 언급했듯이 Judge 서버를 구축하기 위해 필요한 것은 사용자들의 수에 따라 유동적으로 서버의 수가 결정되는 **Auto Scaling** 이다. TOAST에서는 **[Auto Scale](https://toast.com/service/compute/auto_scale)** 이라는 이름으로 서비스를 하고 있다.
 
 <br>
-### RDS for MySQL
+## RDS for MySQL
 
 이번에 구축하고자 하는 Judge 사이트도 회원 정보나 문제들을 저장할 DB가 필요하다. 물론 서버에서 직접 DB를 설치하고 사용할 수도 있겠지만 Auto Scale 때문에 사이트가 운영될 서버와는 별도의 서버에서 돌아가야 했다.
 
@@ -73,3 +73,22 @@ DB 인스턴스를 생성하면 다음과 같은 화면을 볼 수 있는데 모
 ![06.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/06.png)
 
 그림에서는 보이지 않지만 접속 정보에는 DB에 접속하기 위한 IP 및 지정한 Port 번호가 뜬다. 이 정보를 통해 해당 DB에 접속할 수 있다. DB 인스턴스를 생성해놓았으니 사이트를 본격적으로 구축한다.
+
+<br>
+## Auto Scale
+
+TOAST의 Auto Scale를 사용하기 위해서는 먼저 인스턴스 템플릿이라는 것을 만들어야 하는데, Auto Scale 진행시 자동으로 생성되는 인스턴스의 속성이라고 나와있다. [Auto Scale - Overview](https://docs.toast.com/en/Compute/Auto%20Scale/en/overview/)
+
+인스턴스 템플릿을 통해, 자동으로 생성되는 서버의 이미지 (서버 디스크)를 지정할 수 있는데 다음 그림에서 볼 수 있듯이 여러 OS를 지원하는 것을 확인할 수 있다.
+
+<br>
+![07.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/07.png)
+
+Auto Scale 진행될 때마다 OS가 미리 설치되어 있는 이미지를 통해 서버가 생성되는 것을 알 수 있다.
+
+그런데 구축하고자 하는 사이트의 서버는 nginx와 같은 서버 설정 및 Judge 시스템이 미리 구축되어 있어야 한다. Auto Scale 진행할 때마다 서버 설정하고 시스템을 구축할 것은 아니지 않는가?
+
+이를 위해 인스턴스를 하나 생성해서 서버를 구축해놓았다가 이 서버의 이미지를 뜬 다음에, 이 이미지를 통해 인스턴스 템플릿을 만들어야 한다. 그래야 Auto Scale 진행시 이 이미지를 통해 서버를 자동 생성하고 바로 서비스를 할 수 있다.
+
+<br>
+### Instance 생성
