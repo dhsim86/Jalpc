@@ -230,3 +230,8 @@ Scaling Group 생성시 서버 인스턴스의 최소 / 최대 개수 및 scale 
 
 <br>
 ![25.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/25.png)
+
+마지막으로 아까 생성해둔 Load Balancer를 지정한다. 그럼 Load Balancer는 Scaling Group에 의해 생성되는 서버들로 요청들을 분배할 것이다.
+
+<br>
+![26.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/26.png)
