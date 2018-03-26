@@ -77,7 +77,9 @@ DB 인스턴스를 생성하면 다음과 같은 화면을 볼 수 있는데 모
 <br>
 ## Auto Scale
 
-TOAST의 Auto Scale를 사용하기 위해서는 먼저 인스턴스 템플릿이라는 것을 만들어야 하는데, Auto Scale 진행시 자동으로 생성되는 인스턴스의 속성이라고 나와있다. [Auto Scale - Overview](https://docs.toast.com/en/Compute/Auto%20Scale/en/overview/)
+TOAST의 Auto Scale를 사용하기 위해서는 먼저 인스턴스 템플릿이라는 것을 만들어야 하는데, Auto Scale 진행시 자동으로 생성되는 인스턴스의 속성이라고 나와있다. 
+
+[Auto Scale - Overview](https://docs.toast.com/en/Compute/Auto%20Scale/en/overview/)
 
 인스턴스 템플릿을 통해, 자동으로 생성되는 서버의 이미지 (서버 디스크)를 지정할 수 있는데 다음 그림에서 볼 수 있듯이 여러 OS를 지원하는 것을 확인할 수 있다.
 
@@ -93,7 +95,9 @@ Auto Scale 진행될 때마다 OS가 미리 설치되어 있는 이미지를 통
 <br>
 ### 서버 이미지 생성 - 1. Key Pair 생성
 
-서버 이미지를 생성하기 위해 인스턴스를 생성하기 전에, 먼저 Key Pair를 생성해야 한다. TOAST 인스턴스에 접속하기 위해서는 Key Pair를 통해 인증을 거치기 때문이다.
+서버 이미지를 생성하기 위해 인스턴스를 생성하기 전에, 먼저 Key Pair를 생성해야 한다. TOAST 인스턴스에 접속하기 위해서는 Key Pair를 통해 인증을 거치기 때문이다. 
+
+[Instance - Overview](http://docs.toast.com/en/Compute/Instance/en/overview/)
 
 다음과 같이 Instance 메뉴에서 Key Pair를 생성할 수 있다.
 
@@ -105,7 +109,7 @@ Key Pair를 생성하면 .pem 파일을 자동으로 다운로드받게 되는�
 <br>
 ### 서버 이미지 생성 - 2. Security Group 설정
 
-VPC 메뉴에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 서버 인스턴스 사이에 통신 가능한 port 및 protocol을 지정하는 것이다. 사이트를 구축할 것이므로 80번 포트 및 ssh 접속을 위한 22번 포트를 사용할 것인데, 이렇게 자주 사용되는 포트들은 미리 Rule이 정의되어 있어 사용할 수 있게 해놓았다.
+VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 서버 인스턴스 사이에 통신 가능한 port 및 protocol을 지정하는 것이다. 사이트를 구축할 것이므로 80번 포트 및 ssh 접속을 위한 22번 포트를 사용할 것인데, 이렇게 자주 사용되는 포트들은 미리 Rule이 정의되어 있어 사용할 수 있게 해놓았다.
 
 <br>
 ![09.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/09.png)
@@ -120,13 +124,27 @@ VPC 메뉴에서 Security Group을 지정한다. 용도는 쉽게 말해서 외�
 <br>
 ### 서버 이미지 생성 - 3. Floating IP 추가 / 연결
 
-생성될 인스턴스에 SSH 접속을 위해 Floating IP를 추가해야 한다. TOAST에서 제공하는 서버 인스턴스에 외부에서 엑세스하기 위해서는 Floating IP 기능을 사용해야 한다. 다음과 같이 VPC 메뉴에서 Floating IP를 생성할 수 있다.
+생성될 인스턴스에 SSH 접속을 위해 Floating IP를 추가해야 한다. TOAST에서 제공하는 서버 인스턴스에 외부에서 엑세스하기 위해서는 Floating IP 기능을 사용해야 한다. 다음과 같이 VPC에서 Floating IP를 생성할 수 있다.
 
 <br>
 ![11.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/11.png)
 
 <br>
 ### 서버 이미지 생성 - 4. 인스턴스 생성 및 사이트 구축
+
+이번에 본격적으로 서버를 구축한다. 여기서 구축하고자 하는 Judge 시스템 및 서버 설정을 해놓은 후 접속 테스트를 진행한 후에 Auto Scale을 위한 서버 이미지를 생성할 것이다.
+
+다음과 같이 사용할 OS 및 인스턴스 설정을 진행한다. **Select Flavor** 메뉴에서 인스턴스의 사양을 지정할 수 있다. 각자 사용하고자 하는 서버의 용도에 따라 지정한다.
+
+<br>
+![12.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/12.png)
+
+다음과 같이 아까 설정 및 만들어 둔 Security Group 및 Key Pair를 지정한다. 그러면 아까 지정한대로 외부에서 80포트 및 22포트를 통해 HTTP 요청 및 SSH 접속을 할 수 있다. SSH 접속을 할 때는 Key Pair 생성시 다운로드 받은 .pem 파일을 통해 접속한다.
+
+<br>
+![13.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/13.png)
+
+
 
 <br>
 ### 서버 이미지 생성 - 5. 서버 이미지 생성
