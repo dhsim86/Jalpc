@@ -41,6 +41,19 @@ TOAST 클라우드에서도 많은 서비스를 다음과 같이 제공하고 �
 <br>
 ![01.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/01.png)
 
-앞서도 언급했듯이 Judge 서버를 구축하기 위해 필요한 것은 사용자들의 수에 따라 유동적으로 서버의 수가 결정되는 **Auto Scaling** 이다. TOAST에서는 **[Auto Scale](https://toast.com/service/compute/auto_scale)** 이라는 이름으로 서비스를 하고 있다.
+앞서도 언급했듯이 Judge 서버를 구축하기 위해 필요한 것은 사용자들의 수에 따라 유동적으로 서버의 수가 결정되는 **Auto Scaling** 이다. TOAST에서는 **[Auto Scale](https://toast.com/service/compute/auto_scale)** 이라는 이름으로 서비스를 하고 있었다.
 
-또한 회원 정보나 알고리즘 문제, 패스 여부 / 랭킹등을 저장하기 위해 DB가 필요했고 이 또한 TOAST 에서 **[RDS for MySQL](https://toast.com/service/database/rds_for_mysql)** 이라는 이름으로 서비스를 제공하고 있었다.
+<br>
+### RDS for MySQL
+
+이번에 구축하고자 하는 Judge 사이트도 회원 정보나 문제들을 저장할 DB가 필요하다. 물론 서버에서 직접 DB를 설치하고 사용할 수도 있겠지만 Auto Scale 때문에 사이트가 운영될 서버와는 별도의 서버에서 돌아가야 했다.
+
+TOAST 에서는 **[RDS for MySQL](https://toast.com/service/database/rds_for_mysql)** 이라는 이름으로 DB 인스턴스를 제공하고 있었다. 이 서비스를 통해 DB를 구축해놓고 Judge 서버에서는 이 DB를 사용하면 될 것이다.
+
+서비스를 enable 하면 다음과 같은 화면이 뜬다. 이 콘솔에서 DB 인스턴스를 생성하고 사용하는 것으로 보인다.
+
+<br>
+![02.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/02.png)
+
+**생성** 버튼을 누르면 DB 인스턴스를 생성하기 위한 화면이 나오는데 다음과 같이 필요한 정보를 입력한 후 **다음** 버튼을 누른다.
+
