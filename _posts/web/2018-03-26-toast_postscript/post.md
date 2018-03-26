@@ -33,10 +33,14 @@ BOJ 나 알고스팟과 같은 사이트에서 알고리즘 문제들을 풀어�
 
 나는 Judge 서버를 구축하면서 [TOAST](https://toast.com/) 를 사용하기로 했다. AWS를 사용하면서 인스턴스를 잘못 설정했다가 요금 폭탄을 맞은 적도 있고(물론 잘 해결해서 넘어가기는 했지만), 새로운 클라우드 서비스를 써보는 것도 나쁘지 않다고 생각했다.
 
+<br>
 ## TOAST 사용
 
-TOAST 클라우드에서도 많은 서비스를 다음과 같이 제공하고 있다. 
+TOAST 클라우드에서도 많은 서비스를 다음과 같이 제공하고 있다.
 
 <br>
 ![01.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/01.png)
 
+앞서도 언급했듯이 Judge 서버를 구축하기 위해 필요한 것은 사용자들의 수에 따라 유동적으로 서버의 수가 결정되는 **Auto Scaling** 이다. TOAST에서는 **[Auto Scale](https://toast.com/service/compute/auto_scale)** 이라는 이름으로 서비스를 하고 있다.
+
+또한 회원 정보나 알고리즘 문제, 패스 여부 / 랭킹등을 저장하기 위해 DB가 필요했고 이 또한 TOAST 에서 **[RDS for MySQL](https://toast.com/service/database/rds_for_mysql)** 이라는 이름으로 서비스를 제공하고 있었다.
