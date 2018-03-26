@@ -91,4 +91,46 @@ Auto Scale 진행될 때마다 OS가 미리 설치되어 있는 이미지를 통
 이를 위해 인스턴스를 하나 생성해서 서버를 구축해놓았다가 이 서버의 이미지를 뜬 다음에, 이 이미지를 통해 인스턴스 템플릿을 만들어야 한다. 그래야 Auto Scale 진행시 이 이미지를 통해 서버를 자동 생성하고 바로 서비스를 할 수 있다.
 
 <br>
-### Instance 생성
+### 서버 이미지 생성 - 1. Key Pair 생성
+
+서버 이미지를 생성하기 위해 인스턴스를 생성하기 전에, 먼저 Key Pair를 생성해야 한다. TOAST 인스턴스에 접속하기 위해서는 Key Pair를 통해 인증을 거치기 때문이다.
+
+다음과 같이 Instance 메뉴에서 Key Pair를 생성할 수 있다.
+
+<br>
+![08.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/08.png)
+
+Key Pair를 생성하면 .pem 파일을 자동으로 다운로드받게 되는데 인스턴스 접속시 이 파일을 가지고 접속을 하게 된다.
+
+<br>
+### 서버 이미지 생성 - 2. Security Group 설정
+
+Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 서버 인스턴스 사이에 통신 가능한 port 및 protocol을 지정하는 것이다. 사이트를 구축할 것이므로 80번 포트 및 ssh 접속을 위한 22번 포트를 사용할 것인데, 이렇게 자주 사용되는 포트들은 미리 Rule이 정의되어 있어 사용할 수 있게 해놓았다.
+
+<br>
+![09.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/09.png)
+
+위의 화면과 같이 사용하고자하는 Rule을 추가해놓으면 다음과 같이 추가된 Rule들을 확인할 수 있다.
+
+<br>
+![10.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/10.png)
+
+이제 서버 인스턴스 생성시에 이 Security Group을 지정하면 HTTP 요청 및 SSH 접속을 할 수 있을 것이다.
+
+<br>
+### 서버 이미지 생성 - 3. Floating IP 추가 / 연결
+
+<br>
+### 서버 이미지 생성 - 4. 인스턴스 생성 및 사이트 구축
+
+<br>
+### 서버 이미지 생성 - 5. 서버 이미지 생성
+
+<br>
+### Auto Scale 설정 - 1. 인스턴스 템플릿 생성
+
+<br>
+### Auto Scale 설정 - 2. Load Balancer 설정
+
+<br>
+### Auto Scale 설정 - 3. Scaling Group 설정
