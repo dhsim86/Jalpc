@@ -27,7 +27,7 @@ BOJ 나 알고스팟과 같은 사이트에서 알고리즘 문제들을 풀어�
 
 **"자신들의 코드를 사이트에 올려 문제를 통과하는지 알아본다."** 라는 것은 서버에서 사용자들의 코드를 빌드해서 실행시켜본다는 것이고, 이는 CPU의 자원을 많이 소모한다는 것을 의미한다. 당연히 많은 사용자들이 특정 시간에 요청을 하게 되면 서버에 과부하를 일으키게 될 것이다.
 
-이에 대비한다고 좋은 성능의 서버들을 미리 구축해놓자라는 생각도 들기는 했지만 좋은 방법인지는 의구심이 들었다. 얼마나 많은 사용자들이 사이트를 사용할 지도 예측하기가 힘들었고, 시간대에 상관없이 사용자들이 많을 것이라는 생각은 들지 않았기 때문이다. (새벽에도 알고리즘 문제들을 풀어보는 코딩 덕후가 있긴 하겠지만.)
+이에 대비한다고 좋은 성능의 서버들을 미리 구축해놓자라는 생각도 들기는 했지만 좋은 방법인지는 의구심이 들었다. **얼마나 많은 사용자들이 사이트를 사용할 지도 예측하기가 힘들었고, 시간대에 상관없이 사용자들이 많을 것이라는 생각은 들지 않았기 때문이다.** (새벽에도 알고리즘 문제들을 풀어보는 코딩 덕후가 있긴 하겠지만.)
 
 또한 정해진 갯수의 서버로 운영한다는 것은 사용자가 많을 때는 대처하기가 힘들고, 적을 때는 서버가 놀고 있다는 것을 의미한다. 서버는 상당히 비싼 자원(적어도 나에게 있어서는)이기 때문에 사용자의 수에 따라 서버가 유동적으로 늘었다가 줄어드는 것이 필요했다. 이를 **Auto Scaling** 이라고 하는데, [AWS](https://aws.amazon.com/ko/autoscaling/)나 [Azure](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/autoscale), [Google Cloud](https://cloud.google.com/compute/docs/autoscaler/) 등과 같은 여러 클라우드 서비스에서 이미 제공하고 있다.
 
@@ -66,7 +66,6 @@ TOAST 에서는 **[RDS for MySQL](https://toast.com/service/database/rds_for_mys
 ![05.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/05.png)
 
 위와 같이 DB 인스턴스에 대해서 MySQL 설정을 지정할 수가 있었다.
-
 DB 인스턴스를 생성하면 다음과 같은 화면을 볼 수 있는데 모니터링 및 로그 확인 기능도 제공하는 것을 알 수 있었다.
 
 <br>
@@ -77,7 +76,7 @@ DB 인스턴스를 생성하면 다음과 같은 화면을 볼 수 있는데 모
 <br>
 ## Auto Scale
 
-TOAST의 Auto Scale를 사용하기 위해서는 먼저 인스턴스 템플릿이라는 것을 만들어야 하는데, Auto Scale 진행시 자동으로 생성되는 인스턴스의 속성이라고 나와있다. 
+TOAST의 Auto Scale를 사용하기 위해서는 먼저 **인스턴스 템플릿**이라는 것을 만들어야 하는데, Auto Scale 진행시 자동으로 생성되는 인스턴스의 속성이라고 나와있다. 
 
 [Auto Scale - Overview](https://docs.toast.com/en/Compute/Auto%20Scale/en/overview/)
 
@@ -86,9 +85,8 @@ TOAST의 Auto Scale를 사용하기 위해서는 먼저 인스턴스 템플릿�
 <br>
 ![07.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/07.png)
 
-Auto Scale 진행될 때마다 OS가 미리 설치되어 있는 이미지를 통해 서버가 생성되는 것을 알 수 있다.
-
-그런데 구축하고자 하는 사이트의 서버는 nginx와 같은 서버 설정 및 Judge 시스템이 미리 구축되어 있어야 한다. Auto Scale 진행할 때마다 서버 설정하고 시스템을 구축할 것은 아니지 않는가?
+Auto Scale 진행될 때마다 OS가 미리 설치되어 있는 이미지를 통해 서버가 생성된다.
+그런데 구축하고자 하는 사이트의 서버는 **nginx와 같은 서버 설정 및 Judge 시스템이 미리 구축되어 있어야 한다.** Auto Scale 진행할 때마다 서버 설정하고 시스템을 구축할 것은 아니지 않는가?
 
 이를 위해 인스턴스를 하나 생성해서 서버를 구축해놓았다가 이 서버의 이미지를 뜬 다음에, 이 이미지를 통해 인스턴스 템플릿을 만들어야 한다. 그래야 Auto Scale 진행시 이 이미지를 통해 서버를 자동 생성하고 바로 서비스를 할 수 있다.
 
@@ -132,7 +130,7 @@ VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 
 <br>
 ### 서버 이미지 생성 - 4. 인스턴스 생성 및 사이트 구축
 
-이번에 본격적으로 서버를 구축한다. 여기서 구축하고자 하는 Judge 시스템 및 서버 설정을 해놓은 후 접속 테스트를 진행한 후에 Auto Scale을 위한 서버 이미지를 생성할 것이다.
+이제 본격적으로 서버를 구축한다. 여기서 Judge 시스템 구축 및 서버 설정을 해놓고, 접속 테스트를 진행한 후에 Auto Scale을 위한 서버 이미지를 생성할 것이다.
 
 다음과 같이 사용할 OS 및 인스턴스 설정을 진행한다. **Select Flavor** 메뉴에서 인스턴스의 사양을 지정할 수 있다. 각자 사용하고자 하는 서버의 용도에 따라 지정한다.
 
@@ -195,7 +193,7 @@ VPC에서 Load Balancer를 다음과 같이 생성한다.
 <br>
 ![20.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/20.png)
 
-위의 그림을 보면 알 수 있겠지만, 네트워크 요청에 대해서 어떻게 서버들로 분배할 것인지 지정할 수 있고 health check 기능도 제공하는 것을 알 수 있다. Auto Scale의 Scaling Group에서 이 Load Balancer를 선택할 것이므로 Instance registration 에서 인스턴스는 추가하지 않고 HTTP 요청을 분배해야 하므로 80포트를 지정하였다.
+위의 그림을 보면 알 수 있겠지만, 네트워크 요청에 대해서 어떻게 서버들로 분배할 것인지 지정할 수 있고 health check 기능도 제공하는 것을 알 수 있다. Auto Scale의 Scaling Group에서 이 Load Balancer를 선택할 것이므로 Instance registration에서 인스턴스는 추가하지 않고, HTTP 요청을 분배해야 하므로 80포트를 지정하였다.
 
 그리고 다음과 같이 Floating IP를 아까 추가한 Load Balancer에 연결한다.
 
@@ -221,12 +219,12 @@ VPC에서 Load Balancer를 다음과 같이 생성한다.
 이제 Scaling Group 설정을 통해, 자원 사용율에 따라 자동으로 scale in / out 되는 서버들을 사용할 수 있다.
 Scaling Group 생성시 서버 인스턴스의 최소 / 최대 개수 및 scale in / out 되는 조건을 지정할 수 있다.
 
-다음과 같이 최소 / 최대 인스턴스 개수 및 Scaling Group 시작시 실행될 인스턴스 개수를 지정한다. 여기서는 최소 3개 / 최대 10개까지의 서버들이 생성될 것이다.
+다음과 같이 최소 / 최대 인스턴스 개수 및 Scaling Group 시작시 실행 될 인스턴스 개수를 지정한다. 여기서는 최소 3개 / 최대 10개까지의 서버들이 생성될 것이다.
 
 <br>
 ![24.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/24.png)
 
-다음으로 scale in / out 조건을 지정한다. CPU 사용율뿐만 아니라 메모리 사용량, Disk I/O, 네트워크 bandwidth 등을 지정할 수 있다. Judge 사이트는 CPU 사용율에 따라 scale in / out 할 것이므로 다음과 같이 CPU 사용율에 따라 서버 수를 조정하도록 한다. CPU 사용율이 85%가 넘어가면 인스턴스를 새로 생성하도록 하고, 30% 이하일 경우에는 인스턴스를 삭제하도록 지정하였다.
+다음으로 scale in / out 조건을 지정한다. CPU 사용율 뿐만 아니라 메모리 사용량, Disk I/O, 네트워크 bandwidth 등을 지정할 수 있다. Judge 사이트는 CPU 사용율에 따라 scale in / out 할 것이므로 다음과 같이 CPU 사용율에 따라 서버 수를 조정하도록 한다. CPU 사용율이 85%가 넘어가면 인스턴스를 새로 생성하도록 하고, 30% 이하일 경우에는 인스턴스를 삭제하도록 지정하였다.
 
 <br>
 ![25.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/25.png)
@@ -242,6 +240,14 @@ Scaling Group을 생성하면 자동으로 서버 인스턴스들이 생성되�
 ![27.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/27.png)
 
 <br>
+### Auto Scale 설정 - 4. Monitoring
+
+이렇게 생성된 서버들은 Monitoring 메뉴에서 상태를 확인할 수 있다. 그림과 같이 CPU / Memory와 같은 사용율 및 status 등을 표 및 그래프로 확인할 수 있다.
+
+<br>
+![29.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/29.png)
+
+<br>
 ## Auto Scale 테스트
 
 이제 생성된 인스턴스들에 대해 Auto Scaling이 제대로 되는지, Load Balancer는 요청을 분배하는지 테스트 진행하였다.
@@ -255,3 +261,17 @@ Scaling Group을 생성하면 자동으로 서버 인스턴스들이 생성되�
 
 <br>
 ![28.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/28.png)
+
+위의 그림을 보면 알 수 있겠지만 Load Balancer에 의해 health check도 진행되고 있는 것을 확인할 수 있다.
+
+<br>
+### Scale In / Out 테스트
+
+각 서버로 과부하를 걸어 미리 지정한 CPU 사용율을 넘을 경우 새로 인스턴스를 생성하는지 확인하였다.
+아까 구축한 Judge 사이트를 통해 알고리즘 문제 제출을 많이 요청하도록 하여 CPU 사용량에 따라 Scale In 되는지 확인하였다.
+
+<br>
+![30.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/30.png)
+
+Scaling Group에서 미리 지정한 조건들에 의해 생성된 인스턴스들을 확인할 수 있으며, 구축한 Judge 사이트에 많은 사용자들의 요청이 들어오면 서버 자원 사용율에 따라 자동으로 Auto Scaling이 진행되는 것을 예상할 수 있다.
+
