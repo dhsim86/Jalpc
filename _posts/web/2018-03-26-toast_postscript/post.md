@@ -163,7 +163,15 @@ VPC에서 Security Group을 지정한다. 용도는 쉽게 말해서 외부 <-> 
 ssh -i judge.pem ubuntu@IP_ADDRESS
 ```
 
+Judge 시스템 및 서버 설정을 하기에 앞서서, RDS for MySQL 서비스를 통해 만들어두었던 DB 인스턴스에 접속을 할 수 있는지 테스트하였다.
 
+<br>
+![17.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/17.png)
+
+DB에 이상없이 연결이 되었는 것을 확인 후, 필요한 테이블 생성 후 Judge 시스템을 구축하였다. 다음은 지금까지 작업을 한 결과로 브라우저에서 구축한 Judge 사이트에 접속한 결과이다.
+
+<br>
+![18.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/18.png)
 
 <br>
 ### 서버 이미지 생성 - 5. 서버 이미지 생성
