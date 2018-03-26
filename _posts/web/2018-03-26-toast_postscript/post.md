@@ -195,7 +195,7 @@ VPC에서 Load Balancer를 다음과 같이 생성한다.
 <br>
 ![20.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/20.png)
 
-위의 그림을 보면 알 수 있겠지만, 네트워크 요청에 대해서 어떻게 서버들로 분배할 것인지 지정할 수 있고 health check 기능도 제공하는 것을 알 수 있다. Auto Scale의 Scaling Group에서 이 Load Balancer를 선택할 것이므로 Instance registration 에서 인스턴스는 추가하지 않는다.
+위의 그림을 보면 알 수 있겠지만, 네트워크 요청에 대해서 어떻게 서버들로 분배할 것인지 지정할 수 있고 health check 기능도 제공하는 것을 알 수 있다. Auto Scale의 Scaling Group에서 이 Load Balancer를 선택할 것이므로 Instance registration 에서 인스턴스는 추가하지 않고 HTTP 요청을 분배해야 하므로 80포트를 지정하였다.
 
 그리고 다음과 같이 Floating IP를 아까 추가한 Load Balancer에 연결한다.
 
@@ -235,3 +235,23 @@ Scaling Group 생성시 서버 인스턴스의 최소 / 최대 개수 및 scale 
 
 <br>
 ![26.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/26.png)
+
+Scaling Group을 생성하면 자동으로 서버 인스턴스들이 생성되어 시작된다.
+
+<br>
+![27.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/27.png)
+
+<br>
+## Auto Scale 테스트
+
+이제 생성된 인스턴스들에 대해 Auto Scaling이 제대로 되는지, Load Balancer는 요청을 분배하는지 테스트 진행하였다.
+
+<br>
+### Load Balancer 테스트
+
+지금 생성한 서버 인스턴스들은 아까 생성해두었던 Load Balancer와 연결되어 있다. 그리고 Load Balancer를 생성했을 때 80 포트를 지정해두었으므로 Load Balancer로 HTTP 요청시 각 서버로 요청이 고르게 분배되어야 한다.
+
+브라우저로 Load Balancer IP로 접속했을 때, 각 인스턴스에 대해 제대로 요청이 가는지 nginx log를 통해 확인하였다.
+
+<br>
+![28.png](/static/assets/img/blog/web/2018-03-26-toast_postscript/28.png)
