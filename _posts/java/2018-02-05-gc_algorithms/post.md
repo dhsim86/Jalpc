@@ -123,6 +123,55 @@ JVM에서 제공하는 GC 알고리즘은 옵션을 통해 선택할 수 있으�
 <br>
 ## Serial GC
 
+이 알고리즘에서는 **Young 영역에 대해서는 Mark-Copy, Old 영역에 대해서는 Mark-Sweep-Compact 를 사용한다.** Serial GC 라는 이름을 통해 짐작할 수 있겠지만, **하나의 스레드에 의해 수행되며 Young 영역 및 Old 영역에 대한 GC는 모두 Stop-The-World 를 일으킨다.**
+
+JVM에서 이 알고리즘을 사용하기 위해서는 다음과 같이 JVM 파라미터를 설정하면 된다.
+
+```
+java -XX:+UseSerialGC com.mypackages.MyExecutableClass
+```
+
+**하나의 스레드를 통해 수행되므로, 멀티 코어의 이점을 제대로 못살린다.** CPU 코어가 몇 개이든 상관없이 이 GC를 사용할 때는 CPU 코어 하나만 사용하게 된다. 따라서 CPU가 하나인, 작은 크기의 heap 영역만 있으면 되는 환경일 때만 사용하는 것이 권장된다. 멀티코어 / 큰 크기의 메모리를 갖는, 시스템 리소스를 많이 사용할 수 있는 서버 환경에서 이 GC를 사용하는 것은 권장되지 않는다.
+
+다음은 Serial GC를 사용하였을 때의 GC log 이다.
+참고로, GC log를 확인하기 위해 다음과 같이 JVM 파라미터를 설정한다.
+```
+-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps
+```
+
+
+```
+2018-05-26T14:45:37.987-0200: 151.126: [GC (Allocation Failure) 151.126: [DefNew: 629119K->69888K(629120K), 0.0584157 secs] 1619346K->1273247K(2027264K), 0.0585007 secs] [Times: user=0.06 sys=0.00, real=0.06 secs]
+2018-05-26T14:45:59.690-0200: 172.829: [GC (Allocation Failure) 172.829: [DefNew: 629120K->629120K(629120K), 0.0000372 secs]172.829: [Tenured: 1203359K->755802K(1398144K), 0.1855567 secs] 1832479K->755802K(2027264K), [Metaspace: 6741K->6741K(1056768K)], 0.1856954 secs] [Times: user=0.18 sys=0.00, real=0.18 secs]
+```
+
+단 두 줄밖에 되지 않는 로그이지만 많은 정보를 가지고 있다. 위 로그를 통해 두 번의 GC가 일어났다는 것을 알 수 있는데, 하나는 Young 영역에 대한 GC (Minor GC)이고 다른 하나는 heap 영역 전체에 대한 GC (Full GC)이다.
+
+<br>
+### Minor GC
+
+```
+2018-05-26T14:45:37.987-0200: 151.126: [GC (Allocation Failure) 151.126: [DefNew: 629119K->69888K(629120K), 0.0584157 secs] 1619346K->1273247K(2027264K), 0.0585007 secs] [Times: user=0.06 sys=0.00, real=0.06 secs]
+```
+
+다음은 이 로그에서 알 수 있는 내용들이다.
+
+1. [2018-05-26T14:45:37.987-0200]: GC 시작 시간
+2. [151.126]: GC가 일어났을 때의 JVM start-up 시간 (in second)
+3. [Allocation Failure]: GC가 일어난 이유이다. Young 영역에서 새로운 객체 할당을 실패하여 일어난 것이다.
+4. [DefNew]: Garbage collector의 이름인데, stop-the-world를 일으키고 하나의 스레드에 의해 수행되는 mark-copy 알고리즘을 사용한다.
+5. [629119K->69888K]: GC 일어나기 전 후의 Young 영역의 사용량
+6. [(629120K)]: Young 영역의 전체 크기
+7. [1619346K->1273247K]: GC 일어나기 전 후의 Heap 영역의 사용량
+8. [(2027264K)]: Heap 영역의 전체 크기
+9. [0.0585007 secs]: GC가 수행된 시간
+10. [Times: user=0.06 sys=0.00, real=0.06 secs]: GC가 수행된 시간으로 종류에 따라 구분한 것이다.
+    1. user: 전체  
+
+
+<br>
+### Full GC
+
 <br>
 ## Parallel GC
 
