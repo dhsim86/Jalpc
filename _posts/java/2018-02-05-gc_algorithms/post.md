@@ -141,8 +141,8 @@ java -XX:+UseSerialGC com.mypackages.MyExecutableClass
 
 
 ```
-2018-05-26T14:45:37.987-0200: 151.126: [GC (Allocation Failure) 151.126: [DefNew: 629119K->69888K(629120K), 0.0584157 secs] 1619346K->1273247K(2027264K), 0.0585007 secs] [Times: user=0.06 sys=0.00, real=0.06 secs]
-2018-05-26T14:45:59.690-0200: 172.829: [GC (Allocation Failure) 172.829: [DefNew: 629120K->629120K(629120K), 0.0000372 secs]172.829: [Tenured: 1203359K->755802K(1398144K), 0.1855567 secs] 1832479K->755802K(2027264K), [Metaspace: 6741K->6741K(1056768K)], 0.1856954 secs] [Times: user=0.18 sys=0.00, real=0.18 secs]
+2017-01-26T14:45:37.987-0200: 151.126: [GC (Allocation Failure) 151.126: [DefNew: 629119K->69888K(629120K), 0.0584157 secs] 1619346K->1273247K(2027264K), 0.0585007 secs] [Times: user=0.06 sys=0.00, real=0.06 secs]
+2017-01-26T14:45:59.690-0200: 172.829: [GC (Allocation Failure) 172.829: [DefNew: 629120K->629120K(629120K), 0.0000372 secs]172.829: [Tenured: 1203359K->755802K(1398144K), 0.1855567 secs] 1832479K->755802K(2027264K), [Metaspace: 6741K->6741K(1056768K)], 0.1856954 secs] [Times: user=0.18 sys=0.00, real=0.18 secs]
 ```
 
 단 두 줄밖에 되지 않는 로그이지만 많은 정보를 가지고 있다. 위 로그를 통해 두 번의 GC가 일어났다는 것을 알 수 있는데, 하나는 Young 영역에 대한 GC (Minor GC)이고 다른 하나는 heap 영역 전체에 대한 GC (Full GC)이다.
@@ -151,15 +151,15 @@ java -XX:+UseSerialGC com.mypackages.MyExecutableClass
 ### Minor GC
 
 ```
-2018-05-26T14:45:37.987-0200: 151.126: [GC (Allocation Failure) 151.126: [DefNew: 629119K->69888K(629120K), 0.0584157 secs] 1619346K->1273247K(2027264K), 0.0585007 secs] [Times: user=0.06 sys=0.00, real=0.06 secs]
+2017-01-26T14:45:37.987-0200: 151.126: [GC (Allocation Failure) 151.126: [DefNew: 629119K->69888K(629120K), 0.0584157 secs] 1619346K->1273247K(2027264K), 0.0585007 secs] [Times: user=0.06 sys=0.00, real=0.06 secs]
 ```
 
 다음은 이 로그에서 알 수 있는 내용들이다.
 
 <div class="code-line-wrap">
-<p class="code-line"><span class="node">2015-05-26T14:45:37.987-0200<sup>1</sup></span>:<span class="node">151.126<sup>2</sup></span>:[<span class="node">GC<sup>3</sup></span>(<span class="node">Allocation Failure<sup>4</sup></span>) 151.126: [<span class="node">DefNew<sup>5</sup></span>:<span class="node">629119K-&gt;69888K<sup>6</sup></span><span class="node">(629120K)<sup>7</sup></span>, 0.0584157 secs]<span class="node">1619346K-&gt;1273247K<sup>8</sup></span><span class="node">(2027264K)<sup>9</sup></span>,<span class="node">0.0585007 secs<sup>10</sup></span>]<span class="node">[Times: user=0.06 sys=0.00, real=0.06 secs]<sup>11</sup></span></p>
+<p class="code-line"><span class="node">2017-01-26T14:45:37.987-0200<sup>1</sup></span>:<span class="node">151.126<sup>2</sup></span>:[<span class="node">GC<sup>3</sup></span>(<span class="node">Allocation Failure<sup>4</sup></span>) 151.126: [<span class="node">DefNew<sup>5</sup></span>:<span class="node">629119K-&gt;69888K<sup>6</sup></span><span class="node">(629120K)<sup>7</sup></span>, 0.0584157 secs]<span class="node">1619346K-&gt;1273247K<sup>8</sup></span><span class="node">(2027264K)<sup>9</sup></span>,<span class="node">0.0585007 secs<sup>10</sup></span>]<span class="node">[Times: user=0.06 sys=0.00, real=0.06 secs]<sup>11</sup></span></p>
 <ol class="code-line-components">
-<li class="description"><span class="node">2015-05-26T14:45:37.987-0200</span> –GC가 일어난 시간</li>
+<li class="description"><span class="node">2017-01-26T14:45:37.987-0200</span> –GC가 일어난 시간</li>
 <li class="description"><span class="node">151.126</span> – GC가 일어났을 때, JVM이 수행된 시간</li>
 <li class="description"><span class="node">GC</span> – Minor GC / Full GC를 구분하는 플래그, 여기서는 Minor GC를 의미한다.</li>
 <li class="description"><span class="node">Allocation Failure</span> – GC가 일어난 원인, 여기서는 Young 영역에서 새로운 객체를 생성하기 위한 공간이 부족해서 발생한 것이다. </li>
@@ -194,15 +194,15 @@ GC가 일어난 후, Young 영역은 559,231K 의 빈 공간을 확보하였는�
 다음 2번째 줄의 로그는 Full GC에 대한 로그이다.
 
 ```
-2018-05-26T14:45:59.690-0200: 172.829: [GC (Allocation Failure) 172.829: [DefNew: 629120K->629120K(629120K), 0.0000372 secs]172.829: [Tenured: 1203359K->755802K(1398144K), 0.1855567 secs] 1832479K->755802K(2027264K), [Metaspace: 6741K->6741K(1056768K)], 0.1856954 secs] [Times: user=0.18 sys=0.00, real=0.18 secs]
+2017-01-26T14:45:59.690-0200: 172.829: [GC (Allocation Failure) 172.829: [DefNew: 629120K->629120K(629120K), 0.0000372 secs]172.829: [Tenured: 1203359K->755802K(1398144K), 0.1855567 secs] 1832479K->755802K(2027264K), [Metaspace: 6741K->6741K(1056768K)], 0.1856954 secs] [Times: user=0.18 sys=0.00, real=0.18 secs]
 ```
 
 <div class="code-line-wrap">
-<p class="code-line"><span class="node">2015-05-26T14:45:59.690-0200<sup>1</sup></span>: <span class="node">172.829<sup>2</sup></span>:[GC (Allocation Failure) 172.829:<span class="node"> [DefNew: 629120K-&gt;629120K(629120K), 0.0000372 secs<sup>3</sup></span>]172.829:[<span class="node">Tenured<sup>4</sup></span>: <span class="node">1203359K-&gt;755802K <sup>5</sup></span><span class="node">(1398144K) <sup>6</sup></span>,<span class="node">0.1855567 secs<sup>7</sup></span>] <span class="node">1832479K-&gt;755802K<sup>8</sup></span><span class="node">(2027264K)<sup>9</sup></span>,<span class="node">[Metaspace: 6741K-&gt;6741K(1056768K)]<sup>10</sup></span> <span class="node">[Times: user=0.18 sys=0.00, real=0.18 secs]<sup>11</sup></span></p>
+<p class="code-line"><span class="node">2017-01-26T14:45:59.690-0200<sup>1</sup></span>: <span class="node">172.829<sup>2</sup></span>:[GC (Allocation Failure) 172.829:<span class="node"> [DefNew: 629120K-&gt;629120K(629120K), 0.0000372 secs<sup>3</sup></span>]172.829:[<span class="node">Tenured<sup>4</sup></span>: <span class="node">1203359K-&gt;755802K <sup>5</sup></span><span class="node">(1398144K) <sup>6</sup></span>,<span class="node">0.1855567 secs<sup>7</sup></span>] <span class="node">1832479K-&gt;755802K<sup>8</sup></span><span class="node">(2027264K)<sup>9</sup></span>,<span class="node">[Metaspace: 6741K-&gt;6741K(1056768K)]<sup>10</sup></span> <span class="node">[Times: user=0.18 sys=0.00, real=0.18 secs]<sup>11</sup></span></p>
 <ol class="code-line-components">
-<li class="description"><span class="node">2015-05-26T14:45:59.690-0200</span> – GC가 일어난 시간</li>
+<li class="description"><span class="node">2017-01-26T14:45:59.690-0200</span> – GC가 일어난 시간</li>
 <li class="description"><span class="node">172.829</span> – GC가 일어났을 때, JVM이 수행된 시간</li>
-<li class="description"><span class="node">[DefNew: 629120K-&gt;629120K(629120K), 0.0000372 secs</span> –이전 로그와 비슷하게 Young 영역에 대한 GC가 일어났다. 그런데 이 로그에서 봤을 때는 "DefNew" collector가 Young 영역을 깨끗이 비운 것처럼 보인다. 그러나 이 로그에서 JVM은 버그로 인해 잘못 리포트한 것이며, 실제로는 Young 영역이 가득차 있다.</li>
+<li class="description"><span class="node">[DefNew: 629120K-&gt;629120K(629120K), 0.0000372 secs</span> –이전 로그와 비슷하게 Young 영역에 대한 GC가 일어났다. 그런데 사실은 이전 로그에서 알 수 있듯이 Young 영역에 대한 GC가 일어났었기 때문에, 이미 이 시간 때의 Young 영역은 이미 비워져 있다. 이는 JVM의 버그로 Young 영역이 가득차 있는 것처럼 리포트한 것이다. 이 GC가 걸린 시간이 "0.0000372 초"가 걸린 것을 보면 알 수 있을 것이다.</li>
 <li class="description"><span class="node">Tenured</span> – Old 영역에 대한 Garbage Collector의 이름이다. 이 Collector도 또한 싱글 스레드 기반이며, Mark-Sweep-Compact / Stop-The-World 이다.</li>
 <li class="description"><span class="node">1203359K-&gt;755802K </span> – GC 전후의 Old 영역의 사용량</li>
 <li class="description"><span class="node">(1398144K) </span> – Old 영역의 전체 크기</li>
