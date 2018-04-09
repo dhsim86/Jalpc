@@ -251,7 +251,9 @@ function codeLine() {
 				$(this).closest('.code-line-wrap').removeClass('description-highlighted').find('.hover').removeClass('hover');
 			})
 }
-
+jQuery(function () {
+    codeLine();
+})
 </script>
 <br>
 ### Full GC
