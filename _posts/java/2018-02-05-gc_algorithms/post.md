@@ -227,6 +227,32 @@ ol li, ul li {
 }
 </style>
 
+<script>
+function codeLine() {
+	$('.code-line .node, .code-line-components li.description')
+		.hover(function () {
+
+				var node = $(this),
+					wrap = node.closest('.code-line-wrap'),
+					lineWrap = wrap.find('.code-line'),
+					listWrap = wrap.find('.code-line-components'),
+					id = node.closest('.code-line').length ? lineWrap.find('span').index(node) : listWrap.find('li').index(node);
+
+				wrap
+					.addClass('description-highlighted')
+					.find('.hover')
+					.removeClass('hover');
+				lineWrap.find('.node:eq(' + id + ')').addClass('hover');
+				listWrap.find('li.description:eq(' + id + ')').addClass('hover');
+
+
+			},
+			function () {
+				$(this).closest('.code-line-wrap').removeClass('description-highlighted').find('.hover').removeClass('hover');
+			})
+}
+
+</script>
 <br>
 ### Full GC
 
