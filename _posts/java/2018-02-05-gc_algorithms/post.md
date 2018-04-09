@@ -159,25 +159,36 @@ java -XX:+UseSerialGC com.mypackages.MyExecutableClass
 <div class="code-line-wrap">
 <p class="code-line"><span class="node">2015-05-26T14:45:37.987-0200<sup>1</sup></span>:<span class="node">151.126<sup>2</sup></span>:[<span class="node">GC<sup>3</sup></span>(<span class="node">Allocation Failure<sup>4</sup></span>) 151.126: [<span class="node">DefNew<sup>5</sup></span>:<span class="node">629119K-&gt;69888K<sup>6</sup></span><span class="node">(629120K)<sup>7</sup></span>, 0.0584157 secs]<span class="node">1619346K-&gt;1273247K<sup>8</sup></span><span class="node">(2027264K)<sup>9</sup></span>,<span class="node">0.0585007 secs<sup>10</sup></span>]<span class="node">[Times: user=0.06 sys=0.00, real=0.06 secs]<sup>11</sup></span></p>
 <ol class="code-line-components">
-<li class="description"><span class="node">2015-05-26T14:45:37.987-0200</span> – Time when the GC event started.</li>
-<li class="description"><span class="node">151.126</span> – Time when the GC event started, relative to the JVM startup time. Measured in seconds.</li>
-<li class="description"><span class="node">GC</span> – Flag to distinguish between Minor &amp; Full GC. This time it is indicating that this was a Minor GC.</li>
-<li class="description"><span class="node">Allocation Failure</span> – Cause of the collection. In this case, the GC is triggered due to a data structure not fitting into any region in the Young Generation.</li>
-<li class="description"><span class="node">DefNew</span> – Name of the garbage collector used. This cryptic name stands for the single-threaded mark-copy stop-the-world garbage collector used to clean Young generation.</li>
-<li class="description"><span class="node">629119K-&gt;69888K</span> – Usage of the Young Generation before and after collection.</li>
-<li class="description"><span class="node">(629120K)</span> – Total size of the Young Generation.</li>
-<li class="description"><span class="node">1619346K-&gt;1273247K</span> – Total used heap before and after collection.</li>
-<li class="description"><span class="node">(2027264K)</span> – Total available heap.</li>
-<li class="description"><span class="node">0.0585007 secs</span> – Duration of the GC event in seconds.</li>
-<li class="description"><span class="node">[Times: user=0.06 sys=0.00, real=0.06 secs]</span> – Duration of the GC event, measured in different categories:
+<li class="description"><span class="node">2015-05-26T14:45:37.987-0200</span> –GC가 일어난 시간</li>
+<li class="description"><span class="node">151.126</span> – GC가 일어났을 때, JVM이 수행된 시간</li>
+<li class="description"><span class="node">GC</span> – Minor GC / Full GC를 구분하는 플래그, 여기서는 Minor GC를 의미한다.</li>
+<li class="description"><span class="node">Allocation Failure</span> – GC가 일어난 원인, 여기서는 Young 영역에서 새로운 객체를 생성하기 위한 공간이 부족해서 발생한 것이다. </li>
+<li class="description"><span class="node">DefNew</span> – Garbage Collector의 이름. 이 Collector는 Young 영역에 대한 GC를 수행하는데, 싱글 스레드 기반 / Mark-Copy / Stop-The-World 이다.</li>
+<li class="description"><span class="node">629119K-&gt;69888K</span> – GC 전후의 Young 영역의 사용량</li>
+<li class="description"><span class="node">(629120K)</span> – Young 영역의 전체 크기</li>
+<li class="description"><span class="node">1619346K-&gt;1273247K</span> – GC 전후의 Heap 영역의 사용량</li>
+<li class="description"><span class="node">(2027264K)</span> – Heap 영역의 전체 크기</li>
+<li class="description"><span class="node">0.0585007 secs</span> – GC가 수행된 시간 (초)</li>
+<li class="description"><span class="node">[Times: user=0.06 sys=0.00, real=0.06 secs]</span> – GC가 수행된 시간인데, 각 시간은 다음과 같다.:
 <ul>
-<li>user – Total CPU time that was consumed by the garbage collector threads during this collection</li>
-<li>sys – Time spent in OS calls or waiting for system event</li>
-<li>real – Clock time for which your application was stopped. As Serial Garbage Collector always uses just a single thread, real time is thus equal to the sum of user and system times.</li>
+<li>user – GC가 진행되는 동안 Garbage Collector에 의해 수행된 CPU 시간이다.</li>
+<li>sys – System Call과 같이 OS가 수행하거나 기다린 시간이다.</li>
+<li>real – 애플리케이션이 GC로 인해 멈춘 시간이다. Serial GC는 싱글 스레드 기반의 Stop-The-World를 일으키는 GC이므로, 이 시간은 user 와 sys 시간을 합친 것과 같다. </li>
 </ul>
 </li>
 </ol>
 </div>
+
+<br>
+### Full GC
+
+<br>
+## Parallel GC
+
+<br>
+## Concurrent Mark and Sweep
+
+## G1
 
 <style>
 ol li, ul li {
@@ -226,22 +237,3 @@ ol li, ul li {
     border: 0 solid #fff;
 }
 </style>
-
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jquery.min.js" />
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jquery-ui-1.10.4.custom.min.js" />
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jstz.min.js" />
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/typeahead.bundle.min.js" />
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/prettify.js" />
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/olark.js" />
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/custom.js" />
-
-<br>
-### Full GC
-
-<br>
-## Parallel GC
-
-<br>
-## Concurrent Mark and Sweep
-
-## G1
