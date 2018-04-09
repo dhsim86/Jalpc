@@ -227,13 +227,13 @@ ol li, ul li {
 }
 </style>
 
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jquery.min.js">
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jquery-ui-1.10.4.custom.min.js">
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jstz.min.js">
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/typeahead.bundle.min.js">
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/prettify.js">
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/olark.js">
-<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/custom.js">
+<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jquery.min.js" />
+<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jquery-ui-1.10.4.custom.min.js" />
+<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/jstz.min.js" />
+<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/typeahead.bundle.min.js" />
+<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/prettify.js" />
+<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/olark.js" />
+<script type="text/javascript" src="/static/js/blog/java/2018-02-05-gc_algorithms/custom.js" />
 
 <br>
 ### Full GC
