@@ -191,6 +191,40 @@ GC가 일어난 후, Young 영역은 559,231K 의 빈 공간을 확보하였는�
 <br>
 ### Full GC
 
+다음 2번째 줄의 로그는 Full GC에 대한 로그이다.
+
+```
+2018-05-26T14:45:59.690-0200: 172.829: [GC (Allocation Failure) 172.829: [DefNew: 629120K->629120K(629120K), 0.0000372 secs]172.829: [Tenured: 1203359K->755802K(1398144K), 0.1855567 secs] 1832479K->755802K(2027264K), [Metaspace: 6741K->6741K(1056768K)], 0.1856954 secs] [Times: user=0.18 sys=0.00, real=0.18 secs]
+```
+
+<div class="code-line-wrap">
+<p class="code-line"><span class="node">2015-05-26T14:45:59.690-0200<sup>1</sup></span>: <span class="node">172.829<sup>2</sup></span>:[GC (Allocation Failure) 172.829:<span class="node"> [DefNew: 629120K-&gt;629120K(629120K), 0.0000372 secs<sup>3</sup></span>]172.829:[<span class="node">Tenured<sup>4</sup></span>: <span class="node">1203359K-&gt;755802K <sup>5</sup></span><span class="node">(1398144K) <sup>6</sup></span>,<span class="node">0.1855567 secs<sup>7</sup></span>] <span class="node">1832479K-&gt;755802K<sup>8</sup></span><span class="node">(2027264K)<sup>9</sup></span>,<span class="node">[Metaspace: 6741K-&gt;6741K(1056768K)]<sup>10</sup></span> <span class="node">[Times: user=0.18 sys=0.00, real=0.18 secs]<sup>11</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">2015-05-26T14:45:59.690-0200</span> – GC가 일어난 시간</li>
+<li class="description"><span class="node">172.829</span> – GC가 일어났을 때, JVM이 수행된 시간</li>
+<li class="description"><span class="node">[DefNew: 629120K-&gt;629120K(629120K), 0.0000372 secs</span> –이전 로그와 비슷하게 Young 영역에 대한 GC가 일어났다. 그런데 이 로그에서 봤을 때는 "DefNew" collector가 Young 영역을 깨끗이 비운 것처럼 보인다. 그러나 이 로그에서 JVM은 버그로 인해 잘못 리포트한 것이며, 실제로는 Young 영역이 가득차 있다.</li>
+<li class="description"><span class="node">Tenured</span> – Old 영역에 대한 Garbage Collector의 이름이다. 이 Collector도 또한 싱글 스레드 기반이며, Mark-Sweep-Compact / Stop-The-World 이다.</li>
+<li class="description"><span class="node">1203359K-&gt;755802K </span> – GC 전후의 Old 영역의 사용량</li>
+<li class="description"><span class="node">(1398144K) </span> – Old 영역의 전체 크기</li>
+<li class="description"><span class="node">0.1855567 secs</span> – Old 영역을 청소하는데 걸린 시간</li>
+<li class="description"><span class="node">1832479K-&gt;755802K</span> – Young / Old 영역에 대한 GC 전후의 Heap 사용량</li>
+<li class="description"><span class="node">(2027264K)</span> – Heap 영역의 전체 크기</li>
+<li class="description"><span class="node">[Metaspace: 6741K-&gt;6741K(1056768K)]</span> – Metaspace 영역에 대한 정보이다. 여기서는 이 영역에 대해 GC는 수행되지 않았다.</li>
+<li class="description"><span class="node">[Times: user=0.18 sys=0.00, real=0.18 secs]</span> – GC가 수행된 시간인데, 각 시간은 다음과 같다.:
+<ul>
+<li>user – GC가 진행되는 동안 Garbage Collector에 의해 수행된 CPU 시간이다.</li>
+<li>sys – System Call과 같이 OS가 수행하거나 기다린 시간이다.</li>
+<li>real – 애플리케이션이 GC로 인해 멈춘 시간이다. Serial GC는 싱글 스레드 기반의 Stop-The-World를 일으키는 GC이므로, 이 시간은 user 와 sys 시간을 합친 것과 같다. </li>
+</ul>
+</li>
+</ol>
+</div>
+
+Minor GC 때와는 다른데, Young 영역 뿐만 아니라 Old 영역 및 Metaspace 영역에 대해서도 GC를 수행한다. GC 전후의 메모리 레이아웃은 다음 그림과 비슷할 것이다.
+
+<br>
+![05.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/05.png)
+
 <br>
 ## Parallel GC
 
