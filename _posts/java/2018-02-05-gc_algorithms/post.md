@@ -227,6 +227,7 @@ ol li, ul li {
 }
 </style>
 
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" />
 <script>
 function bubbleAgentPosition() {
 	jQuery('.bubble-agent .bubble').hover(function () {
@@ -1500,7 +1501,6 @@ jQuery(function () {
 	jQuery('.introduction').each(function () {
 		jQuery(this).find('[class*="col"]').equalHeights();
 	});
-
 });
 </script>
 <br>
