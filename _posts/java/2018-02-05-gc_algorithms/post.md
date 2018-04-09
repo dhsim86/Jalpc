@@ -179,6 +179,15 @@ java -XX:+UseSerialGC com.mypackages.MyExecutableClass
 </ol>
 </div>
 
+위의 로그를 통해 해당 GC 이벤트 전후로 Memory 사용량이 어떻게 변화하였는지 알 수 있다.
+GC가 일어나기 전에는 Heap 영역의 사용량이 1,619,346K 이었다. 그리고 Young 영역의 사용량은 629,119K 인 것으로 보아, **Old 영역은 990,227K 이다.**
+
+GC가 일어난 후, Young 영역은 559,231K 의 빈 공간을 확보하였는데,  Heap 영역의 사용량은 346,099K 밖에 줄어들지 않았다.
+**이를 통해 213,132K 만큼의 오브젝트들이 Young 영역에서 Old 영역으로 이동하였다는 것을 알 수 있다.**
+
+<br>
+![04.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/04.png)
+
 <br>
 ### Full GC
 
