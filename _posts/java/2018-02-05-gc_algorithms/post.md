@@ -156,18 +156,76 @@ java -XX:+UseSerialGC com.mypackages.MyExecutableClass
 
 다음은 이 로그에서 알 수 있는 내용들이다.
 
-1. [2018-05-26T14:45:37.987-0200]: GC 시작 시간
-2. [151.126]: GC가 일어났을 때의 JVM start-up 시간 (in second)
-3. [Allocation Failure]: GC가 일어난 이유이다. Young 영역에서 새로운 객체 할당을 실패하여 일어난 것이다.
-4. [DefNew]: Garbage collector의 이름인데, stop-the-world를 일으키고 하나의 스레드에 의해 수행되는 mark-copy 알고리즘을 사용한다.
-5. [629119K->69888K]: GC 일어나기 전 후의 Young 영역의 사용량
-6. [(629120K)]: Young 영역의 전체 크기
-7. [1619346K->1273247K]: GC 일어나기 전 후의 Heap 영역의 사용량
-8. [(2027264K)]: Heap 영역의 전체 크기
-9. [0.0585007 secs]: GC가 수행된 시간
-10. [Times: user=0.06 sys=0.00, real=0.06 secs]: GC가 수행된 시간으로 종류에 따라 구분한 것이다.
-    1. user: 전체  
+<div class="code-line-wrap">
+<p class="code-line"><span class="node">2015-05-26T14:45:37.987-0200<sup>1</sup></span>:<span class="node">151.126<sup>2</sup></span>:[<span class="node">GC<sup>3</sup></span>(<span class="node">Allocation Failure<sup>4</sup></span>) 151.126: [<span class="node">DefNew<sup>5</sup></span>:<span class="node">629119K-&gt;69888K<sup>6</sup></span><span class="node">(629120K)<sup>7</sup></span>, 0.0584157 secs]<span class="node">1619346K-&gt;1273247K<sup>8</sup></span><span class="node">(2027264K)<sup>9</sup></span>,<span class="node">0.0585007 secs<sup>10</sup></span>]<span class="node">[Times: user=0.06 sys=0.00, real=0.06 secs]<sup>11</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">2015-05-26T14:45:37.987-0200</span> – Time when the GC event started.</li>
+<li class="description"><span class="node">151.126</span> – Time when the GC event started, relative to the JVM startup time. Measured in seconds.</li>
+<li class="description"><span class="node">GC</span> – Flag to distinguish between Minor &amp; Full GC. This time it is indicating that this was a Minor GC.</li>
+<li class="description"><span class="node">Allocation Failure</span> – Cause of the collection. In this case, the GC is triggered due to a data structure not fitting into any region in the Young Generation.</li>
+<li class="description"><span class="node">DefNew</span> – Name of the garbage collector used. This cryptic name stands for the single-threaded mark-copy stop-the-world garbage collector used to clean Young generation.</li>
+<li class="description"><span class="node">629119K-&gt;69888K</span> – Usage of the Young Generation before and after collection.</li>
+<li class="description"><span class="node">(629120K)</span> – Total size of the Young Generation.</li>
+<li class="description"><span class="node">1619346K-&gt;1273247K</span> – Total used heap before and after collection.</li>
+<li class="description"><span class="node">(2027264K)</span> – Total available heap.</li>
+<li class="description"><span class="node">0.0585007 secs</span> – Duration of the GC event in seconds.</li>
+<li class="description"><span class="node">[Times: user=0.06 sys=0.00, real=0.06 secs]</span> – Duration of the GC event, measured in different categories:
+<ul>
+<li>user – Total CPU time that was consumed by the garbage collector threads during this collection</li>
+<li>sys – Time spent in OS calls or waiting for system event</li>
+<li>real – Clock time for which your application was stopped. As Serial Garbage Collector always uses just a single thread, real time is thus equal to the sum of user and system times.</li>
+</ul>
+</li>
+</ol>
+</div>
 
+<style>
+ol li, ul li {
+    min-height: 1px;
+    vertical-align: bottom;
+}
+
+.code-line-wrap {
+    margin: 30px 0;
+    border-left: 3px solid #ddd;
+    border-radius: 3px;
+}
+.code-line {
+    margin: 0;
+    padding: 10px;
+    background: #faf8f6;
+    color: #009cd5;
+    line-height: 24px;
+    text-shadow: 0 1px 0 #fff;
+    font-family: consolas,"courier new",monospace;
+    overflow: auto;
+}
+.code-line-wrap span.node {
+    display: inline-block;
+    padding: 0 3px;
+    line-height: 18px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #fff;
+    color: #009cd5;
+    white-space: nowrap;
+    font-family: consolas,"courier new",monospace;
+}
+.code-line-wrap ol {
+    line-height: 20px;
+}
+.code-line-components {
+    margin-left: 0;
+    padding: 0 0 20px 3.038em;
+    overflow: auto;
+}
+.code-line-wrap ol li {
+    padding: 2px 5px;
+    position: relative;
+    transition-duration: 0.2s;
+    border: 0 solid #fff;
+}
+</style>
 
 <br>
 ### Full GC
