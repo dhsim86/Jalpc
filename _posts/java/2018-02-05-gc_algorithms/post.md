@@ -422,7 +422,7 @@ GC가 수행된 후, Young 영역의 사용량은 545,336K 가 줄었지만 Heap
 <br>
 ### Full GC
 
-다음 로그를 보면 알 수 있게지만 Serial GC나 Parallel GC와는 로그 형식이 완전히 다르다.
+다음 로그를 보면 알 수 있겠지만 Serial GC나 Parallel GC와는 로그 형식이 완전히 다르다.
 이 로그들은 Old 영역에 대해 GC를 수행하는, CMS GC의 각 단계에 대한 로그들이다.
 
 ```
