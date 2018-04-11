@@ -314,7 +314,7 @@ GC가 수행되고 난 후에, Young 영역의 사용량은 1,389,308K 가 줄�
 <li class="description"><span class="node">8438926K-&gt;6597672K</span> – Young / Old 영역에 대한 GC 전후의 Heap 사용량</li>
 <li class="description"><span class="node">(11185152K)</span> – Heap 영역의 전체 크기</li>
 <li class="description"><span class="node">[Metaspace: 6745K-&gt;6745K(1056768K)] </span> – Metaspace 영역에 대한 정보이다. 여기서 이 영역으로부터 회수된 메모리 공간은 없다.</li>
-<li class="description"><span class="node">0.9158801 secs</span> – Duration of the GC event in seconds</li>
+<li class="description"><span class="node">0.9158801 secs</span> – GC가 수행된 시간 (초)</li>
 <li class="description"><span class="node">[Times: user=4.49 sys=0.64, real=0.92 secs]</span> – GC가 수행된 시간인데, 각 시간은 다음과 같다:
 <ul>
 <li>user – GC가 진행되는 동안 Garbage Collector에 의해 수행된 CPU 시간이다.</li>
