@@ -287,7 +287,7 @@ Parallel GC는 **애플리케이션의 Throughput이 아주 중요할 때 고려
 </div>
 
 GC가 수행되기 전의 Heap 사용량은 9,556,775K 였는데, 이 중 Young 영역의 사용량은 2,694,440K 이다. 이는 GC가 수행되기 전, Old 영역의 사용량은 6,862,335K 라는 것을 의미한다.
-GC가 수행되고 난 후에, Young 영역의 사용량은 1,389,308K 가 줄었지만 Heap 영역의 사용량은 1,117,849K 밖에 줄어들지 않았다. 이를 통해 나머지 271,459K 크기에 해당하는 객체들은
+GC가 수행되고 난 후에 Young 영역의 사용량은 1,389,308K 가 줄었지만 Heap 영역의 사용량은 1,117,849K 밖에 줄어들지 않았다. 이를 통해 나머지 271,459K 크기에 해당하는 객체들은
 모두 Young 영역에서 Old 영역으로 이동하였다는 것을 알 수 있다.
 
 <br>
@@ -303,7 +303,7 @@ GC가 수행되고 난 후에, Young 영역의 사용량은 1,389,308K 가 줄�
 <div class="code-line-wrap">
 <p class="code-line"><span class="node">2018-01-26T14:27:41.155-0200<sup>1</sup></span>:<span class="node">116.356<sup>2</sup></span>:[<span class="node">Full GC<sup>3</sup></span> (<span class="node">Ergonomics<sup>4</sup></span>)<span class="node">[PSYoungGen: 1305132K-&gt;0K(2796544K)]<sup>5</sup></span>[<span class="node">ParOldGen<sup>6</sup></span>:<span class="node">7133794K-&gt;6597672K <sup>7</sup></span><span class="node">(8388608K)<sup>8</sup></span>] <span class="node">8438926K-&gt;6597672K<sup>9</sup></span><span class="node">(11185152K)<sup>10</sup></span>, <span class="node">[Metaspace: 6745K-&gt;6745K(1056768K)] <sup>11</sup></span>, <span class="node">0.9158801 secs<sup>12</sup></span>, <span class="node">[Times: user=4.49 sys=0.64, real=0.92 secs]<sup>13</sup></span></p>
 <ol class="code-line-components">
-<li class="description"><span class="node">2018-05-26T14:27:41.155-0200</span> – GC가 일어난 시간</li>
+<li class="description"><span class="node">2018-01-26T14:27:41.155-0200</span> – GC가 일어난 시간</li>
 <li class="description"><span class="node">116.356</span> – GC가 일어났을 때, JVM이 수행된 시간이다. 여기서는 아까 전의 Minor GC가 일어난 후 바로 시작된 것을 알 수 있다.</li>
 <li class="description"><span class="node">Full GC</span> – Young 영역 및 Old 영역에 대해서 수행하는 Full GC를 가리키는 플래그이다.</li>
 <li class="description"><span class="node">Ergonomics</span> – GC가 일어난 원인으로, 여기서는 JVM 내부 조건으로 인해 트리거되었음을 의미한다.</li>
@@ -335,7 +335,8 @@ GC가 수행되고 난 후에, Young 영역의 사용량은 1,389,308K 가 줄�
 
 이 GC의 공식적인 이름은 **"Mostly Concurrent Mark and Sweep Garbage Collector"** 이다.
 Young 영역에 대해서는 Parallel GC와 마찬가지로 mark-copy 알고리즘을 사용하며 stop-the-world를 일으킨다. 또한 멀티 스레드를 통해 병렬적으로 수행된다.
-**Old 영역에 대해서는 mark-sweep 알고리즘을 사용하는데, GC의 모든 로직들이 애플리케이션 스레드와 "거의" 동시에 수행된다. (Monstly Concurrent)**
+
+**Old 영역에 대해서는 mark-sweep 알고리즘을 사용하는데, GC의 대부분 로직들이 애플리케이션 스레드와 "거의" 동시에 수행된다. (Monstly Concurrent)**
 
 이 GC는 Old 영역에 대한 GC가 발생할 때, 애플리케이션 스레드가 장시간 멈추는 것을 되도록 피하고자 디자인된 것이다.
 다음 두 가지 방법을 통해, 애플리케이션 스레드가 멈추는 것을 막는다.
@@ -343,7 +344,8 @@ Young 영역에 대해서는 Parallel GC와 마찬가지로 mark-copy 알고리�
 1. Old 영역에 대해서 compaction을 수행하지 않고, 객체를 할당할 수 있는 공간을 관리하는 자료구조 (free-list)를 따로 관리한다. compaction도 객체 복사가 일어나므로 애플리케이션 스레드를 멈추게 된다.
 2. Mark와 sweep 단계에서는 특정 단계빼고는 애플리케이션 스레드와 병렬적으로 수행된다.
 
-이 의미는 애플리케이션 스레드가 GC로 인해 멈추는 시간을 현저히 줄일 수 있다는 것이다. 
+이 의미는 애플리케이션 스레드가 GC로 인해 멈추는 시간을 현저히 줄일 수 있다는 것이다.
+
 당연히 GC를 수행하기 위해서는 CPU 코어를 사용하게 되므로 애플리케이션 스레드와 CPU 자원을 얻기 위해 경쟁하게 된다. 기본적으로 이 GC를 위해 수행되는 스레드 개수는 실제 환경의 CPU 코어 개수의 1/4 이다.
 
 이 GC를 수행하기 위해 다음과 같이 JVM 파라미터를 사용한다.
@@ -353,8 +355,9 @@ java -XX:+UseConcMarkSweepGC com.mypackages.MyExecutableClass
 ```
 
 Parallel GC와는 다르게, **Latency가 중요할 때는 애플리케이션 스레드의 멈춤을 되도록 피하는 이 GC를 고려해볼 수 있다.**
-애플리케이션 스레드와 병렬적으로 수행되는 단계가 있는 이 GC를 사용함으로써, 애플리케이션의 responsiveness가 향상된다. 단, 모든 CPU 코어가 애플리케이션 스레드를 위해 사용되지 않고 GC를 위해 일부가
-사용될 수도 있기 때문에, Parallel GC를 사용할 때보다는 Throughput이 줄어들 수 있다. (CPU 바운드인 애플리케이션에 한해서)
+
+애플리케이션 스레드와 병렬적으로 수행되는 단계가 있는 이 GC를 사용함으로써, 애플리케이션의 responsiveness가 향상된다. 
+단, 모든 CPU 코어가 애플리케이션 스레드를 위해 사용되지 않고 GC를 위해 일부가 사용될 수도 있기 때문에, Parallel GC를 사용할 때보다는 Throughput이 줄어들 수 있다. (CPU 바운드인 애플리케이션에 한해서)
 
 다음은 이 GC를 사용했을 때의 GC 로그이다. 여기서 첫 번째 로그는 Minor GC 로그이며, 나머지는 모두 Old 영역에 대한 GC 로그이다.
 
@@ -381,6 +384,32 @@ Parallel GC와는 다르게, **Latency가 중요할 때는 애플리케이션 �
 2018-01-26T16:23:07.219-0200: 64.322: [GC (Allocation Failure) 64.322: [ParNew: 613404K->68068K(613440K), 0.1020465 secs] 10885349K->10880154K(12514816K), 0.1021309 secs] [Times: user=0.78 sys=0.01, real=0.11 secs]
 ```
 
+<div class="code-line-wrap">
+<p class="code-line"><span class="node">2018-01-26T16:23:07.219-0200<sup>1</sup></span>: <span class="node">64.322<sup>2</sup></span>:[<span class="node">GC<sup>3</sup></span>(<span class="node">Allocation Failure<sup>4</sup></span>) 64.322: [<span class="node">ParNew<sup>5</sup></span>: <span class="node">613404K-&gt;68068K<sup>6</sup></span><span class="node">(613440K) <sup>7</sup></span>, <span class="node"> 0.1020465 secs<sup>8</sup></span>] <span class="node">10885349K-&gt;10880154K <sup>9</sup></span><span class="node">(12514816K)<sup>10</sup></span>, <span class="node">0.1021309 secs<sup>11</sup></span>]<span class="node">[Times: user=0.78 sys=0.01, real=0.11 secs]<sup>12</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">2018-01-26T16:23:07.219-0200</span> – GC가 일어난 시간</li>
+<li class="description"><span class="node">64.322</span> – GC가 일어났을 때, JVM이 수행된 시간</li>
+<li class="description"><span class="node">GC</span> – Minor GC / Full GC를 구분하는 플래그, 여기서는 Minor GC를 의미한다.</li>
+<li class="description"><span class="node">Allocation Failure</span> – GC가 일어난 원인, 여기서는 Young 영역에서 새로운 객체를 생성하기 위한 공간이 부족해서 발생한 것이다.</li>
+<li class="description"><span class="node">ParNew</span> – Garbage Collector의 이름. Collector는 Young 영역에 대한 GC를 수행하는데, 병렬적으로 수행되며 Mark-Copy / Stop-The-World 이다. 또한 이 Collector는 Old 영역에 대한 GC를 수행하는 Concurrent Mark &amp; Sweep Garbage Collector와 유기적으로 수행될 수 있도록 디자인되었다.  </li>
+<li class="description"><span class="node">613404K-&gt;68068K</span> – GC 전후의 Young 영역의 사용량</li>
+<li class="description"><span class="node">(613440K) </span> – Young 영역의 전체 크기</li>
+<li class="description"><span class="node"> 0.1020465 secs</span> – GC가 수행되고 난 후의 정리 작업(clean up)을 제외한 시간</li>
+<li class="description"><span class="node">10885349K-&gt;10880154K </span> – GC 전후의 Heap 영역의 사용량</li>
+<li class="description"><span class="node">(12514816K)</span> – Heap 영역의 전체 크기</li>
+<li class="description"><span class="node">0.1021309 secs</span> – Collector가 Young영역에 대해서 mark-copy를 진행하는데 걸린 시간. Old 영역으로 오래된 객체를 이동시키는 것과 GC의 마지막 정리 작업과 같이 Concurrent Mark &amp; Sweep Garbage Collector와 커뮤니케이션 한 시간도 포함된다.</li>
+<li class="description"><span class="node">[Times: user=0.78 sys=0.01, real=0.11 secs]</span> – GC가 수행된 시간인데, 각 시간은 다음과 같다:
+<ul>
+<li>user – GC가 진행되는 동안 Garbage Collector에 의해 수행된 CPU 시간이다.</li>
+<li>sys – System Call과 같이 OS가 수행하거나 기다린 시간이다.</li>
+<li>real – 애플리케이션이 GC로 인해 멈춘 시간이다. Parallel GC와 마찬가지로, 이 시간은 user와 sys 시간을 GC 수행하는 스레드 개수로 나눈 것에 근접한다. 여기서는 8개의 스레드가 GC를 수행했다는 것을 알 수 있다. GC의 모든 로직이 완전히 병렬적으로 수행되지는 않을 것이므로, user와 sys 시간을 스레드 개수로 나눈 값보다는 높다.</li>
+</ul>
+</li>
+</ol>
+</div>
+
+위 로그에서 GC가 수행되기 전의 Heap 사용량은 10,885,349K 이고 Young 영역의 사용량은 613,404K 인 것으로 나온다. 이를 통해 Old 영역의 사용량은 10,271,945K 인 것을 알 수 있다.
+GC가 수행된 후, Young 영역의 사용량은 545,336K 가 줄었지만 Heap 영역의 사용량은 5,195K 밖에 줄지 않았다. 이는 540,141K 크기의 객체들이 Young 영역에서 Old 영역으로 이동했다는 것을 알 수 있다.
 
 
 
