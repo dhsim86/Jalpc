@@ -411,7 +411,8 @@ Parallel GC와는 다르게, **Latency가 중요할 때는 애플리케이션 �
 위 로그에서 GC가 수행되기 전의 Heap 사용량은 10,885,349K 이고 Young 영역의 사용량은 613,404K 인 것으로 나온다. 이를 통해 Old 영역의 사용량은 10,271,945K 인 것을 알 수 있다.
 GC가 수행된 후, Young 영역의 사용량은 545,336K 가 줄었지만 Heap 영역의 사용량은 5,195K 밖에 줄지 않았다. 이는 540,141K 크기의 객체들이 Young 영역에서 Old 영역으로 이동했다는 것을 알 수 있다.
 
-
+<br>
+![08.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/08.png)
 
 <br>
 ### Full GC
