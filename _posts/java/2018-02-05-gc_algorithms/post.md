@@ -65,7 +65,7 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 <br>
 ### Compact
 
-**Mark-Sweep-Compact**의 Compact 단계에서 실제로 살아있는, **Marking 된 객체들을 메모리 영역의 처음부터 몰아넣음으로써 Marn and Sweep의 단점을 제거한다.** 이는 실제 객체를 복사하고 이 객체들의 참조 정보를 업데이트함으로써 이루어지는데, GC의 시간을 증가시킨다. 하지만 이 것을 통해 얻을 수 있는 이익은 여러 가지가 있다.
+**Mark-Sweep-Compact**의 Compact 단계에서 실제로 살아있는, **Marking 된 객체들을 메모리 영역의 처음부터 몰아넣음으로써 Marn and Sweep의 단점을 제거한다.** 이는 실제 객체를 복사하고 이 객체들의 참조 정보를 업데이트함으로써 이루어지는데, GC로 인해 애플리케이션 스레드가 멈추는 시간을 증가시킨다. 하지만 이 것을 통해 얻을 수 있는 이익은 여러 가지가 있다.
 
 * 메모리 단편화를 줄임으로써 발생하는 문제를 해결할 수 있다. (메모리 생성 실패 문제와 같은)
 * 연속적인 공간에서 객체 생성을 하는 것은 아주 적은 연산을 필요로 한다.
@@ -241,12 +241,12 @@ java -XX:+UseParallelOldGC com.mypackages.MyExecutableClass
 java -XX:+UseParallelGC -XX:+UseParallelOldGC com.mypackages.MyExecutableClass
 ```
 
-Parallel GC는 애플리케이션의 Throughput이 아주 중요할 때 고려해 볼 수 있다.
+Parallel GC는 **애플리케이션의 Throughput이 아주 중요할 때 고려해 볼 수 있다.**
 
 * GC가 수행되는 동안에는 모든 코어가 병렬적으로 GC를 수행하므로, 결국 GC로 인해 애플리케이션이 멈추는 시간이 짧아질 수 있다.
 * GC 사이클 간격, 즉 애플리케이션이 수행될 때는 GC 로직을 위해 시스템 리소스가 낭비되지 않는다.
 
-반면에, GC는 수행되는 도중에 중단되지 않기 때문에 GC가 수행되는 시간이 길어지면 여전히 애플리케이션 스레드도 장기간 멈출 수 있다. 
+반면에, **GC는 수행되는 도중에 중단되지 않기 때문에 GC가 수행되는 시간이 길어지면 여전히 애플리케이션 스레드도 장기간 멈출 수 있다.**
 즉, 애플리케이션의 Latency가 중요할 때는 다음에 설명할 CMS나 G1 GC도 고려해봐야 한다.
 
 다음은 Parallel GC를 사용했을 때의 GC 로그이다.
@@ -325,13 +325,68 @@ GC가 수행되고 난 후에, Young 영역의 사용량은 1,389,308K 가 줄�
 </ol>
 </div>
 
-이 로그를 통해 Young 영역뿐만 아니라 Old 및 Metaspace 영역에 대한 GC도 수행되었다는 것을 알 수 있다. GC 전후의 메모리 레이아웃은 다음 그림과 비슷할 것이다.
+이 로그를 통해 Young 영역 뿐만 아니라 Old 및 Metaspace 영역에 대한 GC도 수행되었다는 것을 알 수 있다. GC 전후의 메모리 레이아웃은 다음 그림과 비슷할 것이다.
 
 <br>
 ![07.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/07.png)
 
 <br>
 ## Concurrent Mark and Sweep
+
+이 GC의 공식적인 이름은 **"Mostly Concurrent Mark and Sweep Garbage Collector"** 이다.
+Young 영역에 대해서는 Parallel GC와 마찬가지로 mark-copy 알고리즘을 사용하며 stop-the-world를 일으킨다. 또한 멀티 스레드를 통해 병렬적으로 수행된다.
+**Old 영역에 대해서는 mark-sweep 알고리즘을 사용하는데, GC의 모든 로직들이 애플리케이션 스레드와 "거의" 동시에 수행된다. (Monstly Concurrent)**
+
+이 GC는 Old 영역에 대한 GC가 발생할 때, 애플리케이션 스레드가 장시간 멈추는 것을 되도록 피하고자 디자인된 것이다.
+다음 두 가지 방법을 통해, 애플리케이션 스레드가 멈추는 것을 막는다.
+
+1. Old 영역에 대해서 compaction을 수행하지 않고, 객체를 할당할 수 있는 공간을 관리하는 자료구조 (free-list)를 따로 관리한다. compaction도 객체 복사가 일어나므로 애플리케이션 스레드를 멈추게 된다.
+2. Mark와 sweep 단계에서는 특정 단계빼고는 애플리케이션 스레드와 병렬적으로 수행된다.
+
+이 의미는 애플리케이션 스레드가 GC로 인해 멈추는 시간을 현저히 줄일 수 있다는 것이다. 
+당연히 GC를 수행하기 위해서는 CPU 코어를 사용하게 되므로 애플리케이션 스레드와 CPU 자원을 얻기 위해 경쟁하게 된다. 기본적으로 이 GC를 위해 수행되는 스레드 개수는 실제 환경의 CPU 코어 개수의 1/4 이다.
+
+이 GC를 수행하기 위해 다음과 같이 JVM 파라미터를 사용한다.
+
+```
+java -XX:+UseConcMarkSweepGC com.mypackages.MyExecutableClass
+```
+
+Parallel GC와는 다르게, **Latency가 중요할 때는 애플리케이션 스레드의 멈춤을 되도록 피하는 이 GC를 고려해볼 수 있다.**
+애플리케이션 스레드와 병렬적으로 수행되는 단계가 있는 이 GC를 사용함으로써, 애플리케이션의 responsiveness가 향상된다. 단, 모든 CPU 코어가 애플리케이션 스레드를 위해 사용되지 않고 GC를 위해 일부가
+사용될 수도 있기 때문에, Parallel GC를 사용할 때보다는 Throughput이 줄어들 수 있다. (CPU 바운드인 애플리케이션에 한해서)
+
+다음은 이 GC를 사용했을 때의 GC 로그이다. 여기서 첫 번째 로그는 Minor GC 로그이며, 나머지는 모두 Old 영역에 대한 GC 로그이다.
+
+```
+2018-01-26T16:23:07.219-0200: 64.322: [GC (Allocation Failure) 64.322: [ParNew: 613404K->68068K(613440K), 0.1020465 secs] 10885349K->10880154K(12514816K), 0.1021309 secs] [Times: user=0.78 sys=0.01, real=0.11 secs]
+2018-01-26T16:23:07.321-0200: 64.425: [GC (CMS Initial Mark) [1 CMS-initial-mark: 10812086K(11901376K)] 10887844K(12514816K), 0.0001997 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+2018-01-26T16:23:07.321-0200: 64.425: [CMS-concurrent-mark-start]
+2018-01-26T16:23:07.357-0200: 64.460: [CMS-concurrent-mark: 0.035/0.035 secs] [Times: user=0.07 sys=0.00, real=0.03 secs]
+2018-01-26T16:23:07.357-0200: 64.460: [CMS-concurrent-preclean-start]
+2018-01-26T16:23:07.373-0200: 64.476: [CMS-concurrent-preclean: 0.016/0.016 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]
+2018-01-26T16:23:07.373-0200: 64.476: [CMS-concurrent-abortable-preclean-start]
+2018-01-26T16:23:08.446-0200: 65.550: [CMS-concurrent-abortable-preclean: 0.167/1.074 secs] [Times: user=0.20 sys=0.00, real=1.07 secs]
+2018-01-26T16:23:08.447-0200: 65.550: [GC (CMS Final Remark) [YG occupancy: 387920 K (613440 K)]65.550: [Rescan (parallel) , 0.0085125 secs]65.559: [weak refs processing, 0.0000243 secs]65.559: [class unloading, 0.0013120 secs]65.560: [scrub symbol table, 0.0008345 secs]65.561: [scrub string table, 0.0001759 secs][1 CMS-remark: 10812086K(11901376K)] 11200006K(12514816K), 0.0110730 secs] [Times: user=0.06 sys=0.00, real=0.01 secs]
+2018-01-26T16:23:08.458-0200: 65.561: [CMS-concurrent-sweep-start]
+2018-01-26T16:23:08.485-0200: 65.588: [CMS-concurrent-sweep: 0.027/0.027 secs] [Times: user=0.03 sys=0.00, real=0.03 secs]
+2018-01-26T16:23:08.485-0200: 65.589: [CMS-concurrent-reset-start]
+2018-01-26T16:23:08.497-0200: 65.601: [CMS-concurrent-reset: 0.012/0.012 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]
+```
+
+<br>
+### Minor GC
+
+```
+2018-01-26T16:23:07.219-0200: 64.322: [GC (Allocation Failure) 64.322: [ParNew: 613404K->68068K(613440K), 0.1020465 secs] 10885349K->10880154K(12514816K), 0.1021309 secs] [Times: user=0.78 sys=0.01, real=0.11 secs]
+```
+
+
+
+
+<br>
+### Full GC
+
 
 ## G1
 
