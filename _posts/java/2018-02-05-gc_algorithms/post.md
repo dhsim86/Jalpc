@@ -447,6 +447,29 @@ GC가 수행된 후, Young 영역의 사용량은 545,336K 가 줄었지만 Heap
 
 **Phase 1: Initial Mark**
 
+```
+2018-01-26T16:23:07.321-0200: 64.425: [GC (CMS Initial Mark) [1 CMS-initial-mark: 10812086K(11901376K)] 10887844K(12514816K), 0.0001997 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+```
+
+CMS GC에서 Stop-The-World 를 일으키는 두 개의 이벤트 중 하나이다.
+이 단계에서는 **GC Root 이거나 Young 영역의 살아있는 객체로부터 참조되는 모든 Old 영역의 객체를 mark 한다.**
+
+<br>
+![09.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/09.png)
+
+<div class="code-line-wrap">
+<p class="code-line"><span class="node">2018-01-26T16:23:07.321-0200: 64.42<sup>1</sup></span>: [GC (<span class="node">CMS Initial Mark<sup>2</sup></span>[1 CMS-initial-mark: <span class="node">10812086K<sup>3</sup></span><span class="node">(11901376K)<sup>4</sup></span>] <span class="node">10887844K<sup>5</sup></span><span class="node">(12514816K)<sup>6</sup></span>, <span class="node">0.0001997 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]<sup>7</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">2018-01-26T16:23:07.321-0200: 64.42</span> – GC가 일어난 시간 및 JVM이 수행된 시간이다.</li>
+<li class="description"><span class="node">CMS Initial Mark</span> – GC 단계로 GC Root가 될 수 있는 모든 객체를 mark 한다.</li>
+<li class="description"><span class="node">10812086K</span> – Old 영역의 현재 사용량</li>
+<li class="description"><span class="node">(11901376K)</span> – Old 영역의 전체 크기</li>
+<li class="description"><span class="node">10887844K</span> – Heap 영역의 전체 사용량</li>
+<li class="description"><span class="node">(12514816K)</span> – Heap 영역의 전체 크기</li>
+<li class="description"><span class="node">0.0001997 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]</span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
+</ol>
+</div>
+
 ---
 
 **Phase 2: Concurrent Mark**
