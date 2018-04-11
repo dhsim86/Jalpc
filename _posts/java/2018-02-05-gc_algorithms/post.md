@@ -422,7 +422,58 @@ GC가 수행된 후, Young 영역의 사용량은 545,336K 가 줄었지만 Heap
 <br>
 ### Full GC
 
+다음 로그를 보면 알 수 있게지만 Serial GC나 Parallel GC와는 로그 형식이 완전히 다르다.
+이 로그들은 Old 영역에 대해 GC를 수행하는, CMS GC의 각 단계에 대한 로그들이다.
 
+```
+2018-01-26T16:23:07.321-0200: 64.425: [GC (CMS Initial Mark) [1 CMS-initial-mark: 10812086K(11901376K)] 10887844K(12514816K), 0.0001997 secs] [Times: user=0.00 sys=0.00, real=0.00 secs]
+2018-01-26T16:23:07.321-0200: 64.425: [CMS-concurrent-mark-start]
+2018-01-26T16:23:07.357-0200: 64.460: [CMS-concurrent-mark: 0.035/0.035 secs] [Times: user=0.07 sys=0.00, real=0.03 secs]
+2018-01-26T16:23:07.357-0200: 64.460: [CMS-concurrent-preclean-start]
+2018-01-26T16:23:07.373-0200: 64.476: [CMS-concurrent-preclean: 0.016/0.016 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]
+2018-01-26T16:23:07.373-0200: 64.476: [CMS-concurrent-abortable-preclean-start]
+2018-01-26T16:23:08.446-0200: 65.550: [CMS-concurrent-abortable-preclean: 0.167/1.074 secs] [Times: user=0.20 sys=0.00, real=1.07 secs]
+2018-01-26T16:23:08.447-0200: 65.550: [GC (CMS Final Remark) [YG occupancy: 387920 K (613440 K)]65.550: [Rescan (parallel) , 0.0085125 secs]65.559: [weak refs processing, 0.0000243 secs]65.559: [class unloading, 0.0013120 secs]65.560: [scrub symbol table, 0.0008345 secs]65.561: [scrub string table, 0.0001759 secs][1 CMS-remark: 10812086K(11901376K)] 11200006K(12514816K), 0.0110730 secs] [Times: user=0.06 sys=0.00, real=0.01 secs]
+2018-01-26T16:23:08.458-0200: 65.561: [CMS-concurrent-sweep-start]
+2018-01-26T16:23:08.485-0200: 65.588: [CMS-concurrent-sweep: 0.027/0.027 secs] [Times: user=0.03 sys=0.00, real=0.03 secs]
+2018-01-26T16:23:08.485-0200: 65.589: [CMS-concurrent-reset-start]
+2018-01-26T16:23:08.497-0200: 65.601: [CMS-concurrent-reset: 0.012/0.012 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]
+```
+
+> CMS GC에서 Old 영역에 대한 GC가 수행되는 도중에도, Young 영역에 대한 GC가 발생할 수 있다. 
+이 때 로그 상에서는 Minor GC 로그가 한데 섞여서 보일 것이다.
+
+---
+
+**Phase 1: Initial Mark**
+
+---
+
+**Phase 2: Concurrent Mark**
+
+---
+
+**Phase 3: Concurrent Preclean**
+
+---
+
+**Phase 4: Concurrent Abortable Preclean**
+
+---
+
+**Phase 5: Final Remark**
+
+---
+
+**Phase 6: Concurrent Sweep**
+
+---
+
+**Phase 7: Concurrent Reset**
+
+---
+
+<br>
 ## G1
 
 <style>
