@@ -495,7 +495,7 @@ Concurrent 라는 이름이 나타내는 것처럼, 이 단계에서 애플리�
 2018-01-26T16:23:07.357-0200: 64.460: [<span class="node">CMS-concurrent-mark<sup>1</sup></span>: <span class="node">035/0.035 secs<sup>2</sup></span>] <span class="node">[Times: user=0.07 sys=0.00, real=0.03 secs]<sup>3</sup></span></pre>
 <ol class="code-line-components">
 <li class="description"><span class="node">CMS-concurrent-mark</span> – "Concurrent Mark" 단계로, Old 영역에 있는 살아 있는 오브젝트들을 mark 한다.</li>
-<li class="description"><span class="node">035/0.035 secs</span> – 이 단계에서 걸린 시간으로 elapsed time 및 wall clock time을 나타낸다.</li>
+<li class="description"><span class="node">035/0.035 secs</span> – 이 단계에서 걸린 시간으로 elapsed time(user) 및 wall clock time(real)을 나타낸다.</li>
 <li class="description"><span class="node">[Times: user=0.07 sys=0.00, real=0.03 secs]</span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
 </ol>
 </div>
@@ -511,7 +511,9 @@ Concurrent 라는 이름이 나타내는 것처럼, 이 단계에서 애플리�
 
 이 단계도 "Concurrent" 단계로서, 애플리케이션 스레드를 멈추지 않고 동작한다.
 
-이전 단계에서 애플리케이션 스레드와 동시에 동작하였기 때문에, 객체들간의 참조 그래프가 변했을 수 있다. JVM은 **힙 영역을 일정 크기로 나누어 각 영역을 "Card"**라 불리는 것으로 관리하고, 
+이전 단계에서 애플리케이션 스레드와 동시에 동작하였기 때문에, 객체들간의 참조 그래프가 변했을 수 있다. (Young 영역의 GC가 발생되어 Old 영역으로 객체가 이동되거나, 새로운 객체가 생성되었을 경우. **CMS의 Old 영역 GC 도중에도 Young 영역에 대한 GC가 일어날 수 있다.**)
+
+JVM은 **힙 영역을 일정 크기로 나누어 각 영역을 "Card"**라 불리는 것으로 관리하고, 
 Marking 단계에서 **변화한 객체를 갖고 있는 Card를 dirty로 표시해두는 "[Card Marking](http://psy-lob-saw.blogspot.kr/2014/10/the-jvm-write-barrier-card-marking.html)" 이라는 기법을 사용한다.**
 
 <br>
@@ -529,7 +531,7 @@ Marking 단계에서 **변화한 객체를 갖고 있는 Card를 dirty로 표시
 2018-01-26T16:23:07.373-0200: 64.476: [<span class="node">CMS-concurrent-preclean<sup>1</sup></span>: <span class="node">0.016/0.016 secs<sup>2</sup></span>] <span class="node">[Times: user=0.02 sys=0.00, real=0.02 secs]<sup>3</sup></span></pre>
 <ol class="code-line-components">
 <li class="description"><span class="node">CMS-concurrent-preclean</span> – "Concurrent Preclean" 단계로, 이전 mark 단계에서 변화한 객체들의 상태를 확인하고 작업을 수행한다.</li>
-<li class="description"><span class="node">0.016/0.016 secs</span> – 이 단계에서 걸린 시간으로 elapsed time 및 wall clock time을 나타낸다.</li>
+<li class="description"><span class="node">0.016/0.016 secs</span> – 이 단계에서 걸린 시간으로 elapsed time(user) 및 wall clock time(real)을 나타낸다.</li>
 <li class="description"><span class="node">[Times: user=0.02 sys=0.00, real=0.02 secs]</span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
 </ol>
 </div>
@@ -538,17 +540,105 @@ Marking 단계에서 **변화한 객체를 갖고 있는 Card를 dirty로 표시
 
 **Phase 4: Concurrent Abortable Preclean**
 
+```
+2018-01-26T16:23:07.373-0200: 64.476: [CMS-concurrent-abortable-preclean-start]
+2018-01-26T16:23:08.446-0200: 65.550: [CMS-concurrent-abortable-preclean: 0.167/1.074 secs] [Times: user=0.20 sys=0.00, real=1.07 secs]
+```
+
+"Concurrent" 라는 것은 애플리케이션 스레드와 동시에 동작한다는 의미이기 때문에, 객체의 상태는 GC의 mark 도중에 계속 변화할 수 있다.
+이 단계는 Stop-The-World를 일으키는 **"Final Remark" 단계를 되도록 빨리 끝내기 위해서 수행된다.**
+
+Young (Eden) 영역의 사용량이 "CMSScheduleRemarkEdenSizeThreshold" 보다 높으면, "CMSScheduleRemarkEdenPenetration"에 설정된 비율보다 사용량이 낮아질 떄까지 **precleaning, 즉 변화한 객체들을 계속 스캔한다.**
+
+<div class="code-line-wrap">
+<pre class="code-line">2018-01-26T16:23:07.373-0200: 64.476: [CMS-concurrent-abortable-preclean-start]
+2018-01-26T16:23:08.446-0200: 65.550: [<span class="node">CMS-concurrent-abortable-preclean<sup>1</sup></span>: <span class="node">0.167/1.074 secs<sup>2</sup></span>] <span class="node">[Times: user=0.20 sys=0.00, real=1.07 secs]<sup>3</sup></span></pre>
+<ol class="code-line-components">
+<li class="description"><span class="node">CMS-concurrent-abortable-preclean</span> – "Concurrent Abortable Preclean" 단계이다.</li>
+<li class="description"><span class="node">0.167/1.074 secs</span> – 이 단계에서 걸린 시간으로 elapsed time(user) 및 wall clock time(real)을 나타낸다. clock time보다 elapsed time이 더 적은 것을 알 수 있다. 원래 GC에 의해 수행되는 동작들이 병렬로 수행될 때, real time이 더 적다는 것을 확인하였었다. 근데 여기서는 실제로 GC에 의해 수행된 시간인 elapsed time이 더 적은데, 이는 GC가 어떤 동작을 위해 wait를 많이 하였다는 것읠 의미한다. </li>
+<li class="description"><span class="node">[Times: user=0.20 sys=0.00, real=1.07 secs]</span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
+</ol>
+</div>
+
+이 단계에서 수행한 결과에 따라, 다음 단계인 "Final Remark"의 수행시간에 큰 영향을 끼친다.
+
 ---
 
 **Phase 5: Final Remark**
+
+```
+2018-01-26T16:23:08.447-0200: 65.550: [GC (CMS Final Remark) [YG occupancy: 387920 K (613440 K)]65.550: [Rescan (parallel) , 0.0085125 secs]65.559: [weak refs processing, 0.0000243 secs]65.559: [class unloading, 0.0013120 secs]65.560: [scrub symbol table, 0.0008345 secs]65.561: [scrub string table, 0.0001759 secs][1 CMS-remark: 10812086K(11901376K)] 11200006K(12514816K), 0.0110730 secs] [Times: user=0.06 sys=0.00, real=0.01 secs]
+```
+
+이 단계는 Stop-The-World를 일으키는 두 번째 단계로써, Old 영역에 있는 살아있는 모든 객체들을 완전히 mark 한다.
+
+이전 단계들은 애플리케이션 스레드와 병렬적으로 수행했기 때문에, **애플리케이션의 동작에 따라 변화하는 객체들의 상태를 빠르게 반영하지 못했을 수 있다.**
+따라서 이 단계에서 다시 Stop-The-World를 통해 애플리케이션 스레드를 잠시 멈춤으로써, **객체들의 상태를 완전히 반영하는 것이다.**
+
+CMS GC는 이 단계를 **되도록 Young 영역이 거의 비워져있을 때 수행하게 하도록 하여, Stop-The-World 를 일으키는 동작이 연쇄적으로 발생하는 것을 방지한다.**
+(Young 영역이 가득차 있으면 Young 영역의 GC가 발생하고 오래된 객체들은 Old 영역으로 이동하는데, 그로 인해 Old 영역이 부족해지면 또 Old 영역에 대한 GC가 발생하게 되므로, 결국 Stop-The-World를 일으키는 동작이 연쇄적으로 발생할 가능성이 있다.)
+
+<div class="code-line-wrap">
+<p class="code-line"><span class="node">2018-01-26T16:23:08.447-0200: 65.550<sup>1</sup></span>: [GC (<span class="node">CMS Final Remark<sup>2</sup></span>) [<span class="node">YG occupancy: 387920 K (613440 K)<sup>3</sup></span>]65.550: <span class="node">[Rescan (parallel) , 0.0085125 secs]<sup>4</sup></span>65.559: [<span class="node">weak refs processing, 0.0000243 secs]65.559<sup>5</sup></span>: [<span class="node">class unloading, 0.0013120 secs]65.560<sup>6</sup></span>: [<span class="node">scrub string table, 0.0001759 secs<sup>7</sup></span>][1 CMS-remark: <span class="node">10812086K(11901376K)<sup>8</sup></span>] <span class="node">11200006K(12514816K) <sup>9</sup></span>, <span class="node">0.0110730 secs<sup>10</sup></span>] [<span class="node">[Times: user=0.06 sys=0.00, real=0.01 secs]<sup>11</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">2018-01-26T16:23:08.447-0200: 65.550</span> –GC가 일어난 시간 및 JVM이 수행된 시간이다.</li>
+<li class="description"><span class="node">CMS Final Remark</span> –"Final Remark" 단계로 이전 GC 단계에서 새로이 업데이트된 객체들을 모두 포함하여, Old 영역의 살아있는 객체들을 완전히 mark 한다.</li>
+<li class="description"><span class="node">YG occupancy: 387920 K (613440 K)</span> – Young 영역의 현재 사용량 및 크기</li>
+<li class="description"><span class="node">[Rescan (parallel) , 0.0085125 secs]</span> – 이 "Rescan" 동작에서 애플리케이션 스래드가 멈추어 있을 때, 살아있는 객체들을 mark 하는 것을 완료한다. 여기서는 이 동작이 병렬로 수행되었고, 0.0085125 초가 걸렸다.</li>
+<li class="description"><span class="node">weak refs processing, 0.0000243 secs]65.559</span> – Week reference에 대한 처리 및 이에 걸린 시간이다.</li>
+<li class="description"><span class="node">class unloading, 0.0013120 secs]65.560</span> –사용하지 않는 클래스들을 언로드하는데 걸린 시간이다.</li>
+<li class="description"><span class="node">scrub string table, 0.0001759 secs</span> – Symbol 및 클래스 레벨 메타데이터 등을 참조하는 String들을 지우는 것이다.</li>
+<li class="description"><span class="node">10812086K(11901376K)</span> – 이 단계가 지난 후의 Old 영역의 사용량 및 크기이다.</li>
+<li class="description"><span class="node">11200006K(12514816K) </span> – 이 단계가 지난 후의 Heap 영역의 사용량 및 크기이다.</li>
+<li class="description"><span class="node">0.0110730 secs</span> – 이 단계에서 걸린 시간</li>
+<li class="description"><span class="node">[Times: user=0.06 sys=0.00, real=0.01 secs]</span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
+</ol>
+</div>
+
+Mark 단계가 끝나면 Old 영역에 있는 모든 살아있는 객체들은 mark 되었을 것이며, 이제 Old 영역을 청소함으로써 새로 객체를 할당하기 위한 공간을 확보할 수 있다.
 
 ---
 
 **Phase 6: Concurrent Sweep**
 
+```
+2018-01-26T16:23:08.458-0200: 65.561: [CMS-concurrent-sweep-start]
+2018-01-26T16:23:08.485-0200: 65.588: [CMS-concurrent-sweep: 0.027/0.027 secs] [Times: user=0.03 sys=0.00, real=0.03 secs]
+```
+
+애플리케이션 스레드와 **병렬적으로 수행되며, 사용하지 않는 객체들을 정리하여 빈 공간을 확보한다.**
+
+<br>
+![13.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/13.png)
+
+<div class="code-line-wrap">
+<p class="code-line">2018-01-26T16:23:08.458-0200: 65.561: [CMS-concurrent-sweep-start]
+2018-01-26T16:23:08.485-0200: 65.588: [<span class="node">CMS-concurrent-sweep<sup>1</sup></span>: <span class="node">0.027/0.027 secs<sup>2</sup></span>] [<span class="node">[Times: user=0.03 sys=0.00, real=0.03 secs] <sup>3</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">CMS-concurrent-sweep</span> – "Concurrent Sweep" 단계로 mark 되지 않은 객체들을 정리하여 공간을 확보한다.</li>
+<li class="description"><span class="node">0.027/0.027 secs</span> – 이 단계에서 걸린 시간으로 elapsed time(user) 및 wall clock time(real)을 나타낸다.</li>
+<li class="description"><span class="node">[Times: user=0.03 sys=0.00, real=0.03 secs] </span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
+</ol>
+</div>
+
 ---
 
 **Phase 7: Concurrent Reset**
+
+CMS 알고리즘 내부에서 사용하는 데이터들을 리셋하고, 다음 사이클을 준비한다.
+
+<div class="code-line-wrap">
+<p class="code-line">2018-01-26T16:23:08.485-0200: 65.589: [CMS-concurrent-reset-start]
+2018-01-26T16:23:08.497-0200: 65.601: [<span class="node">CMS-concurrent-reset<sup>1</sup></span>: <span class="node">0.012/0.012 secs<sup>2</sup></span>] [<span class="node">[Times: user=0.01 sys=0.00, real=0.01 secs]<sup>3</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">CMS-concurrent-reset</span> – "Concurrent Reset" 단계로, CMS 알고리즘 내부에서 사용하는 데이터들을 리셋하고, 다음 사이클을 준비한다.</li>
+<li class="description"><span class="node">0.012/0.012 secs</span> – 이 단계에서 걸린 시간으로 elapsed time(user) 및 wall clock time(real)을 나타낸다.</li>
+<li class="description"><span class="node">[Times: user=0.01 sys=0.00, real=0.01 secs]</span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
+</ol>
+</div>
+
+CMS GC는 이렇게 각 단계를 나누어, 애플리케이션 스레드와 병렬적으로 GC 동작을 수행함으로써 Stop-The-World로 인해 애플리케이션이 멈추는 시간을 줄인다.
+하지만 CMS GC도 단점이 있는데, **Young 영역에 대한 Compaction을 수행하지 않음으로써 Old 영역에서 단편화가 발생할 수 있다.** 그리고 또한 **큰 Heap 영역을 가지는 환경에서는 애플리케이션 스레드가 멈추는 시간을 예측하기가 힘들 수 있다.**
 
 ---
 
