@@ -625,6 +625,11 @@ Mark 단계가 끝나면 Old 영역에 있는 모든 살아있는 객체들은 m
 
 **Phase 7: Concurrent Reset**
 
+```
+2018-01-26T16:23:08.485-0200: 65.589: [CMS-concurrent-reset-start]
+2018-01-26T16:23:08.497-0200: 65.601: [CMS-concurrent-reset: 0.012/0.012 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]
+```
+
 CMS 알고리즘 내부에서 사용하는 데이터들을 리셋하고, 다음 사이클을 준비한다.
 
 <div class="code-line-wrap">
