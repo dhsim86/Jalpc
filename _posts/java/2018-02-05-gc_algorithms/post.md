@@ -479,10 +479,10 @@ CMS GC에서 Stop-The-World 를 일으키는 두 개의 이벤트 중 하나이�
 2018-01-26T16:23:07.357-0200: 64.460: [CMS-concurrent-mark: 0.035/0.035 secs] [Times: user=0.07 sys=0.00, real=0.03 secs]
 ```
 
-이 단계에서는 이전 단계인 "Initial Mark" 단계에서 mark 한 오브젝트부터 시작해서 **Old 영역을 순회하면서 살아있는 모든 오브젝트들을 mark 한다.**
+이 단계에서는 이전 단계인 "Initial Mark" 단계에서 mark 한 객체부터 시작해서 **Old 영역을 순회하면서 살아있는 모든 객체들을 mark 한다.**
 Concurrent 라는 이름이 나타내는 것처럼, 이 단계에서 애플리케이션 스레드를 멈추지 않고 동작한다. 
 
-이 단계에서 살아있는 모든 오브젝트가 **완전히 mark 되지 않는다.** 애플리케이션 스레드가 돌고 있으므로, 애플리케이션의 오브젝트들의 상태는 계속 변화할 수 있다.
+이 단계에서 살아있는 모든 객체가 **완전히 mark 되지 않는다.** 애플리케이션 스레드가 돌고 있으므로, 애플리케이션의 객체들의 상태는 계속 변화할 수 있다.
 
 <br>
 ![10.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/10.png)
@@ -500,10 +500,39 @@ Concurrent 라는 이름이 나타내는 것처럼, 이 단계에서 애플리�
 </ol>
 </div>
 
-
 ---
 
 **Phase 3: Concurrent Preclean**
+
+```
+2018-01-26T16:23:07.357-0200: 64.460: [CMS-concurrent-preclean-start]
+2018-01-26T16:23:07.373-0200: 64.476: [CMS-concurrent-preclean: 0.016/0.016 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]
+```
+
+이 단계도 "Concurrent" 단계로서, 애플리케이션 스레드를 멈추지 않고 동작한다.
+
+이전 단계에서 애플리케이션 스레드와 동시에 동작하였기 때문에, 객체들간의 참조 그래프가 변했을 수 있다. JVM은 **힙 영역을 일정 크기로 나누어 각 영역을 "Card"**라 불리는 것으로 관리하고, 
+Marking 단계에서 **변화한 객체를 갖고 있는 Card를 dirty로 표시해두는 "[Card Marking](http://psy-lob-saw.blogspot.kr/2014/10/the-jvm-write-barrier-card-marking.html)" 이라는 기법을 사용한다.**
+
+<br>
+![11.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/11.png)
+
+"Concurrent Preclean" 단계에서는 이 **Card 안에 있는 "dirty 한" 객체로부터 참조되고 있는 객체들을 mark 한다.** 그리고 Card의 dirty 표시는 지워질 것이다.
+
+<br>
+![12.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/12.png)
+
+마지막으로 **"Final Remark" 단계를 위해 필요한 작업을 수행한다.**
+
+<div class="code-line-wrap">
+<pre class="code-line">2018-01-26T16:23:07.357-0200: 64.460: [CMS-concurrent-preclean-start]
+2018-01-26T16:23:07.373-0200: 64.476: [<span class="node">CMS-concurrent-preclean<sup>1</sup></span>: <span class="node">0.016/0.016 secs<sup>2</sup></span>] <span class="node">[Times: user=0.02 sys=0.00, real=0.02 secs]<sup>3</sup></span></pre>
+<ol class="code-line-components">
+<li class="description"><span class="node">CMS-concurrent-preclean</span> – "Concurrent Preclean" 단계로, 이전 mark 단계에서 변화한 객체들의 상태를 확인하고 작업을 수행한다.</li>
+<li class="description"><span class="node">0.016/0.016 secs</span> – 이 단계에서 걸린 시간으로 elapsed time 및 wall clock time을 나타낸다.</li>
+<li class="description"><span class="node">[Times: user=0.02 sys=0.00, real=0.02 secs]</span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
+</ol>
+</div>
 
 ---
 
