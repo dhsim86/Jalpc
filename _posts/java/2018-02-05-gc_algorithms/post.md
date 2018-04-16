@@ -452,7 +452,7 @@ GC가 수행된 후, Young 영역의 사용량은 545,336K 가 줄었지만 Heap
 ```
 
 CMS GC에서 Stop-The-World 를 일으키는 두 개의 이벤트 중 하나이다.
-이 단계에서는 **GC Root 이거나 Young 영역의 살아있는 객체로부터 참조되는 모든 Old 영역의 객체를 mark 한다.**
+이 단계에서는 **GC Root 로부터 바로 참조되거나, Young 영역의 살아있는 객체로부터 참조되는 모든 Old 영역의 객체를 mark 한다.**
 
 <br>
 ![09.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/09.png)
@@ -473,6 +473,33 @@ CMS GC에서 Stop-The-World 를 일으키는 두 개의 이벤트 중 하나이�
 ---
 
 **Phase 2: Concurrent Mark**
+
+```
+2018-01-26T16:23:07.321-0200: 64.425: [CMS-concurrent-mark-start]
+2018-01-26T16:23:07.357-0200: 64.460: [CMS-concurrent-mark: 0.035/0.035 secs] [Times: user=0.07 sys=0.00, real=0.03 secs]
+```
+
+이 단계에서는 이전 단계인 "Initial Mark" 단계에서 mark 한 오브젝트부터 시작해서 **Old 영역을 순회하면서 살아있는 모든 오브젝트들을 mark 한다.**
+Concurrent 라는 이름이 나타내는 것처럼, 이 단계에서 애플리케이션 스레드를 멈추지 않고 동작한다. 
+
+이 단계에서 살아있는 모든 오브젝트가 **완전히 mark 되지 않는다.** 애플리케이션 스레드가 돌고 있으므로, 애플리케이션의 오브젝트들의 상태는 계속 변화할 수 있다.
+
+<br>
+![10.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/10.png)
+
+위의 그림에서 볼 수 있듯이, 검은색 테두리인 "Current Object"의 그래프가 변하였다.
+(Mark 하고 있는 도중에, Current Object가 가지고 있던 참조 객체가 지워졌다는 것이다.)
+
+<div class="code-line-wrap">
+<pre class="code-line">2018-01-26T16:23:07.321-0200: 64.425: [CMS-concurrent-mark-start]
+2018-01-26T16:23:07.357-0200: 64.460: [<span class="node">CMS-concurrent-mark<sup>1</sup></span>: <span class="node">035/0.035 secs<sup>2</sup></span>] <span class="node">[Times: user=0.07 sys=0.00, real=0.03 secs]<sup>3</sup></span></pre>
+<ol class="code-line-components">
+<li class="description"><span class="node">CMS-concurrent-mark</span> – "Concurrent Mark" 단계로, Old 영역에 있는 살아 있는 오브젝트들을 mark 한다.</li>
+<li class="description"><span class="node">035/0.035 secs</span> – 이 단계에서 걸린 시간으로 elapsed time 및 wall clock time을 나타낸다.</li>
+<li class="description"><span class="node">[Times: user=0.07 sys=0.00, real=0.03 secs]</span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다.</li>
+</ol>
+</div>
+
 
 ---
 
