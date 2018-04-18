@@ -673,7 +673,7 @@ G1 GC는 잘게 나누어진 공간 중 **일정 개수의 공간을 Collection 
 ![15.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/15.png)
 
 또한 GC를 수행할 때, 각 공간마다 가지고 있는 살아있는 객체의 수를 조사하는데 이 정보는 Collection Set을 만들 때 참조된다. <br>
-G1 GC는 살아있는 객체가 아닌 garbage collecor 대상이 되는, **더 이상 사용하지 않는 객체가 많은 공간부터 Collection Set에 포함시킨다.** <br>
+G1 GC는 살아있는 객체가 아닌 garbage collector 대상이 되는, **더 이상 사용하지 않는 객체가 많은 공간부터 Collection Set에 포함시킨다.** <br>
 따라서 이 GC의 이름이 Garbage-First 인 것이다.
 
 G1 GC를 사용하기 위해서는 다음과 같이 JVM 파라미터를 설정한다.
@@ -684,6 +684,14 @@ java -XX:+UseG1GC com.mypackages.MyExecutableClass
 
 <br>
 ### Evacuation Pause: Fully Young
+
+애플리케이션이 처음 시작되었을 때는, G1은 GC를 위해 참조될 정보가 없기 때문에 **fully-young 모드로 동작한다.**
+Young 영역이 가득찼을 경우에 애플리케이션 스레드는 잠시 멈추게 되고, Young 영역에 있는 살아있는 객체들은 Survivor 영역으로 이동시킨다. 객체 이동하는 동작을 Evacuation이라고 부르는데, 이전에 봤던 GC 알고리즘들과 거의 동일하다. 
+
+Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와는 관계가 없는 로그를 빼고 살펴보도록 한다. 해당 로그들은 애플리케이션 스레드와 동시에 동작하는 concurrent 단계일 때 다시 볼 것이다. 또한 GC 스레드가 병렬로 동작할 때 남는 로그(Parallel) 들과 "Other" 단계일 때의 로그도 나누어서 볼 것이다.
+
+
+
 
 <br>
 ### Concurrent Marking
