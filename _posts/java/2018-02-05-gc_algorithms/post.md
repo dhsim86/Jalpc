@@ -690,8 +690,59 @@ Young 영역이 가득찼을 경우에 애플리케이션 스레드는 잠시 �
 
 Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와는 관계가 없는 로그를 빼고 살펴보도록 한다. 해당 로그들은 애플리케이션 스레드와 동시에 동작하는 concurrent 단계일 때 다시 볼 것이다. 또한 GC 스레드가 병렬로 동작할 때 남는 로그(Parallel) 들과 "Other" 단계일 때의 로그도 나누어서 볼 것이다.
 
+<div class="code-line-wrap">
+<p class="code-line nowrap"><span class="node">0.134: [GC pause (G1 Evacuation Pause) (young), 0.0144119 secs]<sup>1</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Parallel Time: 13.9 ms, GC Workers: 8]<sup>2</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">…<sup>3</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Code Root Fixup: 0.0 ms]<sup>4</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Code Root Purge: 0.0 ms]<sup>5</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Clear CT: 0.1 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Other: 0.4 ms]<sup>6</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">…<sup>7</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Eden: 24.0M(24.0M)-&gt;0.0B(13.0M) <sup>8</sup></span><span class="node">Survivors: 0.0B-&gt;3072.0K <sup>9</sup></span><span class="node">Heap: 24.0M(256.0M)-&gt;21.9M(256.0M)]<sup>10</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node"> [Times: user=0.04 sys=0.04, real=0.02 secs] <sup>11</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">0.134: [GC pause (G1 Evacuation Pause) (young), 0.0144119 secs]</span> – Young 영역에 대해서만 GC를 수행하는데, JVM이 시작되고 난 후 134ms 후에 시작되었고 0.0144 초가 걸렸다.</li>
+<li class="description"><span class="node">[Parallel Time: 13.9 ms, GC Workers: 8]</span> – 8개의 스레드에 수행되었는데 13.9ms (real time) 걸렸다.</li>
+<li class="description"><span class="node">…</span> – 병렬로 동작한 동작은 따로 살펴본다.</li>
+<li class="description"><span class="node">[Code Root Fixup: 0.0 ms]</span> – 병렬로 수행되는 GC 동작을 위해 갖고 있던 정보를 정리한다.</li>
+<li class="description"><span class="node">[Code Root Purge: 0.0 ms]</span> – 역시 GC를 위해 가지고 있던 정보를 정리한다.</li>
+<li class="description"><span class="node">[Other: 0.4 ms]</span> – GC를 위해 자잘한 일을 수행한 것이다.</li>
+<li class="description"><span class="node">…</span> – 따로 살펴본다.</li>
+<li class="description"><span class="node">[Eden: 24.0M(24.0M)-&gt;0.0B(13.0M) </span> – 이 단계 전후의 Eden 공간의 사용량 및 크기이다.</li>
+<li class="description"><span class="node">Survivors: 0.0B-&gt;3072.0K </span> – 이 단계 전후의 Survivor 크기이다.</li>
+<li class="description"><span class="node">Heap: 24.0M(256.0M)-&gt;21.9M(256.0M)]</span> – 이 단계 전후의 Heap 영역의 사용량 및 크기이다.</li>
+<li class="description"><span class="node"> [Times: user=0.04 sys=0.04, real=0.02 secs] </span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다:
+<ul>
+<li>user – GC가 진행되는 동안 Garbage Collector에 의해 수행된 CPU 시간이다.</li>
+<li>sys – System Call과 같이 OS가 수행하거나 기다린 시간이다.</li>
+<li>real – 애플리케이션이 GC로 인해 멈춘 시간이다. 이 시간은 user와 sys 시간을 GC 수행하는 스레드 개수로 나눈 것에 근접한다. 여기서는 8개의 스레드가 GC를 수행했다는 것을 알 수 있다. GC의 모든 로직이 완전히 병렬적으로 수행되지는 않을 것이므로, user와 sys 시간을 스레드 개수로 나눈 값보다는 높다.</li>
+</ul>
+</li>
+</ol>
+</div>
 
+이 단계에서 제일 시간이 많이 걸린 것은, 8개의 스레드에 병렬적으로 동작한 일들이다.
+다음과 같이 로그 상에서 확인할 수 있다.
 
+<div class="code-line-wrap">
+<p class="code-line nowrap"><span class="node">[Parallel Time: 13.9 ms, GC Workers: 8]<sup>1</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node"> [GC Worker Start (ms)<sup>2</sup></span><code>: Min: 134.0, Avg: 134.1, Max: 134.1, Diff: 0.1]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Ext Root Scanning (ms)<sup>3</sup></span><code>: Min: 0.1, Avg: 0.2, Max: 0.3, Diff: 0.2, Sum: 1.2]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Update RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[Processed Buffers: Min: 0, Avg: 0.0, Max: 0, Diff: 0, Sum: 0]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Scan RS (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Code Root Scanning (ms)<sup>4</sup></span><code>: Min: 0.0, Avg: 0.0, Max: 0.2, Diff: 0.2, Sum: 0.2]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Object Copy (ms)<sup>5</sup></span><code>: Min: 10.8, Avg: 12.1, Max: 12.6, Diff: 1.9, Sum: 96.5]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Termination (ms)<sup>6</sup></span><code>: Min: 0.8, Avg: 1.5, Max: 2.8, Diff: 1.9, Sum: 12.2]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Termination Attempts<sup>7</sup></span><code>: Min: 173, Avg: 293.2, Max: 362, Diff: 189, Sum: 2346]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[GC Worker Other (ms)<sup>8</sup></span><code>: Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">GC Worker Total (ms)<sup>9</sup></span><code>: Min: 13.7, Avg: 13.8, Max: 13.8, Diff: 0.1, Sum: 110.2]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[GC Worker End (ms)<sup>10</sup></span>: Min: 147.8, Avg: 147.8, Max: 147.8, Diff: 0.0]
+</p><ol class="code-line-components">
+<li class="description"><span class="node">[Parallel Time: 13.9 ms, GC Workers: 8]</span> – 다음 로그에 있는 동작들이 수행된 시간이다.</li>
+<li class="description"><span class="node"> [GC Worker Start (ms)</span> – 해당 동작들을 수행하기 시작할 때의 timestamp이다. Min 과 Max의 값이 많이 다르면 이는 너무 많이 스레드의 개수를 설정하였거나 JVM이 아닌 다른 프로세스가 CPU 시간을 많이 잡아먹었을 때이다.  </li>
+<li class="description"><span class="node">[Ext Root Scanning (ms)</span> – Heap 영역에 존재하지 않는 클래스 로더나 JNI 참조 정보, JVM 시스템 정보를 스캔하면서 걸린 시간이다.</li>
+<li class="description"><span class="node">[Code Root Scanning (ms)</span> – 로컬변수와 같은 GC root로부터 참조되는 객체들을 스캔하는데 걸린 시간이다.</li>
+<li class="description"><span class="node">[Object Copy (ms)</span> – GC 대상이 되는 공간으로부터 객체들을 복사하는데 걸린 시간이다.</li>
+<li class="description"><span class="node">[Termination (ms)</span> – GC 동작을 수행 후 스레드들이 더 이상 할 작업이 없다는 것을 확인하고 종료하는데 걸린 시간이다.</li>
+<li class="description"><span class="node">[Termination Attempts</span> – 스레드들이 GC 동작을 종료하기 위해 시도한 횟수이다. GC 종료를 시도할 때 실패하는 경우는 GC를 위해 할 동작이 아직 있다는 것이다.</li>
+<li class="description"><span class="node">[GC Worker Other (ms)</span> – GC를 위해 자잘한 일을 하는데 걸린 시간이다.</li>
+<li class="description"><span class="node">GC Worker Total (ms)</span> – GC 스레드들이 GC를 수행하는데 걸린 전체 시간이다.</li>
+<li class="description"><span class="node">[GC Worker End (ms)</span> – GC가 각자의 일을 마쳤을 때의 timestamp이다. 보통 Min 및 Avg, Max가 같지만, 그렇지 않은 경우에는 스레드들이 기다린 동작이 많거나, 해당 스레드들과 CPU 시간을 경쟁하는 다른 프로세스들이 많다는 것이다.</li>
+</ol>
+</div>
+
+위의 동작말고도 Evacuation 단계에서 자잘한 일들도 많이 수행되었는데 다음과 같다.
+
+<div class="code-line-wrap">
+<p class="code-line nowrap"><span class="node">[Other: 0.4 ms]<sup>1</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Choose CSet: 0.0 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Ref Proc: 0.2 ms]<sup>2</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Ref Enq: 0.0 ms]<sup>3</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Redirty Cards: 0.1 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Humongous Register: 0.0 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Humongous Reclaim: 0.0 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Free CSet: 0.0 ms]<sup>4</sup></span></p>
+<ol class="code-line-components">
+<li class="description"><span class="node">[Other: 0.4 ms]</span> – GC를 위해 기타 작업을 하는데 있어서 걸린 시간으로 GC 스레드들이 병렬로 수행된다.</li>
+<li class="description"><span class="node">[Ref Proc: 0.2 ms]</span> – non-strong reference들과 관련된 작업을 수행하면서 걸린 시간이다.</li>
+<li class="description"><span class="node">[Ref Enq: 0.0 ms]</span> – 남아있는 non-strong reference들을 ReferenceQueue에 큐잉하는데 걸린 시간이다.</li>
+<li class="description"><span class="node">[Free CSet: 0.0 ms]</span> – Collection Set에 있던, GC를 수행해서 비어버린 공간들을 반환하기 위해 걸린 시간이다. 이 공간들은 다음 객체 생성할 때 쓰일 것이다. </li>
+</ol>
+</div>
 
 <br>
 ### Concurrent Marking
