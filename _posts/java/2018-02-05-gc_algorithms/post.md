@@ -651,6 +651,32 @@ CMS GC는 이렇게 각 단계를 나누어, 애플리케이션 스레드와 병
 <br>
 ## G1
 
+G1 알고리즘의 목표 중 하나는, GC로 인해 애플리케이션 스레드가 멈추는 **Stop-The-World의 시간과 빈도를 설정을 통해 예측 가능하도록 하는 것이다.**
+
+이 G1(Garbage-First)은 soft real-time garbage collector로서, 사용자가 설정한대로 garbage collection의 성능이나 GC로 인해 멈추는 시간을 **거의** 맞출 수 있다. 5 millisecond 내에 사용자가 설정한 시간에 따라 Stop-The-World로 인해 애플리케이션 스레드가 멈추는 시간을 조정할 수 있다. Garbage-First GC는 사용자가 설정한, 이 **"목표"**에 따라 멈추는 시간을 넘지 않도록 동작한다. (최대한 사용자가 의도한대로 동작한다는 것이다. 그럴 수 있다면 hard real-time garbage collector가 될 것이다.)
+
+이를 위해 G1은 다음과 같이 구현된다.
+
+앞서 살펴봤던 Young 영역 및 Old 영역으로 Heap을 관리하지 않는다. **대신 Heap 영역을 일정한 크기의 작은 공간으로 나눈다.** (기본 2048개의 공간이다.)
+각 공간은 Eden이거나 Survivor, Old 가 된다. 물론 논리적으로 봤을 때, Eden 및 Survivor에 해당하는 공간을 합쳐서 본다면 Young 영역으로 볼 수 있다. Old 또한 마찬가지.
+
+<br>
+![14.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/14.png)
+
+이렇게 구현하면 garbage collector 입장에서는 한 GC 사이클에 전체 Young / Old 영역에 대해서 GC를 수행할 필요가 없다는 것이다.
+G1 GC는 잘게 나누어진 공간 중 **일정 개수의 공간을 Collection Set이라 불리는 서브셋에 포함시켜, 이 서브셋에 포함되는 공간에 대해서만 GC를 수행한다.**
+
+> 단 Young 영역에 해당하는 모든 공간에 대해서는 한 GC 사이클에 모두 GC가 수행되며, **Old 영역에 대해서만 Collection Set에 포함된 공간에 대해서만 GC를 수행한다.**
+
+<br>
+![15.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/15.png)
+
+또한 GC를 수행할 때, 각 공간마다 가지고 있는 살아있는 객체의 수를 조사하는데 이 정보는 Collection Set을 만들 때 참조된다.
+G1 GC는 살아있는 객체가 아닌 garbage collecor 대상이 되는, **더 이상 사용하지 않는 객체가 많은 공간부터 Collection Set에 포함시킨다.** 따라서 이 GC의 이름이 Garbage-First 인 것이다.
+
+
+
+
 <style>
 ol li, ul li {
     min-height: 1px;
