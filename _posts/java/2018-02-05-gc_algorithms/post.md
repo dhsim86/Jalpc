@@ -674,7 +674,45 @@ G1 GC는 잘게 나누어진 공간 중 **일정 개수의 공간을 Collection 
 또한 GC를 수행할 때, 각 공간마다 가지고 있는 살아있는 객체의 수를 조사하는데 이 정보는 Collection Set을 만들 때 참조된다.
 G1 GC는 살아있는 객체가 아닌 garbage collecor 대상이 되는, **더 이상 사용하지 않는 객체가 많은 공간부터 Collection Set에 포함시킨다.** 따라서 이 GC의 이름이 Garbage-First 인 것이다.
 
+G1 GC를 사용하기 위해서는 다음과 같이 JVM 파라미터를 설정한다.
 
+```
+java -XX:+UseG1GC com.mypackages.MyExecutableClass
+```
+
+<br>
+### Evacuation Pause: Fully Young
+
+<br>
+### Concurrent Marking
+
+---
+
+**Phase 1: Initial Mark**
+
+---
+
+**Phase 2: Root Region Scan**
+
+---
+
+**Phase 3: Concurrent Mark**
+
+---
+
+**Phase 4: Remark**
+
+---
+
+**Phase 5: Cleanup**
+
+---
+
+<br>
+### Evacuation Pause: Mixed
+
+<br>
+## 요약
 
 
 <style>
