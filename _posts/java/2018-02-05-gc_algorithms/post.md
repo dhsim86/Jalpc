@@ -782,6 +782,12 @@ ol li, ul li {
     vertical-align: bottom;
 }
 
+pre, code, kbd, samp {
+    font-family: consolas, 'courier new', monospace;
+    font-size: 1em;
+    color: #009cd5;
+}
+
 .code-line-wrap {
     margin: 30px 0;
     border-left: 3px solid #ddd;
