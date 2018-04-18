@@ -707,13 +707,13 @@ Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와
 <ul>
 <li>user – GC가 진행되는 동안 Garbage Collector에 의해 수행된 CPU 시간이다.</li>
 <li>sys – System Call과 같이 OS가 수행하거나 기다린 시간이다.</li>
-<li>real – 애플리케이션이 GC로 인해 멈춘 시간이다. 이 시간은 user와 sys 시간을 GC 수행하는 스레드 개수로 나눈 것에 근접한다. 여기서는 8개의 스레드가 GC를 수행했다는 것을 알 수 있다. GC의 모든 로직이 완전히 병렬적으로 수행되지는 않을 것이므로, user와 sys 시간을 스레드 개수로 나눈 값보다는 높다.</li>
+<li>real – 애플리케이션이 GC로 인해 멈춘 시간이다. 이 시간은 user와 sys 시간을 GC 수행하는 스레드 개수로 나눈 것에 근접한다. 이 케이스에 대해서는 8개의 스레드가 GC를 수행되었다. GC의 모든 로직이 완전히 병렬적으로 수행되지는 않을 것이므로, user와 sys 시간을 스레드 개수로 나눈 값보다는 높다.</li>
 </ul>
 </li>
 </ol>
 </div>
 
-이 단계에서 제일 시간이 많이 걸린 것은, 8개의 스레드에 병렬적으로 동작한 일들이다.
+이 단계에서 제일 시간이 많이 걸린 것은, 8개의 스레드에 의해 병렬적으로 동작한 일들이다.
 다음과 같이 로그 상에서 확인할 수 있다.
 
 <div class="code-line-wrap">
@@ -737,7 +737,7 @@ Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와
 <div class="code-line-wrap">
 <p class="code-line nowrap"><span class="node">[Other: 0.4 ms]<sup>1</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Choose CSet: 0.0 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Ref Proc: 0.2 ms]<sup>2</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Ref Enq: 0.0 ms]<sup>3</sup></span><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Redirty Cards: 0.1 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Humongous Register: 0.0 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<code>[Humongous Reclaim: 0.0 ms]</code><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="node">[Free CSet: 0.0 ms]<sup>4</sup></span></p>
 <ol class="code-line-components">
-<li class="description"><span class="node">[Other: 0.4 ms]</span> – GC를 위해 기타 작업을 하는데 있어서 걸린 시간으로 GC 스레드들이 병렬로 수행된다.</li>
+<li class="description"><span class="node">[Other: 0.4 ms]</span> – GC를 위해 기타 작업을 하는데 있어서 걸린 시간으로 GC 스레드들이 병렬로 수행한다.</li>
 <li class="description"><span class="node">[Ref Proc: 0.2 ms]</span> – non-strong reference들과 관련된 작업을 수행하면서 걸린 시간이다.</li>
 <li class="description"><span class="node">[Ref Enq: 0.0 ms]</span> – 남아있는 non-strong reference들을 ReferenceQueue에 큐잉하는데 걸린 시간이다.</li>
 <li class="description"><span class="node">[Free CSet: 0.0 ms]</span> – Collection Set에 있던, GC를 수행해서 비어버린 공간들을 반환하기 위해 걸린 시간이다. 이 공간들은 다음 객체 생성할 때 쓰일 것이다. </li>
