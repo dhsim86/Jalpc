@@ -747,33 +747,77 @@ Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와
 <br>
 ### Concurrent Marking
 
+G1 GC 알고리즘의 컨셉은 CMS GC와 많이 비슷하기 때문에, CMS 알고리즘을 잘 이해하고 있다면 이 알고리즘을 이해하는데도 별 어려움이 없을 것이다.
+비록 디테일한 구현은 다르겠지만, 애플리케이션 스레드와 동시에 동작하는 Concurrent Mark는 매우 비슷하다.
+
+G1 GC의 Concurrent Mark는 Snapshot-At-The-Beginning 접근법에 따라, 비록 애플리케이션 스레드의 동작에 따라 객체의 그래프가 변하더라도 해당 사이클 초반에 살아있는 모든 객체를 mark 를 시도한다. 그리고 이 정보는 힙 영역의 애플리케이션 객체 상태 정보를 유지할 수 있게 하고 이는 Collection Set를 만드는데 참조된다.
+
+이 단계는 head 영역의 사용량이 일정 이상이 되었을 때 시작된다. 디폴트는 힙 전체 영역의 45%이지만, **InitiatingHeapOccupancyPercent** 라는 JVM 옵션을 통해 변경할 수 있다. CMS GC랑 비슷하게 이 단계도 여러 서브 단계로 이루어져 있으며 어떤 단계는 애플리케이션과 동시에 동작하지만, 어떤 단계는 Stop-The-World 를 유발한다.
+
 ---
 
 **Phase 1: Initial Mark**
+
+이 단계에서는 GC Root로부터 바로 참조되는 객체를 mark 한다.
+CMS GC는 Stop-The-World를 일으키는 단계였지만, G1 GC는 Evacuation 단계 (Young GC)로부터 트리거되기 때문에 (piggy-backed) 그 오버헤드는 덜하다. 다음 로그와 같이 확인할 수 있다.
+
+```
+1.631: [GC pause (G1 Evacuation Pause) (young) (initial-mark), 0.0062656 secs]
+```
 
 ---
 
 **Phase 2: Root Region Scan**
 
+이 단계에서는 Root 영역에 속해 있는 살아있는 객체로부터 참조되는 모든 객체를 mark 한다.
+애플리케이션 스레드와 동시에 동작하며, 이 때문에 다음 Evacuation 단계 (Young GC)가 일어나기 전까지 반드시 완료해야 한다. (객체의 상태가 변화하고 있는 Young GC가 발생하면 많은 문제가 발생하기 때문이다.)
+
+```
+1.362: [GC concurrent-root-region-scan-start]
+1.364: [GC concurrent-root-region-scan-end, 0.0028513 secs]
+```
+
 ---
 
 **Phase 3: Concurrent Mark**
+
+CMS GC와 매우 유사하게, 특별한 비트맵을 이용하여 힙 영역의 모든 살아있는 객체를 mark 한다. 애플리케이션 스레드와 동시에 동작한다.
+
+Snapshop-At-The-Beginning 접근법에 따라, 살아있는 객체를 모두 mark를 하려고 하는데 도중에 애플리케이션 스레드에 의해 업데이트 되는
+객체 상태는 특별한 log buffer 를 통해 따로 쌓아둔다.
+
+```
+1.364: [GC concurrent-mark-start]
+1.645: [GC concurrent-mark-end, 0.2803470 secs]
+```
 
 ---
 
 **Phase 4: Remark**
 
+이 단계는 Stop-The-World를 일으키는 단계로, mark 하는 단계를 완료하는 단계이다. 애플리케이션 스레드를 잠시 멈추고 log buffer에 있던 정보를 참조하여 객체 상태 업데이트를 완료한다.
+
+또한 모든 공간 (Region)에 대해서 가지고 있는 살아있는 객체의 수를 나타내는 live stat를 계산한다.
+
+```
+1.645: [GC remark 1.645: [Finalize Marking, 0.0009461 secs] 1.646: [GC ref-proc, 0.0000417 secs] 1.646: [Unloading, 0.0011301 secs], 0.0074056 secs]
+[Times: user=0.01 sys=0.00, real=0.01 secs]
+```
+
 ---
 
 **Phase 5: Cleanup**
 
+마지막 단계는, heap 영역에 있는 모든 살아있는 객체 정보를 조사한다. 또한 살아있지 않는 객체만 가지고 있는 공간은 비워진다.
+
+해당 단계에서 비어 있는 영역을 회수하는 것과 살아있는 객체의 상태를 계산하는 것과 같은 일부 로직은 애플리케이션 스레드와 동시에 동작하지만, 어떤 로직은 Stop-The-World를 일으켜 애플리케이션 스레드의 방해없이 자기 자신의 작업을 완료한다.
+
+```
+1.652: [GC cleanup 1213M->1213M(1885M), 0.0030492 secs]
+[Times: user=0.01 sys=0.00, real=0.00 secs]
+```
+
 ---
-
-<br>
-### Evacuation Pause: Mixed
-
-<br>
-## 요약
 
 
 <style>
