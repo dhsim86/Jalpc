@@ -42,26 +42,23 @@ icon: icon-html
 <br>
 ### System Requirement
 
- * Spring Boot 1.5.2 버전을 기준으로, Java 7 / Spring Framework 4.3.7 이상을 요구한다. 단, 약간의 설정을 가지고 Java 6과 함께 사용할 수도 있다.
- > 비록 Java 6을 지원하기는 하지만, 가능하다면 최신 버전의 Java를 사용하는 것이 좋다.
-
+ * Spring Boot 2.0.3 버전을 기준으로, Java 8이나 9 / Spring Framework 5.0.7 이상을 요구한다.
  * Spring Boot는 어떠한 IDE나 Text Editor도 상관이 없으며, jar 파일을 classpath에 넣어두는 것만으로도 사용가능하다.
  > 하지만 gradle이나 maven과 같은 dependency management tool을 사용하는 것이 좋다.
- Spring Boot는 maven 3.2 / gradle 2.9 이상과 호환된다.
+ Spring Boot는 maven 3.2 / gradle 4 이상과 호환된다.
 
 <br>
 #### Servlet Container
 
- Spring Boot에 내장된 Servlet Container는 다음과 같이 지원한다.
+ Spring Boot에 내장된 Servlet Container는 Spring Boot 2.0.3 기준으로 다음과 같이 지원한다.
 
  | Name | Servlet Version | Java Version |
  | ---------- | :--------- | :----------: |
- | Tomcat 8 | 3.1 | Java 7+ |
- | Tomcat 7 | 3.0 | Java 6+ |
- | Jetty 9.3 | 3.1 | Java 8+ |
- | Jetty 9.2 | 3.1 | Java 7+ |
- | Jetty 8 | 3.0 | Java 6+ |
- | Undertow 1.3 | 3.1 | Java 7+ |
+ | Tomcat 8.5 | 3.1 | Java 7+ |
+ | Jetty 9.4 | 3.1 | Java 8+ |
+ | Undertow 1.4 | 3.1 | Java 7+ |
+
+또한 Spring Boot 애플리케이션을 서블릿 3.1 이상을 지원하는 컨테이너에 배포 가능하다.
 
 <br>
 ---

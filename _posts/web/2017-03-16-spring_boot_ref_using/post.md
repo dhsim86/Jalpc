@@ -31,29 +31,29 @@ icon: icon-html
 <parent>
   <groupId>org.springframework.boot</groupId>
   <artifactId>spring-boot-starter-parent</artifactId>
-  <version>1.5.2.RELEASE</version>
+  <version>2.0.3.RELEASE</version>
   <relativePath/> <!-- lookup parent from repository -->
 </parent>
 ~~~
 
  위와 같이  spring-boot-starter-parent 를 상속하는 경우 UTF-8 소스 인코딩이나 pom.xml 내에 <version> 태그를 생략할 수 있는 다음과 같은 특징들이 적용된다.
 
- * 기본 컴파일 레벨을 Java 1.6으로 지정
+ * 기본 컴파일 레벨을 Java 1.8로 지정
  * UTF-8 소스 인코딩
  * spring-boot-starter-dependencies 를 상속하여 <version> 태그를 생략하고 의존성을 관리
  * resource filtering
  * exec plugin, surefire, Git commit ID, shade
 
 <br>
-#### Changing Java Version
+#### Changing Dependencies Version
 
- Spring Boot는 default compile level로 Java 1.6 이지만, 다음과 같이 <java.version> property를 추가하는 것으로 사용하기를 원하는 Java version을 선택할 수 있다.
+만약 spring-boot-starter-parent 에서 사용하는 의존성 라이브러리들의 버전을 입맛에 바꾸고 싶다면 다음과 같이 수정할 수 있다.
 
- ~~~xml
- <properties>
-   <java.version>1.8</java.version>
- </properties>
- ~~~
+~~~xml
+<properties>
+	<spring-data-releasetrain.version>Fowler-SR2</spring-data-releasetrain.version>
+</properties>
+~~~
 
 <br>
 #### Package project as jar.
