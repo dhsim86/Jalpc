@@ -115,17 +115,27 @@ public class SpringBootTestApplicationTests {
 
 Spring Framework로 개발하다보면 **@ContextConfugration** annotation을 써서 ApplicationContext를 로드했을 것이다. 아니면  **@Configuration** annotation을 써서 configuration을 설정하도록 했을 것이다.
 
-* @TestConfiguration
-이 annotation을 사용한다면 @SpringBootApplication 이나 @SpringBootConfiguration이 붙은 클래스를 찾아 반영시킨다. 만약 테스트 진행시에만 ApplicationContext를 커스터마이징하고 싶다면, **@TestConfiguration** annotation을 사용할 수 있다.
+> **@ContextConfugration**: 
+@ContextConfugration(locations={"/app-config.xml", "/test-config.xml"}) 와 같이 XML 파일로부터 ApplicationContext를 로드 <br>
+@ContextConfugration(classes={AppConfig.class, TestConfig.class}) 와 같이 **@Configuration** 클래스로부터 ApplicationContext 로드
+
+* **@TestConfiguration**:
+이 annotation을 **테스트 클래스의 이너 클래스에 사용한다면** @SpringBootApplication 이나 @SpringBootConfiguration이 그 클래스를 찾아 반영시킨다. 만약 테스트 진행시에만 ApplicationContext를 커스터마이징하고 싶다면, **@TestConfiguration** annotation을 사용할 수 있다.
 <br>
 
-* @TestComponent, @TestConfiguration
-@SpringBootApplication이나 @ComponentScan annotation을 써서 개발을 진행할 때 테스트 시에만 사용할려고 정의해둔 여러 컴포넌트나 configuration 들도 실제 환경에서도 추가될 수가 있다. 이 것을 피하기 위해 Spring Boot에서는 **@TestComponent** 와 **@TestConfiguration** annotation을 제공한다. 이 것은 **src/test/java** 에 있는 클래스에 붙여 테스트가 아닌 환경에서는 Spring Boot의 auto configuration 진행시 추가되는 것을 피할 수 있다.
+* **@TestComponent, @TestConfiguration**: 
+@SpringBootApplication이나 @ComponentScan annotation을 써서 개발을 진행할 때 테스트 시에만 사용할려고 정의해둔 여러 컴포넌트나 configuration 들도 실제 환경에서 추가될 수가 있다. 이 것을 피하기 위해 Spring Boot에서는 **@TestComponent** 와 **@TestConfiguration** annotation을 제공한다. 이 것은 **src/test/java** 에 있는 클래스에 붙여 테스트가 아닌 환경에서는 Spring Boot의 auto configuration 진행시 추가되는 것을 피할 수 있다.
 
+> @TestConfiguration 클래스는 테스트 클래스의 이너 클래스에 정의하도록 되어 있다. 만약 이너 클래스가 아닌 별도의 클래스에 정의하면, 테스트 클래스에서 사용하기 위해서는 **@Import** annotation을 통해 별도로 추가시켜야 한다. 테스트 진행시 @SpringBootApplication에 의해 스캔되는 대상이 아니다.
 
-> **@ContextConfugration**
-@ContextConfugration(locations={"/app-config.xml", "/test-config.xml"}) 와 같이 XML 파일로부터 ApplicationContext를 로드
-@ContextConfugration(classes={AppConfig.class, TestConfig.class}) 와 같이 **@Configuration** 클래스로부터 ApplicationContext 로드
+> @TestComponent도 마찬가지로 실제 실행 환경에서, 테스트 용도로 사용할 빈을 자동으로 추가되는 것을 피하기 위해 @Component 대신에 쓰라고 만든 annotation으로, @SpringBootApllication에 의해 자동 스캔되는 대상이 아니다. 단, @CompoentScan을 사용시 exclude filter를 따로 추가해야 자동 스캔되는 것을 막을 수 있다.
+
+[@TestConfiguration](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestConfiguration.html)
+[@TestComponent](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestComponent.html)
+[Excluding Test Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html#boot-features-testing-spring-boot-applications-excluding-config)
+[Top Level @TestConfiguration classes should be picked up by SpringBootTest](https://github.com/spring-projects/spring-boot/issues/6769)
+[@TestComponent are not picked up during tests](https://github.com/spring-projects/spring-boot/issues/8421)
+
 
 <br>
 ## Mocking and spying beans
