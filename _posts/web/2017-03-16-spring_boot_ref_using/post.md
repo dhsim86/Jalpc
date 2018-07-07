@@ -101,11 +101,29 @@ icon: icon-html
    이 annotation은 하나만 사용해야 한다.
 
   > **@ComponentScan**:
-  Spring에게 패키지안에서 다른 컴포넌트, 설정, 서비스를 스캔하도록 한다. 이를 통해 사용자가 추가한 Controller / Service 클래스를 찾는 것이 가능해진다. @Component, @Service, @Repository, @Controller와 같은 컴포넌트들이 자동적으로 Spring 빈으로 추가된다.
+  Spring에게 패키지안에서 다른 컴포넌트, 설정, 서비스를 스캔하도록 한다. 이를 통해 사용자가 추가한 Controller / Service 클래스를 찾는 것이 가능해진다. @Component, @Service, @Repository, @Controller와 같은 **Stereotype** 컴포넌트들이 자동적으로 Spring 빈으로 추가된다.
   [@ComponentScan analysis][componentscan_analysis]
 
   > **@SpringBootApplication**:
   @Configuration, @EnableAutoConfiguration, @ComponentScan annotation들을 main application class에서 함께 사용하는 대신에, 이 annotation으로 사용할 수 있다.
+
+<br>
+## Configuration Classes
+
+Spring Boot는 Java 기반의 configuration을 추천한다. XML도 지원하긴 하지만, 메인 configuration은 자바 config로 하는 것을 추천한다.
+
+> XML 및 Java 기반, 둘다 사용할 경우, 한 쪽에서 다른 쪽의 설정 정보를 import 해야 한다.
+
+<br>
+## Importing Additional Configuration Classes
+
+꼭 모든 설정 정보를 **@Configuration 을 통해 한 클래스에 몰아넣을 필요는 없다.**
+**@Import** annotation을 통해 다른 설정 정보를 가진 클래스를 import 할 수 있다. 아니면 **@Component Scan** annotation을 활용하여 자동으로 추가시킬 수도 있다.
+
+<br>
+## Importing XML Configuration
+
+XML을 어쩔 수 없이 사용해야 하는 경우, **@Configuration** 클래스에서 해당 XML을 import하는 것을 권장한다. 이 때 사용하는 annotation은 **@ImportResource** 이다.
 
 <br>
 ## AutoConfiguration
