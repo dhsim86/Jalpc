@@ -145,7 +145,7 @@ public class Application{
 }
 ~~~
 
- 위 코드같이 작성하지 않아도, 자동 설정되는 클래스는 pom.xml에서 spring.autoconfigure.exclude에 property를 추가함으로써 조정할 수 있다.
+ 위 코드같이 작성하지 않아도, 자동 설정되는 클래스는 **spring.autoconfigure.exclude** property에 추가함으로써 조정할 수 있다.
 
 <br>
 ## Developer tools
