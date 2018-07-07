@@ -128,7 +128,7 @@ Spring Framework로 개발하다보면 **@ContextConfugration** annotation을 �
 
 > @TestConfiguration 클래스는 테스트 클래스의 이너 클래스에 정의하도록 되어 있다. 만약 이너 클래스가 아닌 별도의 클래스에 정의하면, 테스트 클래스에서 사용하기 위해서는 **@Import** annotation을 통해 별도로 추가시켜야 한다. 테스트 진행시 @SpringBootApplication에 의해 스캔되는 대상이 아니다.
 
-> @TestComponent도 마찬가지로 실제 실행 환경에서, 테스트 용도로 사용할 빈을 자동으로 추가되는 것을 피하기 위해 @Component 대신에 쓰라고 만든 annotation으로, @SpringBootApllication에 의해 자동 스캔되는 대상이 아니다. 단, @CompoentScan을 사용시 exclude filter를 따로 추가해야 자동 스캔되는 것을 막을 수 있다.
+> @TestComponent도 마찬가지로 실제 실행 환경에서, 테스트 용도로 사용할 빈을 자동으로 추가되는 것을 피하기 위해 @Component 대신에 쓰라고 만든 annotation으로, @SpringBootApllication에 의해 자동 스캔되는 대상이 아니다. 단, @ComponentScan을 사용시 exclude filter를 따로 추가해야 자동 스캔되는 것을 막을 수 있다.
 
 [@TestConfiguration](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestConfiguration.html)<br>
 [@TestComponent](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestComponent.html)<br>
