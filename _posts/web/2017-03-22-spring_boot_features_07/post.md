@@ -130,10 +130,10 @@ Spring Framework로 개발하다보면 **@ContextConfugration** annotation을 �
 
 > @TestComponent도 마찬가지로 실제 실행 환경에서, 테스트 용도로 사용할 빈을 자동으로 추가되는 것을 피하기 위해 @Component 대신에 쓰라고 만든 annotation으로, @SpringBootApllication에 의해 자동 스캔되는 대상이 아니다. 단, @CompoentScan을 사용시 exclude filter를 따로 추가해야 자동 스캔되는 것을 막을 수 있다.
 
-[@TestConfiguration](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestConfiguration.html)
-[@TestComponent](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestComponent.html)
-[Excluding Test Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html#boot-features-testing-spring-boot-applications-excluding-config)
-[Top Level @TestConfiguration classes should be picked up by SpringBootTest](https://github.com/spring-projects/spring-boot/issues/6769)
+[@TestConfiguration](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestConfiguration.html)<br>
+[@TestComponent](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/test/context/TestComponent.html)<br>
+[Excluding Test Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-testing.html#boot-features-testing-spring-boot-applications-excluding-config)<br>
+[Top Level @TestConfiguration classes should be picked up by SpringBootTest](https://github.com/spring-projects/spring-boot/issues/6769)<br>
 [@TestComponent are not picked up during tests](https://github.com/spring-projects/spring-boot/issues/8421)
 
 
