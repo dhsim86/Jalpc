@@ -91,20 +91,20 @@ icon: icon-html
 
  보통 @EnableAutoConfiguration annotation을 main application class에 사용하는데, 이것은 암묵적으로 다른 Package에 있는 빈을 찾기 위한 Base 로 정의하기 때문이다. main application class에는 @EnableAutoConfiguration이나 @ComponentScan, @SpringBootApplication annotation을 사용할 수 있다.
 
- > @Configuration
+ > **@Configuration**:
   현재의 클래스가 Spring의 설정 파일임을 애플리케이션 컨텍스트에 알려주는 역할
   만약 다른 클래스에도 추가할려면 @Configuration을 일일이 추가하는 것보다는 @Import annotation을 사용하도록 한다.
 
-  > @EnableAutoConfiguration
+  > **@EnableAutoConfiguration**:
    Spring Boot autoconfiguration은 추가된 jar dependency 기반으로 Spring application을 자동으로 설정하는 것을 시도한다. 예를 들어 HSQL DB가 class path에 있으면, DB 연결 빈을 정의하지 않아도 자동적으로 in-memory 데이터베이스에 접근할 것이다.
    자동 설정은 비 침입적으로, DataSource 빈을 추가한다면 디폴트로 자동 설정되는 것은 사라질 것이다.
    이 annotation은 하나만 사용해야 한다.
 
-  > @ComponentScan
+  > **@ComponentScan**:
   Spring에게 패키지안에서 다른 컴포넌트, 설정, 서비스를 스캔하도록 한다. 이를 통해 사용자가 추가한 Controller / Service 클래스를 찾는 것이 가능해진다. @Component, @Service, @Repository, @Controller와 같은 컴포넌트들이 자동적으로 Spring 빈으로 추가된다.
   [@ComponentScan analysis][componentscan_analysis]
 
-  > @SpringBootApplication
+  > **@SpringBootApplication**:
   @Configuration, @EnableAutoConfiguration, @ComponentScan annotation들을 main application class에서 함께 사용하는 대신에, 이 annotation으로 사용할 수 있다.
 
 <br>
