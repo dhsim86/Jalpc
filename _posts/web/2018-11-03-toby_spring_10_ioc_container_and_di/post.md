@@ -36,3 +36,23 @@ public interface ApplicationContext extends ListableBeanFactory, HierarchicalBea
 <br>
 ### IoC 컨테이너를 이용해 애플리케이션 만들기
 
+IoC 컨테이너를 만드는 간단한 방법은 다음과 같이 ApplicationContext 구현 클래스의 인스턴스를 만드는 것이다.
+
+```java
+StaticApplicationContext sc = new StaticApplicationContext();
+```
+
+이렇게 만들어지는 컨테이너가 본격적인 IoC 컨테이너로서 동작하려면 **POJO 클래스와 설정 메타정보**이다.
+
+---
+**POJO 클래스**
+
+애플리케이션의 핵심 로직을 담는 POJO 클래스를 준비해야 한다.
+**특정 기술과 스펙에서 독립적이고 다른 POJO 클래스들끼리 느슨한 결합을 갖도록 만들어야 한다.**
+
+다음과 같이 인터페이스를 두고 유연한 확장성을 가진 POJO 클래스를 만든다.
+
+<br/>
+
+![00.png](/static/assets/img/blog/web/2018-11-03-toby_spring_10_ioc_container_and_di/00.png)
+
