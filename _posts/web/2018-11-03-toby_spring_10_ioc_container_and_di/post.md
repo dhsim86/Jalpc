@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Toby's Spring Chap 10: IOC 컨테이너와 DI"
+title:  "Toby's Spring Chap 10: IOC 컨테이너와 DI part.1"
 date:   2018-11-03
-desc: "Toby's Spring Chap 10: IOC 컨테이너와 DI"
+desc: "Toby's Spring Chap 10: IOC 컨테이너와 DI part.1"
 keywords: "spring"
 categories: [Web]
 tags: [spring]
