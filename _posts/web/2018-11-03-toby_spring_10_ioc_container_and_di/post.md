@@ -118,3 +118,86 @@ IoC 컨테이너는 빈 설정 메타정보를 담은 BeanDefinition을 이용�
 DI 진행시 **BeanReference** 타입의 레퍼런스 오브젝트를 **addPropertyValue** 메소드의 파라미터로 넘겨주면 된다.
 
 [DI Test using BeanDefinition](https://github.com/dhsim86/tobys_spring_study/commit/a1077873ef932ad3c191af5ddfdb36c6fc3f25be)
+
+<br>
+### IoC 컨테이너의 종류와 사용 방법
+
+스프링에는 다양한 용도로 사용할 수 있는 여러 ApplicationContext 구현 클래스가 존재한다. 보통 직접 ApplicationContext 오브젝트를 생성하는 경우는 거의 없다.
+
+---
+**StaticApplicationContext**
+
+코드를 통해 빈 메타정보를 등록하기 위해 사용한다. 실전에서는 사용하면 안된다.
+
+---
+**GenericApplicationContext**
+
+가장 일반적인 ApplicationContext의 구현 클래스다. 실전에서 사용될 수 있는 모든 기능을 갖추고 있으며, 컨테이너의 주요 기능을 DI를 통해 확장할 수 있다.
+
+XML 파일과 같은 **외부 리소스에 있는 빈 설정 메타정보를 리더를 통해 읽어 메타정보로 변환하여 사용한다.**
+
+특정 포맷의 빈 설정 메타정보를 읽어 이를 애플리케이션 컨텍스트가 사용할 수 있는 BeanDefinition 정보로 변환하는 기능을 가진 오브젝트는 **BeanDefinitionReader** 인터페이스를 구현해서 만들고, 빈 설정정보 리더로 불린다.
+
+XML을 읽을 수 있는 리더는 **XmlBeanDefinitionReader** 이다.
+이 리더는 스프링의 리소스 로더를 통해 XML 내용을 읽어온다. 따라서 다양한 리소스 타입의 XML 문서를 읽을 수 있다.
+
+[GenericApplicationContext / XmlBeanDefinitionReader Test](https://github.com/dhsim86/tobys_spring_study/commit/dd0128b8de239c96c65e167378ad900c023b1a86)
+
+스프링 IoC 컨테이너가 사용할 수 있는 **BeanDefinition** 오브젝트로 변환만 할 수 있다면 설정 메타정보는 어떤 포맷으로 만들어져도 상관없다. 예를 들어 프로퍼티 파일을 통해 빈 설정 메타정보륾 가져오는 **PropertiesBeanDefinitionReader** 도 제공한다.
+
+빈 설정 리더를 만들기만 하면 어떤 형태로도 빈 설정 메타정보를 작성할 수 있다.
+
+GenericApplicationContext는 여러 개의 빈 설정 리더를 사용해서 여러 리소스로부터 설정 메타정보를 읽어들이게도 할 수 있다.
+
+스프링 테스트 컨텍스트 프레임워크를 활용하는 JUnit 테스트는 테스트내에서 사용할 수 있도록 애플리케이션 컨텍스트를 자동으로 만들어준다. 이 때도 사용되는 애플리케이션 컨텍스트는 GenericApplicationContext 이다.
+
+```java
+// 애플리케이션 컨텍스트 생성과 동시에 XML 파일을 읽어오고 초기화까지 수행한다.
+@RunWith(SpringJunit4ClassRunner.class)
+@ContextConfiguration(locations = "/text-applicationContext.xml")
+public class UserServiceTest {
+  @Autowired ApplicationContext applicationContext;
+}
+```
+
+---
+**GeneticXmlApplicationContext**
+
+GenericApplicationContext 및 XmlBeanDefinitionReader가 결합된 클래스이다.
+
+```java
+GenericApplicationContext ac = new GeneticXmlApplicationContext("/text-applicationContext.xml");
+Hello hello = ac.getBean("hello", Hello.class);
+```
+
+---
+**WebApplicationContext**
+
+스프링 애플리케이션에서 가장 많이 사용되는 애플리케이션 컨텍스트이다. 웹 환경에서 사용할 때 필요한 기능을 추가된 것이다. XML 설정파일을 사용하도록 만들어지는 클래스는 **XmlWebApplicationContext** 이다.
+
+스프링 IoC 컨테이너는 빈 설정 메타정보를 통해 오브젝트를 만들고 DI 작업을 수행한다. 그러나 그것만으로는 애플리케이션이 동작하지 않는다. **누군가가 특정 빈의 메소드를 호출해서 애플리케이션을 기동해야 한다.**
+
+```java
+ApplicationContext sc = ...
+Hello hello = ac.getBean("hello", Hello.class);
+hello.print(); // 메인 메소드의 역할을 하는 빈의 메소드를 한 번은 호출해야 애플리케이션이 동작한다.
+```
+
+IoC 컨테이너의 역할은 **빈 오브젝트 생성 및 DI 한 후, 최초로 애플리케이션을 기동할 빈 하나를 제공해주는 것까지이다.**
+
+그런데 웹 애플리케이션의 동작방식은 일반적인 애플리케이션과는 다르다. 웹 환경에서는 **서블릿 컨테이너가 HTTP 요청을 받아 해당 요청에 매핑된 서블릿을 실행해주는 방식으로 동작한다.** 서블릿이 일종의 main 메소드와 같은 역할을 하는 것이다.
+
+스프링에서는 main 메소드 역할을 하는 서블릿을 만들어두고, 애플리케이션 컨텍스트를 초기화한 다음, 요청이 서블릿으로 올 때마다 필요한 빈을 가져와 정해진 메소드를 실행해주는 방식으로 동작한다.
+
+<br/>
+
+![02.png](/static/assets/img/blog/web/2018-11-03-toby_spring_10_ioc_container_and_di/02.png)
+
+독립 애플리케이션과 다른 점은 main 메소드에서 했던 작업을 특정 서블릿이 대신하는 것이다.
+
+스프링에서 애플리케이션 컨텍스트를 생성하고 설정 메타정보를 초기화한 후, 클라이언트로부터 들어오는 요청마다 적절한 빈을 찾아 이를 실행해주는 기능을 가진 **DispatchServlet** 이름의 서블릿을 제공한다. 이 서블릿을 **web.xml**에 등록하는 것만으로 웹 환경에서 스프링 컨테이너가 만들어지고 애플리케이션을 실행할 수 있다.
+
+WebApplicationContext의 특징은 자신이 만들어지고 동작하는 환경인 웹 모듈에 대한 정보를 접근할 수 있다는 점이다. 웹 환경으로부터 정보를 가져오거나 자신을 웹 환경에 노출시킬 수 있다.
+
+<br>
+### IoC 컨테이너 계층 구조
