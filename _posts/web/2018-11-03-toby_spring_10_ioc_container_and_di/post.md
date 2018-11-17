@@ -237,7 +237,7 @@ WebApplicationContext의 특징은 자신이 만들어지고 동작하는 환경
 ---
 **웹 애플리케이션 컨텍스트 계층 구조**
 
-웹 애플리케이션 레벨에 등록되는 컨테이너는 **루트 웹 애플리케이션 컨텍스트**라고 불린다. 이 컨텍스트는 서블릿 레벨에서 등록되는 컨테이너들의 부모 컨테이너가 되며, 계층구조 내에서 루트 컨텍스트가 된다.
+웹 애플리케이션 레벨에 등록되는 컨테이너는 **루트 웹 애플리케이션 컨텍스트**라고 불린다. 이 컨텍스트는 **서블릿 레벨에서 등록되는 컨테이너들의 부모 컨테이너가 되며, 계층구조 내에서 루트 컨텍스트가 된다.**
 
 웹 애플리케이션에는 하나 이상의 프론트 컨트롤러 역할을 하는 서블릿이 등록될 수 있다. 이에 따라 각 독립적인 애플리케이션 컨텍스트가 생성되며, 공유될 만한 빈들은 루트 컨텍스트에 등록하면 된다.
 
@@ -255,11 +255,13 @@ WebApplicationContext의 특징은 자신이 만들어지고 동작하는 환경
 
 프론트 컨트롤러 역할을 하는 서블릿을 하나만 사용할 때도 위와 같이 계층 구조를 사용하는 이유는 **웹 기술에 의존적인 것과 그렇지 않은 부분을 분리하기 위해서이다.**
 
-스프링을 이용한다고 스프링이 제공하는 웹 기술만을 사용한다는 것은 아니다. 데이터 엑세스 계층이나 서비스 계층은 스프링 빈으로 만들지만, 프레젠테이션 계층은 스프링이 아닌 다른 기술을 사용할 수도 있다.
+스프링을 이용한다고 스프링이 제공하는 웹 기술만을 사용한다는 것은 아니다. 데이터 엑세스 계층이나 서비스 계층은 스프링 빈으로 만들지만, **프레젠테이션 계층은 스프링이 아닌 다른 기술을 사용할 수도 있다.**
 
-루트 컨텍스트에 해당하는 컨테이너에는 웹 기술에 의존적이지 않은 스프링 빈을 등록해두고, 웹 관련 빈들은 서블릿 안의 일반 애플리케이션 컨텍스트에 등록해둔다. 그리고 이렇게 성격이 다른 빈들을 분리된 컨테이너에 등록해두면 다른 웹 기술을 사용할 때는 루트 컨텍스트에 있는 빈을 사용하면 된다.
+루트 컨텍스트에 해당하는 컨테이너에는 웹 기술에 의존적이지 않은 스프링 빈을 등록해두고, **웹 관련 빈들은 서블릿 안의 일반 애플리케이션 컨텍스트에 등록해둔다.** 그리고 이렇게 성격이 다른 빈들을 분리된 컨테이너에 등록해두면 **다른 웹 기술을 사용할 때는 루트 컨텍스트에 있는 빈을 사용하면 된다.**
 
 다른 웹 기술을 사용할 경우에 대비하여, 스프링은 다른 웹 기술로 구현된 곳에서 루트 컨텍스트로 접근하여 빈을 사용할 수 있는 방법을 제공한다.
+
+스프링은 ServletContext를 통해 루트 애플리케이션 컨텍스트에 접근할 수 있게 해준다.
 
 ```java
 WebApplicationContextUtils.getWebApplicationContext(SevletContext sc);
@@ -286,3 +288,68 @@ ServletContext는 웹 애플리케이션마다 하나씩 만들어지는 것으�
    - 스프링 웹 기술을 사용하지 않는다면 서블릿 애플리케이션 컨텍스트를 사용하지 않게된다.
 3. 서블릿 컨텍스트 단일 구조
    - 스프링 웹 기술을 사용하면서 다른 웹 프레임워크에서 스프링 빈을 사용하지 않는다면 루트 애플리케이션 컨텍스트를 생략한다.
+
+---
+**루트 애플리케이션 컨텍스트 등록**
+
+웹 애플리케이션 레벨에서 만들어지는 루트 웹 애플리케이션 컨텍스트를 등록하는 가장 간단한 방법은 이벤트 리스너를 사용하는 것이다. 웹 애플리케이션의 시작과 종료시 발생하는 이벤트를 처리하는 리스너인 **ServletContextListener**를 사용한다. 이 이벤트 리스너를 통해 시작시 애플리케이션 컨텍스트 초기화시킬 수 있다.
+
+스프링은 이러한 기능을 가진 **ContextLoaderListener**를 제공한다.
+
+```xml
+<listener>
+  <listener-class>
+    org.springframework.web.context.ContextLoaderListener
+  </listener-class>
+</listener>
+```
+
+ContextLoaderListener는 웹 애플리케이션 시작시 자동으로 루트 애플리케이션 컨텍스트를 초기화해준다.
+
+이 ContextLoaderListener가 초기화하는 애플리케이션 컨텍스트 클래스 및 참조하는 설정파일의 위치는 다음과 같다.
+
+* Class: XmlWebApplicationContext
+* 설정파일 위치: /WEB-INF/applicationContext.xml
+
+위의 설정을 다음과 같이 변경할 수 있다.
+
+```xml
+<context-param>
+  <param-name>contextConfigLocation</param-name>
+  <param-value>
+    /WEB-INF/**/*Context.xml <!-- ANT 스타일로 여러 개의 파일 지정 가능 -->
+    /WEB-INF/text.xml <!-- 여러 개의 파일을 통해 로드하려면 여러 줄에 걸쳐스 등록한다. -->
+    classpath:applicationContext.xml <!-- 클래스패스로 지정할 수 있다.-->
+  </param-value>
+</context-param>
+```
+```xml
+<context-param>
+  <param-name>contextClass</param-name>
+  <param-value>
+    org.springframework.web.context.support.AnnotationConfigWebApplicationContext <!-- XmlWebApplicationContext 아닌 다른 애플리케이션 컨텍스트 클래스로 변경할 수 있다. -->
+  </param-value>
+</context-param>
+```
+
+> AnnotationConfigWebApplicationContext 를 사용할 경우 contextConfigLocation을 반드시 설정해주어야 한다. XML 파일의 위치가 아니라 설정 메타정보를 담는 클래스 또는 빈 스캐닝 패키지를 지정한다.
+
+---
+**서블릿 애플리케이션 컨텍스트 등록**
+
+스프링의 웹 기능을 지원하는 프론트 컨트롤러 서블릿은 **DispatcherServlet** 이다. 이름에서 알 수 있듯이 web.xml에 등록해서 사용하는 평범한 서블릿이다.
+
+DispatcherServlet은 서블릿이 초기화될 때, 자신만의 컨텍스트를 생성하고 초기화하며, 웹 애플리케이션 레벨에서 등록해둔 루트 애플리케이션 컨텍스트를 부모의 컨텍스트로 사용한다.
+
+```xml
+<servlet>
+  <servlet-name>spring</servlet-name>
+  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  <load-on-startup>1</load-on-startup>
+</servlet>
+```
+
+* servlet-name: DispatcherServlet에 의해 만들어지는 컨텍스트는 자신만의 네임스페이스를 가지게되며, 이 네임스페이스는 컨텍스트를 구분하는 키가 된다. 네임스페이스는 servlet-name으로 지정한 이름-servlet이 된다. 네임스페이스는 디폴트 XML 설정파일의 위치를 지정할 때 사용되며 위의 예에서는 **/WEB-INF/spring-servlet.xml** 이 된다.
+* load-on-startup: 서블릿 컨테이너가 등록된 서블릿을 언제 만들고 초기화할 지, 그리고 그 순서는 어떻게 되는지를 지정한다.
+
+마찬가지로 서블릿 컨텍스트도 디폴트 설정이 아닌 다른 설정을 사용하고 싶다면, contextConfigLocation과 contextClass를 통해 지정할 수 있다. 서블릿 설정이므로 \<context-param\> 대신 \<init-param\> 을 사용한다.
