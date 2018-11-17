@@ -251,3 +251,114 @@ AspectJ를 통해 트랜잭션을 적용할 때는, @Transactional 애노테이�
 <br>
 ### 트랜잭션 격리수준: isolation
 
+격리수준은 동시에 여러 트랜잭션이 진행될 때에 **트랜잭션의 작업 결과가 여타 트랜잭션에게 어떻게 노출할 것인지를 결정한다.**
+
+* DEFAULT: 데이터 엑세스 기술 또는 드라이버의 디폴트 설정을 따른다. 보통 기본 격리수준은 **READ_COMMITTED**이다.
+* READ_UNCOMMITTED: 가장 낮은 격리수준으로, 하나의 트랜잭션이 커밋되기 전에 그 변화가 다른 트랜잭션에게 그대로 노출된다. 성능이 가장 빠르다.
+* READ_COMMITTED: 가장 많이 사용되는 격리수준으로, 다른 트랜잭션이 커밋하지 않은 변화는 다른 트랜잭션이 읽을 수 없다. 단, 하나의 트랜잭션이 읽은 로우는 다른 트랜잭션에서 수정할 수 있다. 따라서 처음 트랜잭션이 같은 로우를 다시 읽을 경우 다른 내용이 나올 수 있다.
+* REPEATABLE_READ: 하나의 트랜잭션이 읽은 로우를 다른 트랜잭션이 수정하는 것을 막아준다. 하지만 새로운 로우를 추가하는 것은 막지 않는다. 따라서 SELECT를 통해 조건에 맞는 로우를 가져올 경우, 트랜잭션이 끝나기 전에 추가된 로우를 볼 수 있다.
+* SERIALIZABLE: 가장 강력한 격리수준으로, 트랜잭션을 순차적으로 진행시켜준다. 여러 트랜잭션이 같은 테이블의 정보를 엑세스하지 못하므로 가장 안전하지만 성능이 가장 떨어진다.
+
+<br>
+### 트랜잭션 제한시간: timeout
+
+트랜잭션에 시간 제한을 둔다. 값은 초 단위로, 디폴트는 트랜잭션 시스템의 제한시간을 따른다.
+
+<br>
+### 읽기전용 트랜잭션: readOnly
+
+트랜잭션을 읽기전용으로 설정한다. 성능을 최적화하기 위해 사용할 수도 있고, 특정 트랜잭션 작업 안에서 쓰기 작업이 일어나는 것을 의도적으로 방지하기 위해 사용한다. 일부 트랜잭션 매니저는 이 속성을 무시할 수도 있다. 이 트랜잭션이 시작된 후, 쓰기작업이 일어나면 예외가 발생한다.
+
+<br>
+### 트랜잭션 롤백 예외: rollbackFor, rollbackForClassName
+
+기본적으로 스프링은 체크 예외를 예외적인 상황에서 발생한 것보다는 리턴 값을 대신하는 비즈니스 의미를 담은 결과를 돌려주는 용도로 사용한다고 가정하므로, 런타임 예외만을 롤백 대상으로 삼는다.
+
+체크 예외 또한 롤백 대상으로 삼기 위해서 이 속성을 사용한다.
+
+<br>
+### 트랜잭션 커밋 예외: noRollbackFor, noRollbackForClassName
+
+rollbackFor과는 반대로 런타임 예외를 트랜잭션 커밋 대상으로 지정해준다.
+
+<br>
+## 데이터 엑세스 기술 트랜잭션의 통합
+
+스프링은 자바의 다양한 데이터 엑세스 기술을 위한 트랜잭션 매니저를 제공해준다. 보통 여러 개의 DB를 사용하지 않는 경우에는 트랜잭션 매니저는 하나만 사용한다.
+
+**DB가 하나인데 데이터 엑세스 기술을 여러 개 사용할 수도 있다. 이는 두 개 이상의 기술을 사용해서 만든 DAO를 하나의 트랜잭션 안에서 사용한다는 뜻이다.**
+
+스프링은 두 개 이상의 데이터 엑세스 기술로 만든 DAO를 하나의 트랜잭션으로 묶어서 사용하는 방법을 제공한다. 물론 DB 당 트랜잭션 매니저는 하나라는 것은 바뀌지 않는다. 하나의 트랜잭션 매니저가 여러 개의 데이터 엑세스 기술의 트랜잭션 기능을 지원하는 것이다.
+
+<br>
+### 트랜잭션 매니저별 조합 가능 기술
+
+<br>
+
+![02.png](/static/assets/img/blog/web/2018-11-17-toby_spring_11_transaction/02.png)
+
+* DataSourceTransactionManager: 동일한 DataSource를 사용하게 함으로써, JDBC와 MyBatis에서 같은 트랜잭션을 사용할 수 있다. DataSourceTransactionManager는 DataSource로부터 connection 정보를 가져와 같은 DataSource를 사용하는 JDBC와 MyBatis DAO에게 트랜잭션 동기화 기능을 제공한다. 
+
+<br>
+
+![03.png](/static/assets/img/blog/web/2018-11-17-toby_spring_11_transaction/03.png)
+
+* JPATransactionManager: JPA는 JPA API를 통해 트랜잭션이 처리된다. 스프링에서는 JPA의 EntityManagerFactory가 스프링의 빈으로 등록된 DataSource를 사용할 수 있으므로, 같은 DataSource를 공유하게 해주면 JPATransactionManager에 의해 세 가지 기술을 이용하는 DAO 작업을 하나의 트랜잭션으로 관리해줄 수 있다.
+
+<br>
+
+* JTATransactionManager: 모든 종류의 데이터 엑세스 기술의 DAO가 같은 트랜잭션안에서 동작하게 만들 수 있다.
+
+<br>
+### ORM과 비 ORM DAO를 함께 사용할 경우 주의 사항
+
+JPA나 하이버네이트와 같은 엔티티 기반의 ORM 기술과 JDBC, MyBatis와 같은 SQL 기반의 비 ORM 기술을 같이 사용할 경우 예상치 못한 오류를 만날 수 있다.
+
+```java
+public class MemberJPADao {
+  @PersistenceContext EntityManager entityManager;
+
+  public void add(Member m) {
+    entityManager.persist(m)
+  }
+}
+public class MemberJdbcDao extends JdbcDaoSupports {
+  SimpeJdbcInsert insert;
+  protected void initTemplateConfig() {
+    insert = new SimpleJdbcInsert(getDataSource()).withTableName("member");
+  }
+  public void addMember(Member m) {
+    insert.execute(new BeanPropertySqlParameterSource(m))
+  }
+  public long count() {
+    return getJdbcTemplate().queryForObject("select count(*) from member", Long.class).longValue()
+  }
+}
+
+...
+@Transactional
+public void test() {
+  jdbcDao.add(new Member())
+  jpaDao.add(new Member())
+  int count = jdbcDao.count() // Return -> 1
+}
+```
+
+위와 같이 코드를 수행할 때, 2가 되어야 할 값이 1이라고 나온다. 이는 ORM과 비 ORM 특성이 다르기 때문이다.
+
+JPA나 하이버네이트는 **새로 만든 오브젝트에 영속성을 부여해주면 DB에 바로 반영되는 것이 아니다.** 새로 등록된 오브젝트는 엔티티 매니저가 관리하는 영속성 컨텍스트나 세션에만 저장해둔다. 이를 1차 캐시라고도 부르기도 하는데 이는 DB에 작업하는 것을 최대한 지연시키기 위해서이다.
+
+DB에 동기화가 필요한 시점, 즉 트랜잭션이 종료되거나 등록된 엔티티가 반영되어야만 정상적인 결과가 나올 수 있는 쿼리가 실행되기 전까지는 실제 DB 작업은 지연시킨다.
+
+따라서 1번째 DB 작업인 **jpaDao.add(new Member())** 구문은 DB에 반영하지 않고 1차 캐시에만 저장했을 것이다.
+
+JDBC는 이런 것을 모르며, 따라서 현재 DB에 반영된 것만을 가져올 뿐이다.
+
+이를 해결하기 위해서는 JDBC를 사용하기 전에는 JPA나 하이버네이트의 1차 캐시 내용을 DB에 반영시켜야 한다. JDBC의 DAO가 호출될 때마다 AOP 등을 활용해 JPA나 하이버네이트의 캐시를 **flush** 하도록 하면 쉽게 해결할 수 있다.
+
+<br>
+## JTA를 이용한 글로벌 트랜잭션
+
+한 개 이상의 DB나 JMS의 작업을 하나의 트랜잭션 안에서 동작하게 하려면 글로벌 트랜잭션을 사용해야 한다.
+
+JTA를 위한 트랜잭션 매니저는 ObjectWeb의 JOTM이나 Atomikos의 TransactionalEssential이 대표적이다.
