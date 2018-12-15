@@ -74,7 +74,8 @@ MVC 아키텍처는 **프론트 컨트롤러** 패턴과 함께 사용된다.
 
 ![00.png](/static/assets/img/blog/web/2018-12-15-toby_spring_12_web/00.png)
 
-1. DispatcherServlet의 HTTP 요청 접수
+<br>
+#### **(1) DispatcherServlet의 HTTP 요청 접수**
 
   - 자바 서버의 서블릿 컨테이너는 HTTP 프로토콜을 통해 들어오는 요청이 스프링의 DispatcherServlet으로 할당된 것이면 HTTP 요청정보를 Dispatcher 서블릿으로 전달한다. 보통 web.xml은 다음과 같이 정의되어 있다.
 
@@ -87,6 +88,7 @@ MVC 아키텍처는 **프론트 컨트롤러** 패턴과 함께 사용된다.
 
   - 위의 설정은 /app으로 시작하는 모든 요청을 스프링의 프론트 컨트롤러인 DispatcherServlet으로 할당하는 것이다. DispatcherServlet은 공통으로 진행해야하는 작업이 있다면 먼저 수행한다.
 
-2. DispatcherServlet에서 컨트롤러로 HTTP 요청 위임
+<br>
+#### **(2)DispatcherServlet에서 컨트롤러로 HTTP 요청 위임**
    
  - DispatcherServlet은 URL이나 파라미터 정보, HTTP 메소드를 참고하여 어떤 컨트롤러로 작업을 위임할지 결정한다. 컨트롤러를 설정하는 것은 DispatcherServlet의 **핸들러 매핑 전략**을 이용한다. 사용자 요청 기준으로 어떤 핸들러에게 작업을 위임할지를 결정해주는 것을 핸들러 매핑 전략이라고 한다.
