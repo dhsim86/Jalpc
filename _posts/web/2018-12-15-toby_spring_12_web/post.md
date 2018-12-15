@@ -70,5 +70,7 @@ MVC 아키텍처는 **프론트 컨트롤러** 패턴과 함께 사용된다.
 
 스프링 서블릿 / MVC의 핵심은 **DispatcherServlet**이라는 프론트 컨트롤러이다. 이 DispatcherServlet은 MVC 아키텍처로 구성된 프레젠테이션 계층을 만들 수 있도록 설계되어 있다.
 
+<br>
 
+![00.png](/static/assets/img/blog/web/2018-12-15-toby_spring_12_web/00.png)
 
