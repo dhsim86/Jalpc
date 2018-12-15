@@ -132,3 +132,62 @@ MVC 아키텍처는 **프론트 컨트롤러** 패턴과 함께 사용된다.
  - 뷰 생성까지 모든 작업을 마친 후, DispatcherServlet은 등록된 후처리기가 있는지 확인 후 있다면 후처리기에서 후속 작업을 진행 후 뷰가 만들어준 HttpServletResponse에 담긴 결과를 서블릿 컨테이너로 돌려준다.
  - 서블릿 컨테이너는 HttpServletResponse에 담긴 정보를 HTTP 응답으로 만들어 사용자의 브라우저나 클라이언트로 전송하고 작업을 종료한다.
 
+<br>
+### DispacherServlet의 DI 가능한 전략
+
+DispatcherServlet은 DI로 확장 가능한 여러 전략들이 있다. 스프링 MVC는 자주 사용되는 전략을 디폴트로 설정해주고 있다. 따라서 필요한 전략만 확장해서 사용하고 나머지는 디폴트 전략을 사용해도 된다.
+
+다음 전략들은 DispatcherServlet의 동작 방식을 확장하는 확장 포인트라고 할 수 있다. 
+**DispatcherServlet은 서블릿 컨테이너가 생성하고 관리하는 오브젝트이지, 스프링 컨텍스트에서 관리하는 빈 오브젝트가 아니다.** 하지만 DispatcherServlet은 내부에 서블릿 웹 애플리케이션 컨텍스트를 가지고 있고 내부 컨텍스트로부터 전략이 담긴 빈 오브젝트를 찾아 사용한다.
+
+DispatcherServlet에 적용할 전략을 선택하고, 필요에 따라 확장하거나 다른 방식으로 사용하는 것이 스프링 MVC를 바로 사용하는 첫 걸음이다.
+
+<br>
+#### **HandlerMapping**
+
+URL과 요청 정보를 기준으로 **어떤 핸들러 오브젝트, 즉 컨트롤러를 사용할 것인지를 결정하는 로직을 담당한다.** **HandlerMapping** 인터페이스를 구현해서 만들 수도 있다. 
+
+DispatcherServlet은 하나 이상의 핸들러 매핑을 가질 수 있다. 디폴트는 **BeanNameUrlHandlerMapping**과 **DefaultAnnotationHandlerMapping** 두 가지가 설정되어 있다.
+
+<br>
+#### **HandlerAdapter**
+
+핸들러 매핑으로 선택한 컨트롤러 / 핸들러를 DispatcherServlet이 **호출할 때 사용하는 어댑터**이다.
+컨트롤러 타입에는 제한이 없으며, 호출 방식은 타입에 따라 다르기 때문에 컨트롤러를 결정한다고 해서 DispatcherServlet이 바로 호출할 수 없다. 따라서 컨트롤러 타입을 지원하는 HandlerAdapter가 필요하다.
+
+컨트롤러 타입에 적합한 어댑터를 가져다가 이를 통해 컨트롤러를 호출한다. 디폴트는 **HttpRequestHandlerAdapter**, **SimpleControllerHandlerAdapter**, **AnnotationMethodHandlerAdapter**이다.
+
+핸들러 매핑과 어댑터는 서로 연관이 있을 수도 있고 없을 수도 있다.
+다만 @RequestMapping과 @Controller 어노테이션을 통해 정의되는 컨트롤러의 경우, **DefaultAnnotationHandlerMapping**에 의해 핸들러가 결정되고, **AnnotationMethodHandlerAdapter**에 의해 호출이 일어난다.
+
+<br>
+#### HandlerExceptionResolver
+
+**예외가 발생했을 때, 이를 처리하는 로직을 가진다.**
+예외가 발생했을 때, 예외의 종류에 따라 에러 페이지를 표시한다던가 관리자에게 통보하는 작업은 개별 컨트롤러가 아닌 프론트 컨트롤러인 DispatcherServlet을 통해 처리되어야 한다.
+
+DispatcherServlet은 등록된 HandlerExceptionResolver 중에서 발생한 예외에 적합한 것을 찾아 예외처리를 위임한다.
+
+디폴트는 **AnnotationMethodHandlerExceptionResolver**, **ResponseStatusExceptionResolver**, **DefaultHandlerExceptionResolver** 세 가지가 등록되어 있다.
+
+<br>
+#### ViewResolver
+
+뷰 리졸버는 컨트롤러가 리턴한 **뷰 이름을 참고해서 적절한 뷰 오브젝트를 찾는 로직을 가진다.**
+스프링이 지원하는 뷰의 종류는 다양하므로, 뷰의 종류에 따라 적절한 뷰 리졸버를 추가로 설정하면 된다.
+
+<br>
+#### LocaleResolver
+
+**지역 정보를 결정해주는 전략이다.**
+디폴트인 **AcceptHeaderLocaleResolver**는 HTTP 헤더의 정보를 보고 지역정보를 설정한다. 헤더말고도 세션이나 URL 파라미터, 쿠키 정보를 고려하도록 다른 전략을 통해 결정하게 할 수 있다.
+
+<br>
+#### ThemeResolver
+
+테마를 가지고 이를 변경해서 사이트를 구성할 경우, 쓸 수 있는 테마 정보를 결정해주는 전략이다.
+
+<br>
+#### RequestToViewNameTranslator
+
+컨트롤러에서 뷰 이름이나 뷰 오브젝트를 지정해주지 않았을 경우, **URL과 같은 요청정보를 참고하여 자동으로 뷰 이름을 생성해주는 전략이다.** 디폴트는 **DefaultRequestToViewNameTranslator**이다.
