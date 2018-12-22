@@ -89,3 +89,47 @@ DefaultAnnotationHandlerMapping (스프링 3.1부터는 RequestMappingHandlerMap
 - Map, Model, ModelMap 파라미터: 컨트롤러에서 별도로 ModelAndView 오브젝트를 만들어 리턴하는 경우라도 빠짐없이 모델에 추가된다.
 - @ModelAttribute 메소드: 메소드 레벨에 붙일 경우, 모델 오브젝트를 생성하는 메소드를 지정하기 위해 사용한다. @RequestMapping과 같이 사용해서는 안되며, 다른 컨트롤러의 메소드가 호출될 때 자동으로 해당 메소드가 만든 오브젝트를 모델에 추가시킨다.
 - BindingResult
+
+<br>
+## 모델의 일생
+
+<br>
+### HTTP 요청으로부터 컨트롤러 메소드까지
+
+<br>
+
+![00.png](/static/assets/img/blog/web/2018-12-22-toby_spring_13_@mvc/00.png)
+
+- @ModelAttribute 메소드 파라미터
+  - 컨트롤러 메소드의 모델 파라미터와 @ModelAttribute로부터 모델 이름, 모델 타입 정보를 가져온다.
+- @SessionAttribute 세션 저장 대상 확인
+  - 모델 이름과 동일한 것이 있다면 HTTP 세션에 저장해둔 것이 있는지 확인한다. 만약 있다면 모델 오브젝트를 새로 만드는 대신, 세션에 저장된 것을 사용한다.
+- PropertyEditor / ConversionService
+  - WebBindingInitializer나 @InitBinder 메소드를 통해 등록된 변환 기능 오브젝트를 통해 모델의 프로퍼티에 맞도록 요청 파라미터를 변환한다.
+  - 커스텀 프로퍼티 에디터 > 컨버전 서비스 > 디폴트 프로퍼티 에디터 순으로 우선순위가 정해진다.
+  - 타입 변환 실패시 BindingResult 오브젝트에 필드 에러가 등록된다.
+- Validator
+  - WebBindingInitializer나 @InitBinder 메소드를 통해 등록된 Validator로 모델을 검증한다. 검증 결과는 BindingResult에 등록된다.
+- ModenAndView의 모델 맵
+  - 모델 오브젝트는 컨트롤러 메소드가 호출되기 전 임시 모델 맵에 저장된다.
+  - 컨트롤러가 처리를 하면서 추가로 등록된 모델 오브젝트와 함께 ModelAndView에 담겨 DispatcherServlet으로 전달된다.
+- 컨트롤러 메소드 및 BindingResult
+  - HTTP 요청을 담은 모델 오브젝트가 파라미터로 전달되면서 컨트롤러 메소드가 실행된다.
+  - BindingResult는 ModelAndView의 모델 맵에 자동 추가된다.
+
+
+<br>
+### 컨트롤러 메소드부터 뷰까지
+
+<br>
+
+![01.png](/static/assets/img/blog/web/2018-12-22-toby_spring_13_@mvc/01.png)
+
+- MessageCodeResolver
+  - 바인딩 또는 검증 결과로 등록된 에러 코드를 확장해서 메시지 코드 후보 목록을 만든다.
+- MessageSource / LocaleResolver
+  - LocaleResolver에 의해 결정된 지역 정보와 MessageCodeResolver가 생성한 메시지 코드 후보 키 목록을 이용해 MesssageSource가 뷰에 출력할 에러 메시지를 결정한다.
+- @SessionAttribute 세션 저장 대상 확인
+  - @SessionAttribute에 지정한 이름과 동일한 모델 오브젝트가 있다면 HTTP 세션에 저장된다.
+- 뷰
+  - 뷰 오브젝트로 모델 맵에 포함된 모델 오브젝트 및 에러 메시지가 전달된다.
