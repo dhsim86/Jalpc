@@ -34,7 +34,7 @@ DefaultAnnotationHandlerMapping (스프링 3.1부터는 RequestMappingHandlerMap
 @RequestMapping 정보는 상속되며, 서브 클래스에서 @RequestMapping을 재정의하면 상위에서 정의한 @RequestMapping은 무시된다.
 
 <br>
-### @Controller
+## 파라미터
 
 @Controller 애노테이션은 컴포넌트 스캔에 의해 빈 자동 인식을 할 수 있게하는 스테레오 타입의 애노테이션이지만, 이 말고도 **컨트롤러 역할을 담당하는 메소드 정의를 자유롭게 지정할 수 있게 해준다.**
 
@@ -64,9 +64,28 @@ DefaultAnnotationHandlerMapping (스프링 3.1부터는 RequestMappingHandlerMap
 - @Valid: 빈 검증기를 통해 모델 오브젝트를 검증하도록 지시하는 애노테이션이다. 보통 @ModelAttribute와 같이 사용한다.
 
 <br>
-### 리턴 타입의 종류
+## 리턴 타입의 종류
 
 @MVC 컨트롤러 메소드는 리턴 타입도 자유롭게 지정할 수 있다.
 컨트롤러가 DispatcherServlet에게 돌려줘야 하는 것은 모델과 뷰이다. 핸들러 어댑터를 통해 최종적으로 DispatcherServlet으로 리턴되는 것은 ModelAndView 타입이다. 물론 ModelAndView를 무시하고 HttpServletResponse에 직접 응답 값을 넣어줄 수도 있다.
 
+리턴 타입은 기타 정보와 결합하여 최종적으로 ModelAndView로 만들어진다.
 
+- ModelAndView / Map / Model / ModelMap : 컨트롤러가 리턴하는 정보를 담는다.
+- String: 뷰 이름으로 사용된다.
+- void: 뷰 이름은 RequestToViewNameResolver 전략에 의해 자동으로 결정된다.
+- 모델 오브젝트: 뷰 이름은 RequestToViewNameResolver를 통해 자동 생성하도록 하고, 모델 오브젝트가 하나 뿐이라면 Model이나 ModelAndView 대신 바로 모델 오브젝트를 리턴해도 된다. 스프링은 이를 모델에 자동으로 추가시켜 준다.
+- View
+- @ResponseBody: HttpMessageConverter에 HTTP 응답 바디로 전환된다.
+
+> Map 자체가 모델 오브젝트인 경우 바로 리턴해서는 안된다. 스프링이 모델 맵으로 인식하여 다시 각 엔트리를 다시 개별적인 모델로 추가시키기 때문이다.
+
+<br>
+### 자동 추가 모델 오브젝트와 자동생성 뷰 이름
+
+다음 네 가지는 메소드 리턴 타입과는 상관없이, 모델에 자동으로 추가된다.
+
+- @ModelAttribute 오브젝트: 해당 애노테이션이 붙거나, 단순 타입이 아니라 커맨드 오브젝트로 처리된 오브젝트는 자동으로 모델에 추가된다.
+- Map, Model, ModelMap 파라미터: 컨트롤러에서 별도로 ModelAndView 오브젝트를 만들어 리턴하는 경우라도 빠짐없이 모델에 추가된다.
+- @ModelAttribute 메소드: 메소드 레벨에 붙일 경우, 모델 오브젝트를 생성하는 메소드를 지정하기 위해 사용한다. @RequestMapping과 같이 사용해서는 안되며, 다른 컨트롤러의 메소드가 호출될 때 자동으로 해당 메소드가 만든 오브젝트를 모델에 추가시킨다.
+- BindingResult
