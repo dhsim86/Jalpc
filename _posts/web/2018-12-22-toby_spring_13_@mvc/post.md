@@ -19,7 +19,7 @@ icon: icon-html
 
 그러나 대상의 타입이나 코드에 영향을 받지 않는 **애노테이션을 활용함으로써 메소드 레벨까지 세분화해서 매핑 및 호출할 수 있게 되었다.**
 
-DefaultAnnotationHandlerMapping (스프링 3.2부터는 RequestMappingHandlerMapping)은 핸들러 매핑 정보로 **@RequestMapping** 애노테이션을 활용한다.
+DefaultAnnotationHandlerMapping (스프링 3.1부터는 RequestMappingHandlerMapping)은 핸들러 매핑 정보로 **@RequestMapping** 애노테이션을 활용한다.
 
 @RequestMapping은 클래스나 메소드 둘다 붙일 수 있으므로, 스프링은 **클래스에 정의된 @RequestMapping을 기준으로 삼아 메소드 레벨의 @RequestMapping 정보를 통해 더 세분화하여 요청 정보와 핸들러 간의 매핑을 적용한다.**
 

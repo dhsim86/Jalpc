@@ -184,7 +184,7 @@ public interface HandlerAdapter {
 핸들러 매핑과 어댑터는 서로 연관이 있을 수도 있고 없을 수도 있다.
 다만 @RequestMapping과 @Controller 어노테이션을 통해 정의되는 컨트롤러의 경우, **DefaultAnnotationHandlerMapping**에 의해 핸들러가 결정되고, **AnnotationMethodHandlerAdapter**에 의해 호출이 일어난다.
 
-> 스프링 3.2부터는 DefaultAnnotationHandlerMapping -> RequestMappingHandlerMapping / AnnotationMethodHandlerAdapter -> RequestMappingHandlerAdapter 를 사용한다.
+> 스프링 3.1부터는 DefaultAnnotationHandlerMapping -> RequestMappingHandlerMapping / AnnotationMethodHandlerAdapter -> RequestMappingHandlerAdapter 를 사용한다.
 
 - AnnotationMethodHandlerAdapter: 지원하는 컨트롤러의 타입이 정해져있지 않다. 클래스와 메소드에 붙은 몇 가지 애노테이션 정보와 메소드 이름, 파라미터, 리턴 타입에 대한 규칙을 종합적으로 분석해서 컨트롤러를 선별하고 호출 방식을 결정한다. 또한 URL 매핑 단위가 클래스가 아닌 메소드 단위이다. 스프링 3.1부터 deprecated 되었고, 대신에 **RequestMappingHandlerAdapter** 를 사용한다.
 
@@ -206,7 +206,8 @@ public interface HandlerExceptionResolver {
 
 DispatcherServlet은 등록된 HandlerExceptionResolver 중에서 발생한 예외에 적합한 것을 찾아 예외처리를 위임한다.
 
-디폴트는 **AnnotationMethodHandlerExceptionResolver**, **ResponseStatusExceptionResolver**, **DefaultHandlerExceptionResolver** 세 가지가 등록되어 있다.
+디폴트는 **AnnotationMethodHandlerExceptionResolver**, **ResponseStatusExceptionResolver**, **DefaultHandlerExceptionResolver** 세 가지가 등록되어 있다. 
+단 3.1부터는 AnnotationMethodHandlerExceptionResolver 대신, **ExceptionHandlerExceptionResolver를 사용한다.**
 
 <br>
 #### ViewResolver
