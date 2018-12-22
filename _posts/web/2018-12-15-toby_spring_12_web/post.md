@@ -223,6 +223,24 @@ public interface ViewResolver {
 뷰 리졸버는 컨트롤러가 리턴한 **뷰 이름을 참고해서 적절한 뷰 오브젝트를 찾는 로직을 가진다.**
 스프링이 지원하는 뷰의 종류는 다양하므로, 뷰의 종류에 따라 적절한 뷰 리졸버를 추가로 설정하면 된다.
 
+컨트롤러가 작업을 마친 후 뷰 정보를 **ModelAndView** 타입 오브젝트를 DispatcherServlet으로 돌려주는데, 뷰 이름을 넣어주거나 **View** 타입의 오브젝트를 돌려주는 방법이 있다. 뷰 이름을 넣어주는 경우, 위의 뷰 리졸버가 필요하다.
+
+```java
+public interface View {
+
+	@Nullable
+	default String getContentType() {
+		return null;
+	}
+
+	void render(@Nullable Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
+			throws Exception;
+
+}
+```
+
+View 인터페이스는 뷰 오브젝트가 생성하는 콘텐츠의 타입 정보 제공 및 모델을 전달받아 클라이언트에 돌려줄 결과물을 만들어주는 메소드들로 구성되어 있다.
+
 <br>
 #### LocaleResolver
 
@@ -286,3 +304,4 @@ public interface HandlerInterceptor {
 스프링 3.0부터는 핸들러 인터셉터를 URL 패턴을 이용해 모든 핸들러 매핑에 일괄 적용할 수 있게 하는 기능이 추가되었다.
   
 [Example for SimpleController interface, SimpleHandlerAdapter.](https://github.com/dhsim86/tobys_spring_study/commit/8eccfb8f4a07fa8754c8d316f98b81715ce2603d)
+
