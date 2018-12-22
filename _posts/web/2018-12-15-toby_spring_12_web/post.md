@@ -145,12 +145,36 @@ DispatcherServlet에 적용할 전략을 선택하고, 필요에 따라 확장�
 <br>
 #### **HandlerMapping**
 
+```java
+public interface HandlerMapping {
+
+	@Nullable
+	HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception;
+
+}
+```
+
 URL과 요청 정보를 기준으로 **어떤 핸들러 오브젝트, 즉 컨트롤러를 사용할 것인지를 결정하는 로직을 담당한다.** **HandlerMapping** 인터페이스를 구현해서 만들 수도 있다. 
 
 DispatcherServlet은 하나 이상의 핸들러 매핑을 가질 수 있다. 디폴트는 **BeanNameUrlHandlerMapping**과 **DefaultAnnotationHandlerMapping** 두 가지가 설정되어 있다.
 
+- DefaultAnnotationHandlerMapping: @RequestMapping이라는 애노테이션을 컨트롤러 클래스나 메소드에 직접 부여하고 이를 이용해 매핑하는 전략이다. 스프링 3.1부터 deprecated되고, 대신에 **RequestMappingHandlerMapping**이 추가되었다.
+
 <br>
 #### **HandlerAdapter**
+
+```java
+public interface HandlerAdapter {
+
+	boolean supports(Object handler);
+
+	@Nullable
+	ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception;
+
+	long getLastModified(HttpServletRequest request, Object handler);
+
+}
+```
 
 핸들러 매핑으로 선택한 컨트롤러 / 핸들러를 DispatcherServlet이 **호출할 때 사용하는 어댑터**이다.
 컨트롤러 타입에는 제한이 없으며, 호출 방식은 타입에 따라 다르기 때문에 컨트롤러를 결정한다고 해서 DispatcherServlet이 바로 호출할 수 없다. 따라서 컨트롤러 타입을 지원하는 HandlerAdapter가 필요하다.
@@ -160,8 +184,22 @@ DispatcherServlet은 하나 이상의 핸들러 매핑을 가질 수 있다. 디
 핸들러 매핑과 어댑터는 서로 연관이 있을 수도 있고 없을 수도 있다.
 다만 @RequestMapping과 @Controller 어노테이션을 통해 정의되는 컨트롤러의 경우, **DefaultAnnotationHandlerMapping**에 의해 핸들러가 결정되고, **AnnotationMethodHandlerAdapter**에 의해 호출이 일어난다.
 
+> 스프링 3.2부터는 DefaultAnnotationHandlerMapping -> RequestMappingHandlerMapping / AnnotationMethodHandlerAdapter -> RequestMappingHandlerAdapter 를 사용한다.
+
+- AnnotationMethodHandlerAdapter: 지원하는 컨트롤러의 타입이 정해져있지 않다. 클래스와 메소드에 붙은 몇 가지 애노테이션 정보와 메소드 이름, 파라미터, 리턴 타입에 대한 규칙을 종합적으로 분석해서 컨트롤러를 선별하고 호출 방식을 결정한다. 또한 URL 매핑 단위가 클래스가 아닌 메소드 단위이다. 스프링 3.1부터 deprecated 되었고, 대신에 **RequestMappingHandlerAdapter** 를 사용한다.
+
 <br>
 #### HandlerExceptionResolver
+
+```java
+public interface HandlerExceptionResolver {
+
+	@Nullable
+	ModelAndView resolveException(
+			HttpServletRequest request, HttpServletResponse response, @Nullable Object handler, Exception ex);
+
+}
+```
 
 **예외가 발생했을 때, 이를 처리하는 로직을 가진다.**
 예외가 발생했을 때, 예외의 종류에 따라 에러 페이지를 표시한다던가 관리자에게 통보하는 작업은 개별 컨트롤러가 아닌 프론트 컨트롤러인 DispatcherServlet을 통해 처리되어야 한다.
@@ -173,11 +211,30 @@ DispatcherServlet은 등록된 HandlerExceptionResolver 중에서 발생한 예�
 <br>
 #### ViewResolver
 
+```java
+public interface ViewResolver {
+
+	@Nullable
+	View resolveViewName(String viewName, Locale locale) throws Exception;
+
+}
+```
+
 뷰 리졸버는 컨트롤러가 리턴한 **뷰 이름을 참고해서 적절한 뷰 오브젝트를 찾는 로직을 가진다.**
 스프링이 지원하는 뷰의 종류는 다양하므로, 뷰의 종류에 따라 적절한 뷰 리졸버를 추가로 설정하면 된다.
 
 <br>
 #### LocaleResolver
+
+```java
+public interface LocaleResolver {
+
+	Locale resolveLocale(HttpServletRequest request);
+
+	void setLocale(HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable Locale locale);
+
+}
+```
 
 **지역 정보를 결정해주는 전략이다.**
 디폴트인 **AcceptHeaderLocaleResolver**는 HTTP 헤더의 정보를 보고 지역정보를 설정한다. 헤더말고도 세션이나 URL 파라미터, 쿠키 정보를 고려하도록 다른 전략을 통해 결정하게 할 수 있다.
@@ -196,3 +253,36 @@ DispatcherServlet은 등록된 HandlerExceptionResolver 중에서 발생한 예�
 
 DispatcherServlet을 프론트 컨트롤러로 사용하는 스프링 MVC의 가장 큰 특징은 매우 유연한 컨트롤러 호출 방식을 사용한다는 것이다. 컨트롤러 종류에 제약을 받지 않고, 적절한 어댑터만 제공해준다면 다양한 종류의 컨트롤러를 사용할 수 있다.
 
+<br>
+#### 핸들러 인터셉터
+
+핸들러 매핑의 역할은 URL과 요청정보로부터 컨트롤러 빈을 찾는 것 뿐만 아니라, 핸들러 인터셉터를 적용해주는 것도 있다. 핸들러 인터셉터는 DispatcherServlet이 **컨트롤러를 호출하기 전과 후에 요청과 응답을 참조하거나 가공할 수 있는 일종의 필터이다.**
+
+핸들러 매핑은 DispatcherServlet으로부터 매핑 작업을 요청받으면 그 결과로 **핸들러 실행 체인(HandlerExecutionChain)**을 돌려준다. 
+핸들러 실행 체인은 하나 이상의 핸들러 인터셉터를 걸쳐서 컨트롤러가 실행될 수 있도록 구성되어 있다. 핸들러 인터셉터가 등록되어 있다면 순서에 따라 인터셉터를 거친 후 컨트롤러가 호출된다.
+
+```java
+public interface HandlerInterceptor {
+
+	boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+
+		return true;
+	}
+
+	void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			@Nullable ModelAndView modelAndView) throws Exception {
+	}
+
+  void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+			@Nullable Exception ex) throws Exception {
+	}
+
+}
+```
+
+핸들러 인터셉터는 기본적으로 핸들러 매핑 단위로 등록한다. 다시 말하자면, 핸들러 매핑 빈의 interceptors 프로퍼티에 핸들러 인터셉터 빈을 레퍼런스로 넣어줘야 한다는 것이다.
+
+스프링 3.0부터는 핸들러 인터셉터를 URL 패턴을 이용해 모든 핸들러 매핑에 일괄 적용할 수 있게 하는 기능이 추가되었다.
+  
+[Example for SimpleController interface, SimpleHandlerAdapter.](https://github.com/dhsim86/tobys_spring_study/commit/8eccfb8f4a07fa8754c8d316f98b81715ce2603d)
