@@ -191,3 +191,8 @@ DispatcherServlet은 등록된 HandlerExceptionResolver 중에서 발생한 예�
 #### RequestToViewNameTranslator
 
 컨트롤러에서 뷰 이름이나 뷰 오브젝트를 지정해주지 않았을 경우, **URL과 같은 요청정보를 참고하여 자동으로 뷰 이름을 생성해주는 전략이다.** 디폴트는 **DefaultRequestToViewNameTranslator**이다.
+
+---
+
+DispatcherServlet을 프론트 컨트롤러로 사용하는 스프링 MVC의 가장 큰 특징은 매우 유연한 컨트롤러 호출 방식을 사용한다는 것이다. 컨트롤러 종류에 제약을 받지 않고, 적절한 어댑터만 제공해준다면 다양한 종류의 컨트롤러를 사용할 수 있다.
+
