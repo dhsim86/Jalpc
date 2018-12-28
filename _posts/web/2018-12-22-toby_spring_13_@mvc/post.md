@@ -82,6 +82,8 @@ public @interface RequestMapping {
 - Map, Model, ModelMap: 핸들러 어댑터는 모델의 정보를 추가하는데 사용하는 오브젝트를 미리 만들어 컨트롤러 메소드로 제공해줄 수 있다.
 - @ModelAttribute: 도메인 오브젝트의 프로퍼티에 요청 파라미터를 바인딩하여 한 번에 받을 수 있다. 스프링은 setter를 통해 프로퍼티에 값을 설정해준다. 
   - 컨트롤러가 리턴하는 모델 맵이 담기는 모델 오브젝트의 한 가지로, 해당 오브젝트를 다시 모델 맵에 추가시켜준다. 
+  - 파라미터를 바인딩하기 전, 빈 오브젝트를 생성하는데 이를 위해 디폴트 생성자가 반드시 필요하다.
+  - @SessionAttribute에 의해 세션에 저장된 모델 오브젝트가 있다면 새로 오브젝트를 생성하는 대신, 세션에 저장되어 있던 오브젝트를 사용한다.
   - 사용자 요청 값에 대한 추가적인 검증 작업이 추가된다. 핸들러 어댑터는 검증 결과를 컨트롤러에게 제공해준다.
   - @RequestParam과는 다르게 요청 값에 대한 타입 변환이 실패하였다고 해서 작업이 중지되지 않는다. 다만 BindingResult나 Error에 변환 결과가 같이 저장되어 컨트롤러로 전달된다. 
   - 변환 작업이나 검증에 실패했을 때, BindingResult나 Error 타입의 파라미터가 없다면 BindingException 예외가 발생한다.
@@ -118,6 +120,84 @@ public @interface RequestMapping {
 - Map, Model, ModelMap 파라미터: 컨트롤러에서 별도로 ModelAndView 오브젝트를 만들어 리턴하는 경우라도 빠짐없이 모델에 추가된다.
 - @ModelAttribute 메소드: 메소드 레벨에 붙일 경우, 모델 오브젝트를 생성하는 메소드를 지정하기 위해 사용한다. @RequestMapping과 같이 사용해서는 안되며, 다른 컨트롤러의 메소드가 호출될 때 자동으로 해당 메소드가 만든 오브젝트를 모델에 추가시킨다.
 - BindingResult
+
+<br>
+## 모델 바인딩과 검증
+
+컨트롤러 메소드에 @ModelAttribute가 지정된 파라미터가 있다면 다음 세 가지 작업이 자동으로 진행된다.
+
+1. **파라미터 타입의 오브젝트를 준비한다**. 이를 위해 디폴트 생성자가 필요하다. 만약 @SessionAttribute에 의해 세션에 저장된 모델 오브젝트가 있다면 새 오브젝트를 생성하는 대신에 이를 사용한다.
+2. **모델 오브젝트의 프로퍼티에 웹 파라미터를 바인딩한다.** 스프링에 준비되어 있는 디폴트 프로퍼티 에디터를 통해 타입에 맞게 자동으로 변환한다. 전환이 불가능하면 BindingResult 오브젝트에 바인딩 오류를 저장하여 컨트롤러에 넘겨주거나 BindingException 예외를 발생시킨다.
+3. **모델의 값을 검증한다.** 바인딩 단계에서 타입 검증은 끝났지만 이 외에 검증할 내용이 있다면 적절한 검증기(Validator)를 등록해서 모델의 내용를 검증할 수 있다.
+
+<br>
+### 바인딩
+
+스프링에서 바인딩이라고 할 때는 오브젝트의 프로퍼티에 값을 넣는 것을 의미한다.
+프로퍼티 바인딩은 프로퍼티의 타입에 맞게 주어진 값을 적절히 변환하고, 실제 프로퍼티의 Setter를 호출하여 값을 넣는 두 가지 작업이 필요하다.
+
+> @ModealAttribute로 지정된 모델 오브젝트의 프로퍼티 뿐만 아니라 @RequestParam이나 @PathVariable 같은 단일 파라미터에 대한 바인딩도 적용된다.
+
+---
+
+**PropertyEditor**
+
+기본적으로 제공하는 타입 변환 API로, 자바빈 표준에 정의된 인터페이스이다.
+바인딩 과정에서는 변환할 파라미터 또는 모델 프로퍼티의 타입에 맞는 프로퍼티 에디터가 자동으로 선정되어 사용된다.
+
+<br>
+
+![02.png](/static/assets/img/blog/web/2018-12-22-toby_spring_13_@mvc/02.png)
+
+HTTP Request에서 타입 변환시 **setAsText** 메소드를 통해 String 타입의 문자열을 넣고, **getValue** 메소드를 통해 변환된 오브젝트를 가져온다. 반대로 오브젝트를 다시 문자열로 바꿀 때는 **setValue** 메소드로 오브젝트를 넣고 **getAsText** 메소드로 변환된 문자열을 가져온다. 구현해야 될 메소드는 **setAsText**와 **getAsText**이다.
+
+프로퍼티 에디터를 만들 때는 PropertyEditor 인터페이스를 구현하는 것보다는 **PropertyEditorSupport** 클래스를 상속하여 필요한 메소드만 오버라이드하는 것이 좋다.
+
+> setXXX 메소드를 통해 한 번 저장하고, getXXX 메소드를 통해 가져오는 프로퍼티 에디터 방식은 값이 한 번은 프로퍼티 에디터에 저장된다는 것이다. 이 때문에 프로퍼티 에디터는 싱글톤으로 만들어 사용해서는 안된다. 만약 스프링에 의해 DI가 필요한 경우라면 프로토타입 스코프 빈으로 사용하거나 Converter를 사용한다.
+
+---
+
+**@InitBindter**
+
+@MVC에는 스프링 컨테이너에 정의된 디폴트 프로퍼티 에디터만 등록되어 있다.
+핸들러 어댑터는 @RequestParam이나 @ModelAttribute와 같은 파라미터 변수에 바인딩해주는 작업이 필요한 애노테이션을 만나면 먼저 **WebDataBinder**를 생성한다.
+
+WebDataBinder는 여러 가지 기능을 제공하는데, HTTP 요청으로부터 가져온 문자열을 파라미터 타입의 오브젝트로 변환하는 기능을 제공한다. 이 변환 작업 진행시 등록된 프로퍼티 에디터를 사용한다. 직접 만든 커스텀 프로퍼티 에디터를 적용하려면 **스프링이 제공하는 WebDataBindier 초기화 메소드를 통해 WebDataBinder에 프로퍼티 에디터를 등록해야 한다.**
+
+```java
+@InitBinder
+public void initBinder(WebDataBinder binder) {
+    binder.registerCustomEditor(CustomType.class, new CustomTypePropertyEditor())
+}
+```
+
+위와 같이 컨트롤러 클래스에 @InitBinder 애노테이션을 부여한 메소드를 등록시키면 메소드 파라미터를 바인딩하기 전에 자동으로 호출되는데, WebDataBinder에 커스텀 프로퍼티 에디터를 등록시켜 커스텀 프로퍼티 에디터를 통한 바인딩 작업이 일어나게 할 수 있다.
+
+> @InitBinder에 의해 등록된 커스텀 에디터는 같은 컨트롤러 메소드에서 HTTP 요청을 바인딩하는 모든 작업에 적용된다. 적용 대상은 @RequestParam, @CookieValue, @RequestHeader, @PathVariable, @ModelAttribue의 프로퍼티이다.
+
+> @ModelAttribute로 지정된 오브젝트의 필드에 바인딩 적용할 때 프로퍼티 이름을 지정하여 특정 이름을 가진 프로퍼티에만 적용하게 할 수도 있다.
+
+---
+
+**WebBindingInitializer**
+
+@InitBinder 메소드를 통해 등록한 커스텀 프로퍼티 에디터는 메소드가 있는 컨트롤러 클래스 안에서만 동작한다.
+모든 컨트롤러에 적용하고자 할 때는 **WebBindingInitializer**를 사용한다
+
+---
+
+**Converter**
+
+바인딩할 때마다 매번 새로운 오브젝트를 만들어야 한다는 단점을 가지는 PropertyEditor 대신에 **Converter를 사용하면 싱글톤 빈으로 등록하여 타입 변환을 진행할 수 있다.**
+
+```java
+public interface Converter<S, T> {
+    T convert(S source);
+}
+```
+
+위와 같이 메소드가 한 번만 호출되어 바로 변환된 값을 받을 수 있기 때문에 싱글톤 빈으로도 등록 가능하다.
+단 프로퍼티 에디터와는 다르게 단방향만 지원하므로, 양방향 변환하려면 Converter를 두 개 등록해야 한다.
 
 <br>
 ## 모델의 일생
