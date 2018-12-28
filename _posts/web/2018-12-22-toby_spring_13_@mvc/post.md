@@ -26,10 +26,38 @@ DefaultAnnotationHandlerMapping (스프링 3.1부터는 RequestMappingHandlerMap
 <br>
 ### @RequestMapping
 
+DefaultAnnotationHandlerMapping (RequestMappingHandlerMapping)의 핵심은 핸들러 매핑 정보로 **@RequestMapping** 애노테이션을 활용한다는 점이다.
+
+```java
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Mapping
+public @interface RequestMapping {
+	String name() default "";
+
+	@AliasFor("path")
+	String[] value() default {};
+	@AliasFor("value")
+	String[] path() default {};
+
+	RequestMethod[] method() default {};
+	String[] params() default {};
+	String[] headers() default {};
+
+	String[] consumes() default {};
+	String[] produces() default {};
+}
+```
+
+다음은 @RequestMapping 애노테이션에서 사용 가능한 엘리먼트의 종류로, 이를 기반으로 매핑을 진행한다.
+
 - value: String 배열로 하나 이상의 URL 패턴을 지정, ANT 패턴을 사용할 수도 있다.
 - method: HTTP 메소드를 지정
-- params: HTTP 요청 파라미터와 값을 추가적으로 매핑 정보로 활용한다.
+- params: HTTP의 GET 쿼리 파라미터와 값을 추가적으로 매핑 정보로 활용한다.
 - headers: HTTP 헤더 정보를 매핑 정보로 활용한다.
+
+> 여러 개의 @RequestMapping으로 정의한 것이 있고, 어떤 request 요청이 여러 매핑 조건에 대해 만족한다면 좀 더 많은 조건을 만족시키는 쪽으로 우선시되어 매핑된다.
 
 @RequestMapping 정보는 상속되며, 서브 클래스에서 @RequestMapping을 재정의하면 상위에서 정의한 @RequestMapping은 무시된다.
 
@@ -51,7 +79,7 @@ DefaultAnnotationHandlerMapping (스프링 3.1부터는 RequestMappingHandlerMap
   - 타입 변환 작업이 실패하면 예외가 발생한다.
 - @CookieValue: 쿠키 값을 받는다.
 - @RequestHeader: HTTP 헤더의 정보를 받는다.
-- Map, Model, ModelMap: 이 타입의 오브젝트를 통해 모델의 정보를 넣어줄 수 있다.
+- Map, Model, ModelMap: 핸들러 어댑터는 모델의 정보를 추가하는데 사용하는 오브젝트를 미리 만들어 컨트롤러 메소드로 제공해줄 수 있다.
 - @ModelAttribute: 도메인 오브젝트의 프로퍼티에 요청 파라미터를 바인딩하여 한 번에 받을 수 있다. 스프링은 setter를 통해 프로퍼티에 값을 설정해준다. 
   - 컨트롤러가 리턴하는 모델 맵이 담기는 모델 오브젝트의 한 가지로, 해당 오브젝트를 다시 모델 맵에 추가시켜준다. 
   - 사용자 요청 값에 대한 추가적인 검증 작업이 추가된다. 핸들러 어댑터는 검증 결과를 컨트롤러에게 제공해준다.
@@ -67,7 +95,8 @@ DefaultAnnotationHandlerMapping (스프링 3.1부터는 RequestMappingHandlerMap
 ## 리턴 타입의 종류
 
 @MVC 컨트롤러 메소드는 리턴 타입도 자유롭게 지정할 수 있다.
-컨트롤러가 DispatcherServlet에게 돌려줘야 하는 것은 모델과 뷰이다. 핸들러 어댑터를 통해 최종적으로 DispatcherServlet으로 리턴되는 것은 ModelAndView 타입이다. 물론 ModelAndView를 무시하고 HttpServletResponse에 직접 응답 값을 넣어줄 수도 있다.
+
+컨트롤러가 DispatcherServlet에게 돌려줘야 하는 것은 모델과 뷰이다. **핸들러 어댑터를 통해 최종적으로 DispatcherServlet으로 리턴되는 것은 ModelAndView 타입이다.** 물론 ModelAndView를 무시하고 HttpServletResponse에 직접 응답 값을 넣어줄 수도 있다.
 
 리턴 타입은 기타 정보와 결합하여 최종적으로 ModelAndView로 만들어진다.
 
@@ -75,8 +104,8 @@ DefaultAnnotationHandlerMapping (스프링 3.1부터는 RequestMappingHandlerMap
 - String: 뷰 이름으로 사용된다.
 - void: 뷰 이름은 RequestToViewNameResolver 전략에 의해 자동으로 결정된다.
 - 모델 오브젝트: 뷰 이름은 RequestToViewNameResolver를 통해 자동 생성하도록 하고, 모델 오브젝트가 하나 뿐이라면 Model이나 ModelAndView 대신 바로 모델 오브젝트를 리턴해도 된다. 스프링은 이를 모델에 자동으로 추가시켜 준다.
-- View
-- @ResponseBody: HttpMessageConverter에 HTTP 응답 바디로 전환된다.
+- View: 뷰 이름 대신에 뷰 오브젝트를 리턴할 수도 있다.
+- @ResponseBody: 적절한 HttpMessageConverter를 통해 변환되어 HTTP 응답 바디로 전환된다. (HttpServletResponse의 출력 스트림)
 
 > Map 자체가 모델 오브젝트인 경우 바로 리턴해서는 안된다. 스프링이 모델 맵으로 인식하여 다시 각 엔트리를 다시 개별적인 모델로 추가시키기 때문이다.
 

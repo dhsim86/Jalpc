@@ -179,6 +179,8 @@ public interface HandlerAdapter {
 핸들러 매핑으로 선택한 컨트롤러 / 핸들러를 DispatcherServlet이 **호출할 때 사용하는 어댑터**이다.
 컨트롤러 타입에는 제한이 없으며, 호출 방식은 타입에 따라 다르기 때문에 컨트롤러를 결정한다고 해서 DispatcherServlet이 바로 호출할 수 없다. 따라서 컨트롤러 타입을 지원하는 HandlerAdapter가 필요하다.
 
+> 핸들러 어댑터는 DispatcherServlet으로부터 HttpServletRequest와 HttpServletResponse를 받아 이를 컨트롤러가 사용하는 파라미터 타입으로 변환해서 제공한다. 그리고 받은 결과를 ModelAndView 타입의 오브젝트에 담아 DispatcherServlet으로 돌려준다.
+
 컨트롤러 타입에 적합한 어댑터를 가져다가 이를 통해 컨트롤러를 호출한다. 디폴트는 **HttpRequestHandlerAdapter**, **SimpleControllerHandlerAdapter**, **AnnotationMethodHandlerAdapter**이다.
 
 핸들러 매핑과 어댑터는 서로 연관이 있을 수도 있고 없을 수도 있다.
