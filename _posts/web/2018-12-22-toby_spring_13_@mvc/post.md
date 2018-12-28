@@ -56,6 +56,8 @@ public @interface RequestMapping {
 - method: HTTP 메소드를 지정
 - params: HTTP의 GET 쿼리 파라미터와 값을 추가적으로 매핑 정보로 활용한다.
 - headers: HTTP 헤더 정보를 매핑 정보로 활용한다.
+- consumes: HTTP 헤더의 Content-Type을 매핑 정보로 활용한다.
+- produces: HTTP 헤더의 Accepts를 매핑 정보로 활용한다.
 
 > 여러 개의 @RequestMapping으로 정의한 것이 있고, 어떤 request 요청이 여러 매핑 조건에 대해 만족한다면 좀 더 많은 조건을 만족시키는 쪽으로 우선시되어 매핑된다.
 

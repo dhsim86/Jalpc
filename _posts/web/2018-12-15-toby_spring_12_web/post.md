@@ -160,6 +160,8 @@ DispatcherServlet은 하나 이상의 핸들러 매핑을 가질 수 있다. 디
 
 - DefaultAnnotationHandlerMapping: @RequestMapping이라는 애노테이션을 컨트롤러 클래스나 메소드에 직접 부여하고 이를 이용해 매핑하는 전략이다. 스프링 3.1부터 deprecated되고, 대신에 **RequestMappingHandlerMapping**이 추가되었다.
 
+> RequestMappingHandlerMapping은 웹 요청을 핸들러 오브젝트가 아닌 핸들러 메소드(HandlerMethod)로 매핑한다.
+
 <br>
 #### **HandlerAdapter**
 
