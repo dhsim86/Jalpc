@@ -45,3 +45,41 @@ public static Boolean valueOf(boolean b) {
     - 반환 타입의 하위 타입이기만 하면, 매개변수에 따른 적절한 하위 클래스의 인스턴스를 반환할 수도 있다.
 
 5. 정적 팩터리 메소드를 작성하는 시점에는 반환할 객체의 클래스가 존재하지 않아도 된다.
+    - 대표적으로 JDBC의 getConnection 이다.
+
+<br>
+### 정적 팩터리 메서드 단점
+
+1. 상속을 하려면 public이나 protected 생성자가 필요한데, 정적 팩터리 메소드만 제공하면 하위 클래스 생성할 수 없다.
+2. 정적 팩터리 메서드는 찾기 어렵다.
+   - 생성자처럼 API 설명에 명확히 드러나지 않으니 사용자는 정적 팩터리 메서드 클래스를 인스턴스화할 방법을 알아내야 한다.
+
+- 정적 팩터리 메서드에 흔히 사용되는 명명 방식
+
+~~~java
+// 1. from: 매개변수를 받아 해당 타입의 인스턴르를 반환하는 형변환 메서드
+Date d = Date.from(instant);
+
+// 2. of: 여러 매개변수를 받아 적절한 타입의 인스턴스 반환
+Set<Rank> faceCards = EnumSet.of(JACK, QUEEN, KING);
+
+// 3. valueOf: from과 of의 더 자세한 버전
+BigInteger prime = BigInteger.valueOf(Integer.MAX_VALUE);
+
+// 4. instance, getInstance: 매개변수로 명시한 인스턴스 반환. 같은 인스턴스임을 보장하지는 않는다.
+StackWalker luke = StackWalker.getInstance(options);
+
+// 5. create, newInstance: instance나 getInstance와 같지만, 매번 새로운 인스턴스를 생성하는 것을 보장한다.
+Object newArray = Array.newInstance(classObject, arrayLen);
+
+// 6. getType: getInstannce와 같으나 다른 클래스에 팩터리 메서드를 정의할 때 사용. "Type"는 반환되는 객체 타입이다.
+FileStore fs = Files.getFileStore(path);
+
+// 7. newType: newInstance와 같으나 다른 클래스에 팩터리 메서드를 정의할 때 사용.
+BufferedReader br = Files.newBufferedReader(path);
+
+// 8. type: getType와 newType의 간결한 버전
+List<Complaint> litany = Collections.list(legacyLitany);
+~~~
+
+> 정적 팩터리 메서드와 public 생성자는 각자의 쓰임새가 있으므로, 상대적인 단점을 이해하고 사용하는 것이 좋다.
