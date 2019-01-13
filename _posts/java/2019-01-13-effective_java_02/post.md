@@ -319,3 +319,148 @@ Boolean.valueOf(String) // 불필요한 객체 생성을 피한다.
 불필요한 객체를 만들어내는 예로 오토박싱이 있다. 오토박싱은 프로그래머가 기본 타입과 박싱된 기본 타입을 섞어 쓸 때 자동으로 상호 변환해준다. 오토박싱을 위한 객체 생성 비용으로 인해 성능에 영향이 갈 수도 있다.
 따라서 되도록이면 박싱된 타입보다는 기본 타입을 사용하도록 한다.
 
+<br>
+## 7. 다 쓴 객체 참조를 해제하라.
+
+다음 코드 중 pop 메서드에서 메모리 누수가 발생한다.
+
+```java
+public class Stack {
+    private Object[] elements;
+    private int size = 0;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+
+    public Stack() {
+        elements = new Object[DEFAULT_INITIAL_CAPACITY];
+    }
+
+    public void push(Object e) {
+        ensureCapacity();
+        elements[size++] = e;
+    }
+
+    public Object pop() {
+        if (size == 0)
+            throw new EmptyStackException();
+        return elements[--size];    // 가비지 컬렉터 입장에서는 size 뒤에 있는 객체도 모두 유효한 객체이다.
+    }
+
+    private void ensureCapacity() {
+        if (elements.length == size)
+            elements = Arrays.copyOf(elements, 2 * size + 1);
+    }
+
+    public static void main(String[] args) {
+        Stack stack = new Stack();
+        for (String arg : args)
+            stack.push(arg);
+
+        while (true)
+            System.err.println(stack.pop());
+    }
+}
+```
+
+스택을 표현한 배열이 다 쓴 참조를 여전히 가지고 있기 때문이다. 참조를 가지고 있으므로, 가비지 컬렉터는 스택에서 꺼내진 겍체들을 회수하지 않는다.
+
+객체 참조 하나를 살려두면, 그 객체가 참조하는 모든 객체들까지도 모두 회수하지 못한다. 이를 위해 다음과 같이 null을 대입하여 참조를 해제한다.
+
+```java
+public Object pop() {
+    if (size == 0)
+        throw new EmptyStackException();
+    Object result = elements[--size];
+    elements[size] = null; // 다 쓴 참조 해제
+    return result;
+}
+```
+
+null 대입과 같은 객체 참조 해제는 항상 위의 경우와 같은 예외적인 상황에서만 사용하여 코드가 지저분해지지 않도록 한다. 자기 메모리를 직접 관리하는 경우라면 항상 메모리 누수에 주의해야 한다.
+
+<br>
+## 8. finalizer와 cleaner 사용을 피하라.
+
+자바는 두 가지 객체 소멸자를 제공한다.
+
+**finalizer는 예측할 수 없고, 상황에 따라 위험할 수 있어 일반적으로 불필요하다.
+cleaner는 finalizer 보다는 덜 위험하지만 여전히 예측할 수 없고, 느리고, 일반적으로는 불필요하다.**
+
+C++의 파괴자(destructor)와는 다른 개념이다. C++에서의 파괴자는 생성자의 대척점으로 특정 객체와 관련된 자원을 회수하는 보편적인 방법이다.
+
+자바에서는 접근할 수 없게 된 객체를 회수하는 역할을 가비지 컬렉터가 담당하며, 이 때 finalizer가 호출된다.
+이 **메서드를 언제 호출할지는 전적으로 가비지 컬렉터 알고리즘에 달려있다.** 따라서 즉시 수행된다는 보장이 없으므로 **finalizer와 cleaner로는 제때 실행해야 되는 작업을 수행해서는 안된다.**
+
+이렇게 가비지 컬렉터 마음대로 메서드 실행이 지연되므로 finalizer에서 구현되어 있는 자원 회수도 제멋대로 지연되어 OutOfMemoryError가 발생할 수도 있다.
+
+> finalizer 스레드는 다른 애플리케이션 스레드보다 우선순위가 낮다.
+
+자바 언어 명세는 finalizer나 cleaner의 수행 시점뿐만 아니라 수행 여부까지 보장하지 않는다. 따라서 그 메서드에서 구현된 종료 작업이 전혀 수행되지 않을 수도 있다.
+
+finalizer 동작 중에 발생한 예외는 무시되며, 그 순간 작업이 종료되어 뒤에 있는 작업이 되지 않는 위험도 있다. 보통의 경우에는 예외가 스레드를 중단시키고 스택 트레이스를 출력하겠지만, 같은 일이 finalizer 안에서 일어난다면 경고조차 출력하지 않는다.
+
+finalizer와 cleaner는 또한 가비지 컬렉터의 효율을 떨어뜨린다.
+
+finalizer 및 cleaner 대신에 **AutoCloseable** 을 구현해주고, 인스턴스 사용 후 close 메소드를 통해 정리 작업을 진행하는 것이 좋다. (예외가 발생하더라도 close를 호출할 수 있도록 try-with-resource를 사용해야 한다.)
+
+<br>
+## 9. try-finally 보다는 try-with-resources를 사용하라.
+
+자바 라이브러리에는 InputStream / OutputStream과 같이 close 메소드를 호출해 직접 닫아줘야 하는 자원이 많다.
+
+보통 다음과 같이 finally 블록에서 close 메소드를 호출하여 자원이 반납되도록 하였다.
+
+```java
+static void copy(String src, String dst) throws IOException {
+    InputStream in = new FileInputStream(src);
+    try {
+        OutputStream out = new FileOutputStream(dst);
+        try {
+            byte[] buf = new byte[BUFFER_SIZE];
+            int n;
+            while ((n = in.read(buf)) >= 0)
+                out.write(buf, 0, n);
+        } finally {
+            out.close();
+        }
+    } finally {
+        in.close();
+    }
+}
+```
+
+위의 코드와 같이 여러 자원을 사용할 때는 중첩되는 try-finally 블록을 사용해야 되서 코드가 지저분해질 수 있고, read 메서드에서 예외 발생했는데, close 메서드에서도 예외가 발생하면 두 번째 예외가 첫 번째 예외를 삼킨다. 따라서 사용자 입장에서는 디버깅이 매우 어렵게 될 수 있다.
+
+이러한 문제를 자바 7의 try-with-resource를 통해 해결할 수 있다.
+이 구조를 사용하려면 해당 자원이 **AutoCloseable** 인터페이스를 구현해야 한다.
+AutoCloeseable 인터페이스느 close 메소드 하나만 정의한 단순한 인터페이스이다.
+
+```java
+static void copy(String src, String dst) throws IOException {
+    try (InputStream   in = new FileInputStream(src);
+            OutputStream out = new FileOutputStream(dst)) {
+        byte[] buf = new byte[BUFFER_SIZE];
+        int n;
+        while ((n = in.read(buf)) >= 0)
+            out.write(buf, 0, n);
+    }
+}
+```
+
+try-with-resources 를 사용하면 코드가 간결해질 뿐만 아니라, read 및 close (보이지 않는) 메서드에서 둘다 예외가 발생시 read에 대한 예외가 삼켜지지 않고 기록된다. 
+close 메서드에 대한 예외는 숨겨지긴 하지만 스택 추적 내역에 suppressed라는 꼬리표를 통해 기록이 남게 된다. getSuppressed 메소드를 통해 프로그램 코드에서 숨겨진 예외를 가져올 수도 있다.
+
+다음과 같이 다수의 예외를 한 catch 문으로 처리할 수도 있다.
+
+```java
+static String firstLineOfFile(String path, String defaultVal) {
+    try (BufferedReader br = new BufferedReader(
+            new FileReader(path))) {
+        return br.readLine();
+    } catch (IOException e) {
+        return defaultVal;
+    }
+}
+```
+
+> try-with-resources를 사용하면 코드는 더 짧고 명확해지고, 만들어지는 예외 정보도 훨씬 유용해진다.
+
