@@ -432,7 +432,7 @@ static void copy(String src, String dst) throws IOException {
 
 이러한 문제를 자바 7의 try-with-resource를 통해 해결할 수 있다.
 이 구조를 사용하려면 해당 자원이 **AutoCloseable** 인터페이스를 구현해야 한다.
-AutoCloeseable 인터페이스느 close 메소드 하나만 정의한 단순한 인터페이스이다.
+AutoCloeseable 인터페이스는 close 메소드 하나만 정의한 단순한 인터페이스이다.
 
 ```java
 static void copy(String src, String dst) throws IOException {
