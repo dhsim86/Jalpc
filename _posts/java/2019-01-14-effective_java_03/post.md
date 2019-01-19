@@ -294,3 +294,108 @@ public int hashCode() {
 
 > 해시코드 계산의 성능을 높인다고 핵심 필드를 생략하는 일은 없어야 한다. 해시 품질이 나빠져 해시 테이블 사용시 성능을 심각하게 떨어뜨릴 수 있다.
 
+<br>
+## 12. toString을 항상 재정의하라.
+
+Object의 toString 메서드는 보통 **클래스이름@16진수로_표현한_해시코드**를 반환한다.
+
+toString 메서드는 원래 일반 규약에 따르면 **간결하고도 사람이 읽기 쉬운 형태의 정보**로 반환되어야 한다. 그리고 **모든 Object의 하위 클래스는 toString 메서드를 재정의하라고 규정되어 있다.**
+
+toString을 잘 구현한 클래스는 디버깅하기가 쉬워진다.
+println이나 printf, 문자열 연결 연산자 (+), assert 구문에 넘길 때 또는 디버거가 객체를 출력할 때 자동으로 toString을 호출한다.
+
+<br>
+## 13. clone 재정의는 주의해서 진행하라.
+
+Cloneable 인터페이스는 복제해도 되는 클래스임을 명시하는, 메서드는 하나도 없는 믹스인 인터페이스이다.
+
+원래대로라면 clone 메서드는 Object 클래스에 정의되어 있고 그마저도 protected로 되어 있어 Cloneable 인터페이스를 구현하는 것만으로는 외부에서 clone 메서드를 호출할 수 없다.
+
+그런데 이 **Cloneable 인터페이스는 Object의 protected 메서드인 clone 메서드의 동작 방식을 결정한다.**
+Cloneable을 구현한 클래스 인스턴스에서 clone을 호출하면 그 객체의 필드를 하나하나 복사한 객체를 반환하며, 그렇지 않은 클래스라면 CloneNotSupportedException 예외를 던진다. 이는 인터페이스를 이례적으로 사용한 예이다.
+
+> 인터페이스를 구현한다는 것은 일반적으로 해당 클래스가 그 인터페이스에서 정의한 기능을 제공한다는 것이다. 그런데 Cloneable의 경우에는 상위 클래스에 정의된 protected 메서드의 동작 방식을 변경한 것이다.
+
+실무에서는 Cloneable을 구현한 클래스는 **clone 메서드를 public으로 제공하며, 사용자는 당연히 복제가 제대로 이뤄지리라 기대한다.**
+
+이를 위해 Cloneable을 구현한 클래스 및 모든 상위 클래스는 복잡하지만 강제할 수는 없고, 허술하게 기술된 프로토콜을 지켜야 한다.
+
+다음은 clone 메서드의 일반 규약이다.
+
+* 객체의 복사본을 생성해 반환한다. 어떤 객체 x에 대해 다음 식은 참이다. 반드시 지킬 필요는 없다.
+  * x.clone() != x
+  * x.clone().getClass() == x.getClass()
+* 다음 식은 일반적으로 참이지만, 필수는 아니다.
+  * x.clone().equals(x)
+* 관례상, 이 메서드가 반환하는 객체는 super.clone을 호출해 얻어야 한다. 만약 이 클래스 및 상위 클래스가 이 관례를 따른다면 다음 식은 참이다.
+  * x.clone().getClass() == x.getClass()
+* 반환된 객체와 원본 객체는 서로 독립적이어야 한다.
+
+즉, Cloneable을 구현한 클래스와 상위 클래스의 clone 메서드는 super.clone을 통해 객체를 얻어야 한다.
+
+> 클래스 B가 A를 상속할 때, 하위 클래스 B의 clone은 B 타입 객체를 반환해야 한다. 그런데 A의 clone이 자신의 생성자를 통해 생성한 객체를 반환하면 B.clone도 A 타입 객체를 반환할 수 밖에 없다.
+
+> 다르게 말하면, super.clone을 연쇄적으로 호출하도록 하면 clone이 처음 호출된 하위 클래스의 객체가 생성된다.
+
+```java
+@Override
+public PhoneNumber clone() {
+    // Object.clone 메서드는 checked 예외를 던지도록 되어 있어 try-catch 블록으로 감싸야 한다.
+    // 이는 CloneNotSupportedException이 unchecked 예외였어야 한다는 것이다.
+    try {
+        return (PhoneNumber)super.clone(); //super.clone을 호출하는 것만으로 원본의 완벽한 복제본을 얻는다.
+    } catch(CloneNotSupportedException e) {
+        throw new AssertionError();
+    }
+}
+```
+
+> Object.clone은 Object 타입을 리턴하지만, 오버라이드한 PhoneNumber의 clone은 PhoneNumber 타입을 리턴한다. 이는 자바가 공변 반환 타이핑 (covariant return typing)을 지원하기 때문으로, 이렇게 구현하는 것이 권장된다.
+
+만약 클래스 내부에 가변 객체를 참조한다면 clone 메서드를 구현할 경우, 원본 객체 및 복사된 객체가 서로 독립적이도록 **깊은 복사**를 구현해야 한다. **원래 clone 메서드는 대입에 의해 복사되는 얕은 복사를 수행하기 때문이다.**
+
+```java
+public class Stack implements Cloneable {
+    private Object[] elements;
+    private int size = 0;
+    private static final int DEFAULT_INITIAL_CAPACITY = 16;
+
+    public Stack() {
+        this.elements = new Object[DEFAULT_INITIAL_CAPACITY];
+    }
+
+    public void push(Object e) {
+        ensureCapacity();
+        elements[size++] = e;
+    }
+    
+    public Object pop() {
+        if (size == 0)
+            throw new EmptyStackException();
+        Object result = elements[--size];
+        elements[size] = null; // 다 쓴 참조 해제
+        return result;
+    }
+
+    public boolean isEmpty() {
+        return size ==0;
+    }
+
+    @Override 
+    public Stack clone() {
+        try {
+            Stack result = (Stack) super.clone();
+            result.elements = elements.clone(); // 이렇게 참조 값으로 가지는 필드는 따로 복제를 수행해야 한다.
+            return result;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+
+    // 원소를 위한 공간을 적어도 하나 이상 확보한다.
+    private void ensureCapacity() {
+        if (elements.length == size)
+            elements = Arrays.copyOf(elements, 2 * size + 1);
+    }
+}
+```
