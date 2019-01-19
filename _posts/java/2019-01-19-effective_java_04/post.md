@@ -314,3 +314,145 @@ static List<Integer> intArrayAsList(int[] a) {
 <br>
 ## 21. 인터페이스는 구현하는 쪽을 생각해 설계하라.
 
+자바 8 이전에는 기존 구현체를 깨뜨리지 않고는 인터페이스에 메서드를 추가할 방법이 없었다.
+디폴트 메서드를 통해 기존 인터페이스에 메서드를 추가할 수 있도록 하였지만 위험이 사라진 것은 아니다.
+
+디폴트 메서드를 선언하면 그 인터페이스를 구현한 후 디폴트 메서드를 재정의하지 않은 모든 클래스에서 디폴트 구현이 쓰이게 된다. 디폴트 메서드는 기존 구현체에 런타임 오류를 일으킬 수도 있다.
+
+> 대표적으로 자바 8의 인터페이스에 추가된 removeIf 디폴트 메서드가 있는데, 이를 구현하는 아차피 커먼즈 라이브러리의 Collections.synchronizedCollection 정적 팩토리 메서드가 반환하는 클래스에서 removeIf를 재정의하지 않아 동기화해주지 못하는 경우가 있다.
+
+기존 인터페이스가 있고 이 인터페이스를 구현하는 여러 클래스가 존재할 때, 이 인터페이스에 디폴트 메서드로 새 메서드를 추가하는 일은 기존 구현체와 충돌할 수도 있으므로 심사숙고해서 결정해야 한다. 
+
+> 새로운 인터페이스를 만드는 경우라면 표준적인 메서드 구현을 제공하는 데 유용하다.
+
+<br>
+## 22. 인터페이스는 타입을 정의하는 용도로만 사용하라.
+
+**인터페이스는 자신을 구현한 클래스의 인스턴스를 참조할 수 있는 타입 역할을 한다.**
+즉, 클래스가 어떤 인터페이스를 구현한다는 것은 자신의 인스턴스로 무엇을 할 수 있는지 클라이언트에 알리는 것이다.
+
+인터페이스는 이 용도로만 사용해야 한다.
+
+다음과 같은 메서드가 없어 상수만 나열된 상수 인터페이스 안티패턴은 인터페이스를 잘못 사용한 예다.
+
+```java
+public interface PhysicalConstants {
+
+    static final double AVOGADROS_NUMBER   = 6.022_140_857e23;
+
+    static final double BOLTZMANN_CONSTANT = 1.380_648_52e-23;
+
+    static final double ELECTRON_MASS      = 9.109_383_56e-31;
+
+}
+```
+
+클래스 내부에서 사용하는 상수는 외부 인터페이스가 아니라 내부 구현에 해당한다. 
+따라서 이런 메서드가 하나도 없는 상수 인터페이스를 구현하는 것은 이 내부 구현을 클래스의 공개 API로 노출하는 행위이다. (클라이언트 코드가 상수 인터페이스의 상수들을 직접 사용할 수도 있다.)
+
+상수를 공개할 목적이라면 클래스나 메서드가 있는 인터페이스 (인터페이스 용도가 맞는) 자체에 추가하거나, 인스턴스화할 수 없는 유틸리티 클래스에 담아 공개하도록 한다.
+
+<br>
+## 23. 태그 달린 클래스보다는 클래스 계층 구조를 활용하라.
+
+두 가지 이상을 표현할 수 있으며, 그 중 현재 표현하려는 의미를 태그 값으로 알려주는 다음과 같은 클래스가 있다고 하자. 이 클래스는 원이나 사각형을 표현하는 클래스이다.
+
+```java
+class Figure {
+    enum Shape { RECTANGLE, CIRCLE };
+
+    // 태그 필드 - 현재 모양을 나타낸다.
+    final Shape shape;
+
+    // 다음 필드들은 모양이 사각형(RECTANGLE)일 때만 쓰인다.
+    double length;
+    double width;
+
+    // 다음 필드는 모양이 원(CIRCLE)일 때만 쓰인다.
+    double radius;
+
+    // 원용 생성자
+    Figure(double radius) {
+        shape = Shape.CIRCLE;
+        this.radius = radius;
+    }
+
+    // 사각형용 생성자
+    Figure(double length, double width) {
+        shape = Shape.RECTANGLE;
+        this.length = length;
+        this.width = width;
+    }
+
+    double area() {
+        switch(shape) {
+            case RECTANGLE:
+                return length * width;
+            case CIRCLE:
+                return Math.PI * (radius * radius);
+            default:
+                throw new AssertionError(shape);
+        }
+    }
+}
+```
+
+이 클래스는 단점이 가득하다. 열거 타입 선언이나 태그 필드, switch 문과 같이 쓸데없는 코드가 많다.
+특히 필드들을 final로 선언하려면 해당 의미에 쓰이지 않는 필드들까지 초기화해야 한다.
+
+또 새로운 의미가 추가된다면 siwtch 문을 찾아 코드를 추가해나가야 하며, 인스턴스 타입만으로는 현재 나타내는 의미를 정확히 알기 어렵다.
+
+따라서 이런 클래스는 계층 구조를 가지는 클래스로 바꾸어야 한다.
+추상 클래스를 정의하여 공통적인 의미가 담도록 하고, 상속받도록 한다.
+
+```java
+abstract class Figure {
+    abstract double area();
+}
+
+class Rectangle extends Figure {
+    final double length;
+    final double width;
+
+    Rectangle(double length, double width) {
+        this.length = length;
+        this.width  = width;
+    }
+    @Override
+    double area() { return length * width; }
+}
+
+
+class Circle extends Figure {
+    final double radius;
+
+    Circle(double radius) { this.radius = radius; }
+
+    @Override
+    double area() { return Math.PI * (radius * radius); }
+}
+
+```
+
+<br>
+## 24. 멤버 클래스는 되도록 static으로 만들라.
+
+중첩 클래스란 다른 클래스 안에 정의된 클래스를 말한다.
+**중첩 클래스는 자신을 감싼 바깥 클래스에서만 쓰여야 하며, 그 외의 쓰임새가 있다면 톱레벨 클래스로 만들어야 한다.**
+
+정적 멤버 클래스는 다른 클래스 안에 선언되고, 외부 클래스의 private 필드에 직접 접근할 수 있다는 점만 빼고는 일반 클래스와 같다. 정적 멤버 클래스는 다른 정적 멤버와 똑같은 접근 규칙을 적용받는다.
+
+흔히 바깥 클래스와 함께 쓰일 때만 유용한 도우미 클래스로 많이 쓰인다.
+
+정적 멤버 클래스와 비정적 멤버 클래스는 구문상의 차이는 static 뿐이지만 의미 상으로 차이가 크다.
+비정적 멤버 클래스의 인스턴스는 암묵적으로 외부 클래스 인스턴스와 연결된다.
+
+**중첩 클래스의 인스턴스가 외부 클래스 인스턴스와 독립적으로 존재할 수 있다면 정적 멤버 클래스로 만들어야 한다.** 비정적 멤버 클래스는 외부 클래스 인스턴스로의 숨은 외부 참조를 가지게 된다. 
+
+이 관계 정보는 비정적 멤버 클래스의 인스턴스 안에 만들어져 메모리 공간을 차지하며 생성 시간도 더 걸린다. 만약 비정적 멤버 클래스의 인스턴스를 누군가가 계속 참조하고 있다면, 더 이상 사용하지 않는 외부 클래스 인스턴스를 가비지 컬렉터가 수거하지 못할 수도 있다.
+
+<br>
+## 25. 톱레벨 클래스는 한 파일에 하나만 담으라.
+
+소스 파일 하나에 톱레벨 클래스를 여러 개 선언해도 자바 컴파일러는 불평하지 않는다.
+그러나 아무런 이득이 없고, 만약 똑같은 클래스가 여러 파일에 걸쳐 존재한다면, 자바 컴파일시 소스 파일을 어느 순서로 컴파일하냐에 따라 동작이 달라진다.
