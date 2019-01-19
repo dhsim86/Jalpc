@@ -399,3 +399,65 @@ public class Stack implements Cloneable {
     }
 }
 ```
+
+<br>
+## 14. Comparable을 구현할지 고려하라.
+
+compareTo는 Object의 메서드가 아니고, Comparable 인터페이스의 메서드이다. 순서를 비교할 수 있으며 이 메서드가 정의된 Comparable 인터페이스를 구현한다는 것은 **그 클래스의 인스턴스들에게는 순서가 있다는 것을 의미한다.**
+
+```java
+public interface Comparable<T> {
+    int compareTo(T t);
+}
+```
+
+Comparable 인터페이스를 통해 compareTo 메서드를 구현하면 자연스럽게 정렬을 수행할 수 있다.
+
+```java
+Arrays.sort(a);
+```
+
+순서가 명확한 값 클래스를 작성한다면 Comparable 인터페이스를 구현하는 것이 좋다.
+
+compareTo 메서드의 일반 규약은 equals와 비슷하다.
+
+* 객체와 주어진 객체의 순서를 비교한다. 이 객체가 주어진 객체보다 작으면 음수를, 같으면 0을, 크다면 양수를 리턴한다.
+  * 비교할 수 없는 타입일 경우 ClassCastException 예외를 던진다.
+* 다음에서 **sgn** 표기는 부호 함수를 뜻하며 표현식의 값이 음수, 0, 양수일 때 -1, 0, 1을 반환하도록 정의했다.
+  * x, y에 대해 sgn(x.compareTo(y)) ==  -sgn(y.compareTo(x))
+    * y.compareTo(x)가 예외를 던지는 경우에 한해, x.compareTo(y)에서 예외를 던져야 한다.
+  * 추이성을 보장해야 한다.
+    * x.compareTo(y) > 0 && y.compareTo(z) > 0 이면, x.compareTo(z) > 0 이다.
+  * x.compare(y) == 0 일 때, sgn(x.compareTo(z)) == sgn(y.compareTo(z)) 이다.
+  * 필수는 아니지만, 동치성 테스트 결과가 equals와 같아야 한다.
+    * x.compareTo(y) == 0 이면 x.equals(y) 여야 한다.
+
+**compareTo 메서드로 수행하는 동치성 검사도 equals 와 마찬가지로 반사성, 대치성, 추이성을 충족해야 한다.** 단, equals 메서드와는 다르게, compareTo는 타입이 다른 객체를 신경쓰지 않아도 된다. ClassCaseException 예외만 던져도 충분하다.
+
+**compareTo 규약을 지키지 않는다면 비교를 활용하는 클래스와 어울리지 못한다.** 비교를 활용하는 TreeSet과 TreeMap, 검색과 정렬을 사용하는 Collections와 Arrays가 있다.
+
+객체 참조 필드를 비교할 때는 compareTo 메서드를 재귀적으로 호출하도록 한다. 만약 해당 필드의 클래스가 Comparable 인터페이스를 구현하지 않았거나, 표준이 아닌 순서로 비교해야 한다면 **Comparator**를 사용하도록 한다.
+
+```java
+public int compareTo(CaseInsensitiveString cis) {
+    return String.CASE_INSENSITIVE_ORDER.compare(s, cis.s);
+}
+```
+
+CompareTo 메서드 구현할 때, **기본 타입 필드의 경우에는 박싱된 기본 타입 클래스의 정적 메서드인 compare를 사용하도록 한다.** 관계 연산자를 사용하는 방식은 거추장스럽고 오류를 유발시킬 수 있다.
+
+equals 메서드와 마찬가지로 가장 핵심적인 필드부터 비교해나가면서 중간에 결과가 0이 아니라면 바로 리턴하는 것이 성능 상의 이득이 된다.
+
+자바 8부터는 Comparator 인터페이스를 통해 메서드 연쇄 방식으로 비교자를 생성하여 비교할 수도 있다.
+
+```java
+// PhoneNumber 클래스 객체를 비교할 수 있는 Comparator 반환
+private static final Comparator<PhoneNumber> COMPARATOR =
+        comparingInt((PhoneNumber pn) -> pn.areaCode)
+                .thenComparingInt(pn -> pn.prefix)
+                .thenComparingInt(pn -> pn.lineNum);
+
+public int compareTo(PhoneNumber pn) {
+    return COMPARATOR.compare(this, pn);
+}
+```
