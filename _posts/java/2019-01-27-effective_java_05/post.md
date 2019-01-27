@@ -223,7 +223,7 @@ public class Super {
     ...
 }
 
-public Sub extends Super {
+public class Sub extends Super {
     ...
 }
 
