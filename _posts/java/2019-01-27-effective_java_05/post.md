@@ -479,3 +479,115 @@ private static<E> void swapHelper(List<E> list, int i, int j) {
 
 > 위의 예에서 도우미 메서드는 public API로 사용하기에 부적절한 첫 번째 swap 메서드와 시그니처가 같다.
 
+<br>
+## 32. 제네릭과 가변인수를 함께 쓸 때는 신중하라.
+
+가변인수 메서드와 제네릭은 서로 어울리지 않다.
+
+**실체화 불가 타입인 제네릭이나 매개변수화 타입은 런타임에는 컴파일타임보다 타입 관련 정보를 적게 담고 있다.**
+
+먼저 메서드를 선언할 때 실체화 불가 타입으로 가변 매개변수를 선언하면 컴파일러가 경고를 보낸다. 제네릭이나 매개변수화 타입을 담고 있는 배열이 생성되기 때문이다. 가변인수 메서드를 호출할 때도 넘겨지는 변수가 실체화 불가 타입으로 추론되면 경고를 보낸다.
+
+그렇다면 왜 다음과 같이 직접 제네릭 배열을 생성하는 것은 금지하면서도, 가변인수를 제네릭으로 선언하는 것은 허용하는 것일까?
+
+```java
+List<String>[] stringLists = new ArrayList<String>[1]; // 컴파일 오류
+
+// 문제 없음
+public <T> void genericVargsMethod(T... List) {
+    ...
+}
+```
+
+그 이유는 제네릭이나 매개변수화 타입의 가변 매개변수를 받는 메서드가 실무에서 매우 유용하기 때문이다. 사실 자바 라이브러리도 이런 메서드를 여럿 제공하고 있다.
+
+* Arrays.asList(T... a)
+* Collections.addAll(Collection\<? super T\> c, T... elements)
+
+그러나 이렇게 제네릭으로 가변 매개변수를 선언할 때 컴파일 경고가 발생하므로, 자바 7 전에는 이 경고를 없애기 위해 @SuppressWarning 애너테이션을 통해 제거해야만 했다.
+
+자바 7에서는 **@SafeVarargs** 애너테이션이 추가되어 제네릭 가변인수 메서드 작성자가 클라이언트 측에서 발생하는 경고를 숨길 수 있게 되었다.
+
+**@SafeVarargs 애너테이션은 메서드 작성자가 그 메서드가 타입 안전함을 보장하는 장치이다.** 따라서 메서드가 안전한게 확실하지 않다면 애너테이션을 달아서는 안된다.
+
+가변인수 메서드를 호출할 때 그 메서드가 타입 안전한지는 메서드가 안에서 가변인수 배열에 대해 건드리지 않고 그 배열의 참조를 밖으로 노출하지 않는다면 타입 안전하다고 할 수 있다.
+
+즉, 가변 매개변수 배열이 호출자로부터 그 메서드로 **순수하게 인수들을 전달하는 역할만 한다면 그 메서드는 타입 안전하다.**
+
+만약 다음과 같이 가변 매개변수를 받는 메서드가 외부로 가변 매개변수 배열 참조를 외부로 노출하면 타입 안전성이 깨지게 된다.
+
+```java
+// 컴파일 타임에 반환되는 배열의 타입이 결정
+// 컴파일 시점에 컴파일러로 충분한 정보가 주어지지 않아 타입을 잘못 판단할 수 있다.
+// 따라서 그대로 반환시 힙 오염이 이 메서드를 호출한 쪽의 콜 스택까지 전이할 수 있다.
+static <T> T[] toArray(T... args) {
+    return args;
+}
+
+// 이 메서드를 본 컴파일러는 toArray 메서드에 넘길 가변 매개변수를 담을 배열을 만드는 코드를 생성한다.
+// 이 때, 이 배열의 타입은 Object[] 인데, pickTwo에 어떤 타입의 객체를 넘기더라도
+// 담을 수 있는 가장 구체적인 타입이기 떄문이다.
+static <T> T[] pickTwo(T a, T b, T c) {
+    switch(ThreadLocalRandom.current().nextInt(3)) {
+        case 0: return toArray(a, b);
+        case 1: return toArray(a, c);
+        case 2: return toArray(b, c);
+    }
+    throw new AssertionError();
+}
+
+// ClassCastException 예외 발생
+// pickTwo는 Object[] 타입의 배열을 리턴하게 된다.
+// 컴파일러는 pickTwo의 반환 값을 attributes에 저장하기 위해
+// String[] 으로 변환하는 코드를 컴파일러가 자동 생성한다.
+// Object[]는 String[]의 하위 타입이 아니므로 이 형변환은 실패한다.
+String[] attributes = pickTwo("Test1", "Test2", "Test3");
+```
+
+위의 예는 **제네릭 가변 매개변수 배열에 다른 메서드가 접근하도록 허용하면 안전하지 않다**라는 예시이다. 단, 이에 대한 예외는 두 가지가 있다.
+
+첫 번째로는 @SafeVarargs 애너테이션이 달린, 또 다른 가변 매개변수를 받는 메서드에 넘기는 것은 안전하다. (@SafeVarargs 애너테이션을 사용한다는 것은 타입 안전하다는 것을 보장한다는 의미이다.)
+
+두 번째는 그저 이 배열의 일부를 일반 메서드에 넘기는 것도 안전하다.
+
+다음이 제네릭 가변 매개변수를 안전하게 사용하는 예이다.
+
+```java
+@SafeVarargs
+static <T> List<T> flatten(List<? extends T>... lists) {
+    List<T> results = new ArrayList<>();
+    for (List<? extends T> list: lists) {
+        result.addAll(list);
+    }
+    return result;
+}
+```
+
+@SafeVarargs 애너테이션을 사용해야 할 때 정하는 규칙은 간단하다. **제네릭이나 매개변수화 타입의 가변 매개변수를 받는 모든 메서드에는 @SafeVarargs 애너테이션을 단다.** 그래야 사용자를 헷갈리게 하는 컴파일러 경고를 없앨 수 있다. **이 말은 안전하지 않은 메서드는 절대 작성해서는 안 된다는 뜻이기도 하다.**
+
+만약 타입 안전하지 않은 가변 매개변수를 받는 메서드가 있으면 다음과 같이 수정해야 된다.
+
+* 가변 매개변수 배열을 건드는 코드가 있다면, 아무것도 저장하지 않고 건들지 않도록 수정한다.
+* 그 배열의 참조 또는 복제복을 신뢰할 수 없는 외부로 노출시키지 않는다.
+
+> @SafeVarargs 애너테이션은 재정의할 수 없는 메서드에만 달아야 한다. 재정의한 메서드도 안전할지는 보장할 수 없기 때문이다.
+
+사실 @SafeVarargs 애너테이션만이 유일한 정답은 아니다.
+
+다음과 같이 제네릭만을 사용해, 사용자 쪽에서는 임의 개수의 매개변수를 넘길 수도 있다.
+
+```java
+static <T> List<T> flatten(List<List<? extends T>> lists) {
+    List<T> result = new ArrayList<>();
+    for (List<? extends T> list: lists) {
+        result.addAll(list);
+    }
+    return result;
+}
+
+// 정적 팩터리 메서드인 List.of를 활용해 임의 개수의 매개변수를 넘길 수 있다.
+List<String> flattenList = flatten(List.of(friends, romans, countrymen));
+```
+
+위 방식의 장점은 컴파일러가 이 메서드의 타입 안전성을 검증할 수 있는데에 있다.
+
