@@ -70,7 +70,7 @@ private final Collection<Stamp> stamps = ...;
 List와 같은 로 타입은 사용해서는 안되나, List<Object> 처럼 임의 객체를 허용하는 매개변수화 타입은 괜찮다.
 로 타입인 List와 매개변수화 타입인 List<Object>의 차이는, List는 제네릭 타입에서 완전히 발을 뺀 것이고, List<Object>는 모든 타입을 허용한다는 의사를 컴파일러에 명확히 전달한 것이다.
 
-매개변수로 List를 받는 메서드에는 List<String>을 전달할 수 있지만, List<Object>를 받는 메서드에는 전달할 수 없다. List<String>은 List의 하위 타입이지만, List<Object>의 하위 타입은 아니다. 따라서 **List<Object>를 사용할 때와는 달리 List 같은 로 타입을 사용하면 타입 안전성을 잃게 된다.**
+매개변수로 List를 받는 메서드에는 List<String>을 전달할 수 있지만, List<Object>를 받는 메서드에는 전달할 수 없다. List<String>은 List의 하위 타입이지만, List<Object>의 하위 타입은 아니다. 따라서 **List\<Object\>를 사용할 때와는 달리 List 같은 로 타입을 사용하면 타입 안전성을 잃게 된다.**
 
 ```java
 public class Raw {
@@ -138,4 +138,18 @@ if (o instanceof Set) { // instanceof 연산자 사용시에는 로 타입 사�
     ...
 }
 ```
+
+<br>
+## 27. 비검사 경고를 제거하라.
+
+제네릭을 사용하기 시작하면 수 많은 컴파일러 경고를 받게 된다.
+제네릭에 익숙해질수록 마주치는 경고 수는 줄겠지만 경고를 무시해서는 안된다.
+
+대부분의 비검사 경고는 쉽게 제거할 수 있다.
+
+```java
+Set<Lark> exaltation = new HashSet();
+```
+
+위와 같이 코드를 작성하고 javac 옵션에 -Xlint:unchecked 옵션을 추가하여 컴파일하면 경고가 발생한다.
 
