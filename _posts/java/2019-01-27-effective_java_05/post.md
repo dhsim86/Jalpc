@@ -140,16 +140,71 @@ if (o instanceof Set) { // instanceof 연산자 사용시에는 로 타입 사�
 ```
 
 <br>
-## 27. 비검사 경고를 제거하라.
+## 27. 비검사 경고 (unchecked warning)를 제거하라.
 
 제네릭을 사용하기 시작하면 수 많은 컴파일러 경고를 받게 된다.
-제네릭에 익숙해질수록 마주치는 경고 수는 줄겠지만 경고를 무시해서는 안된다.
+제네릭에 익숙해질수록 마주치는 경고 수는 줄겠지만 **경고를 무시해서는 안된다.**
 
 대부분의 비검사 경고는 쉽게 제거할 수 있다.
+다음과 같이 코드 작성시, unchecked conversion 경고가 발생할 것이다.
 
 ```java
 Set<Lark> exaltation = new HashSet();
 ```
 
-위와 같이 코드를 작성하고 javac 옵션에 -Xlint:unchecked 옵션을 추가하여 컴파일하면 경고가 발생한다.
+자바 7부터 지원하는 다이아몬드 연산자를 통해 해당 경고는 쉽게 제거할 수 있다. 그러면 컴파일러는 올바른 실제 타입 매개변수 Lark를 추론한다.
+
+```java
+Set<Lark> exaltation = new HashSet<>();
+```
+
+제거하기 어려운 경고도 많지만, **할 수 있는 한 모든 비검사 경고 (unchecked) 경고를 제거하는 것이 좋다.**
+
+모두 제거한다면 그 코드의 타입 안전성은 확실히 보장된다. 즉 런타임에는 ClassCastException이 발생할 일이 없고 의도대로 잘 동작하리라 확신할 수 있다.
+
+<br>
+### @SuppressWarnings("unchecked")
+
+**경고를 제거할 수는 없지만 타입 안전하다고 확신할 수 있다면 @SuppressWarnings 애너테이션을 통해 경고를 숨기도록 한다.**
+
+타입 안전성을 검증하지 않은 채 경고를 숨긴다면 예외가 발생할 수 있으니 피해야 되지만, 그렇다고 안전하다고 검증된 코드에 대해 **경고를 숨기지 않고 그대로 두면 진짜 문제를 알리는 새로운 경고가 발생하더라도 눈치채지 못할 수 있다.**
+
+@SuppressWarning 애너테이션은 개별 지역변수부터 클래스 전체까지 어떤 선언에도 달 수 있다. 하지만 **@SuppressWarning 애너테이션 사용시, 항상 가능한 한 좁은 범위에 적용하도록 한다.** 그래야 심각한 경고를 놓치지 않을 수 있다.
+
+만약 한 줄이 넘는 메서드나 생성자에 달린 @SuppressWarning 애너테이션을 발견하면 가급적 지역변수 선언 쪽으로 옮기는 것이 좋다. 지역변수를 새로 선언하는 수고를 해야할 수 있으나, 그만한 값어치가 있다.
+
+```java
+public <T> T[] toArray(T[] a) {
+    if (a.length < size)
+        return (T[]) Arrays.copyOf(elements, size, a.getClass()); // unchecked cast warning
+    System.arraycopy(elements, 0, a, 0, size);
+    if (a.length > size)
+        a[size] = null;
+    return a;
+}
+```
+
+위의 코드를 컴파일하면 주석이 달린 줄에서 경고가 발생할 것이다.
+
+만약 이 코드의 타입 안전성이 확실하다고 검증된다면 @SuppressWarning 애너테이션를 사용해야 할텐데, 메소드 전체에 적용하는 것보다는 가능한 범위를 좁히는 것이 좋다.
+
+그런데 애너테이션은 선언에만 달 수 있으므로 위 코드의 주석이 달린 줄에 바로 애너테이션을 달 수는 없다.
+
+따라서 다음과 같이 반환 값을 담을 지역변수를 하나 선언하고 그 변수에 애너테이션을 다는 것이다. 지역변수가 선언되기는 했지만 비검사 경고를 무시하는 범위를 최대한 좁힐 수 있다.
+
+```java
+public <T> T[] toArray(T[] a) {
+    if (a.length < size) {
+        @SuppressWarnings("unchecked") T[] result =
+            (T[]) Arrays.copyOf(elements, size, a.getClass());
+        return result;
+    }
+    System.arraycopy(elements, 0, a, 0, size);
+    if (a.length > size)
+        a[size] = null;
+    return a;
+}
+```
+
+**@SuppressWarning 애너테이션을 사용할 때는, 그 경고를 무시해도 되는 이유를 항상 주석으로 남겨야 한다.** 그래야 다른 사람이 코드를 이해하는 데 도움이 되며, 다른 사람이 그 코드를 잘못 수정하여 타입 안전성을 잃는 상황을 줄일 수 있다.
 
