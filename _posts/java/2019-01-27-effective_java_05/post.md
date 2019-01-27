@@ -216,7 +216,7 @@ public <T> T[] toArray(T[] a) {
 
 배열과 제네릭 타입에는 중요한 차이가 두 가지 있다.
 
-첫 번째로는 **배열은 공변(Covariant)이지만, 제네력은 불공변(Incovariant) 이다.**
+첫 번째로는 **배열은 공변(Covariant)이지만, 제네릭은 불공변(Incovariant) 이다.**
 
 ```java
 public class Super {
