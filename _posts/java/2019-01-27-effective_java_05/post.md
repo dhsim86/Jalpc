@@ -67,10 +67,10 @@ private final Collection<Stamp> stamps = ...;
 로 타입(타입 매개변수가 없는 제네릭 타입)을 쓰는 것은 언어 차원에서 막지는 않았지만 사용해서는 안된다.
 **로 타입을 쓰면 제네릭이 안겨주는 안정성과 표현력을 모두 잃게 된다.**
 
-List와 같은 로 타입은 사용해서는 안되나, List<Object> 처럼 임의 객체를 허용하는 매개변수화 타입은 괜찮다.
-로 타입인 List와 매개변수화 타입인 List<Object>의 차이는, List는 제네릭 타입에서 완전히 발을 뺀 것이고, List<Object>는 모든 타입을 허용한다는 의사를 컴파일러에 명확히 전달한 것이다.
+List와 같은 로 타입은 사용해서는 안되나, List\<Object\> 처럼 임의 객체를 허용하는 매개변수화 타입은 괜찮다.
+로 타입인 List와 매개변수화 타입인 List\<Object\>의 차이는, List는 제네릭 타입에서 완전히 발을 뺀 것이고, List\<Object\>는 모든 타입을 허용한다는 의사를 컴파일러에 명확히 전달한 것이다.
 
-매개변수로 List를 받는 메서드에는 List<String>을 전달할 수 있지만, List<Object>를 받는 메서드에는 전달할 수 없다. List<String>은 List의 하위 타입이지만, List<Object>의 하위 타입은 아니다. 따라서 **List\<Object\>를 사용할 때와는 달리 List 같은 로 타입을 사용하면 타입 안전성을 잃게 된다.**
+매개변수로 List를 받는 메서드에는 List\<String\>을 전달할 수 있지만, List\<Object\>를 받는 메서드에는 전달할 수 없다. List\<String\>은 List의 하위 타입이지만, List\<Object\>의 하위 타입은 아니다. 따라서 **List\<Object\>를 사용할 때와는 달리 List 같은 로 타입을 사용하면 타입 안전성을 잃게 된다.**
 
 ```java
 public class Raw {
@@ -110,7 +110,7 @@ static int numElementsInCommon(Set s1, Set s2) {
 static int numElementsInCommon(Set s1<?>, Set<?> s2)
 ```
 
-Set과 Set<?>의 차이점은 Set과 같은 로 타입 컬렉션에는 아무 원소나 넣을 수 있어, 불변식을 훼손하기 쉽지만 Set<?>과 같은 비한정적 와일드카드 타입을 사용한 경우 null 이외에 어떤 원소도 넣을 수 없다.
+Set과 Set\<?\>의 차이점은 Set과 같은 로 타입 컬렉션에는 아무 원소나 넣을 수 있어, 불변식을 훼손하기 쉽지만 Set\<?\>과 같은 비한정적 와일드카드 타입을 사용한 경우 null 이외에 어떤 원소도 넣을 수 없다.
 
 <br>
 ### 몇 가지 예외사항
@@ -207,4 +207,39 @@ public <T> T[] toArray(T[] a) {
 ```
 
 **@SuppressWarning 애너테이션을 사용할 때는, 그 경고를 무시해도 되는 이유를 항상 주석으로 남겨야 한다.** 그래야 다른 사람이 코드를 이해하는 데 도움이 되며, 다른 사람이 그 코드를 잘못 수정하여 타입 안전성을 잃는 상황을 줄일 수 있다.
+
+<br>
+## 28. 배열보다는 리스트를 사용하라.
+
+배열과 제네릭 타입에는 중요한 차이가 두 가지 있다.
+
+첫 번째로는 **배열은 공변(Covariant)이지만, 제네력은 불공변(Incovariant) 이다.**
+
+```java
+public class Super {
+    ...
+}
+
+public Sub extends Super {
+    ...
+}
+
+Super[] arr = new Sub[1];   // 가능. Sub[]은 Super[]의 하위 타입
+List<Super> list = new ArrayList<Sub>(); // 불가. List<Super>는 List<Sub>과 관계없음
+```
+
+배열 Sub[]은 Super[]의 하위 타입이 되지만 List\<Super\>와 List\<Sub\>은 아무 관계가 없다.
+
+이런 특성으로 인해, 배열을 사용할 때는 문제가 발생할 가능성이 높다.
+
+```java
+Object[] objectArray = new Long[1];
+objectArray[0] = "test"; // ArrayStoreException. 단, 컴파일 타임에는 알아챌 수 없다.
+
+List<Object>ol = new ArrayList<Long>();
+ol.add("test"); // 컴파일 에러
+```
+
+어느 쪽이든 Long 용 저장소에 String 값을 넣을 수는 없다.
+그러나 **배열은 런타임에 실수를 알게 되지만, 리스트를 사용할 때 컴파일시 바로 알 수 있다는 장점이 있다.**
 
