@@ -211,6 +211,9 @@ public <T> T[] toArray(T[] a) {
 <br>
 ## 28. 배열보다는 리스트를 사용하라.
 
+<br>
+### 배열과 제네릭 차이
+
 배열과 제네릭 타입에는 중요한 차이가 두 가지 있다.
 
 첫 번째로는 **배열은 공변(Covariant)이지만, 제네력은 불공변(Incovariant) 이다.**
@@ -233,13 +236,119 @@ List<Super> list = new ArrayList<Sub>(); // 불가. List<Super>는 List<Sub>과 
 이런 특성으로 인해, 배열을 사용할 때는 문제가 발생할 가능성이 높다.
 
 ```java
+// 문법적으로는 정상. 그러나 런타임에 실패
 Object[] objectArray = new Long[1];
 objectArray[0] = "test"; // ArrayStoreException. 단, 컴파일 타임에는 알아챌 수 없다.
 
+// 문법에 맞지 않음.
 List<Object>ol = new ArrayList<Long>();
 ol.add("test"); // 컴파일 에러
 ```
 
-어느 쪽이든 Long 용 저장소에 String 값을 넣을 수는 없다.
-그러나 **배열은 런타임에 실수를 알게 되지만, 리스트를 사용할 때 컴파일시 바로 알 수 있다는 장점이 있다.**
+어느 쪽이든 Long 용 저장소에 String 값을 넣을 수는 없다. 그러나 **배열은 런타임에 실수를 알게 되지만, 리스트를 사용할 때 컴파일시 바로 알 수 있다는 장점이 있다.**
 
+두 번째로는 **배열은 실체화(reify)된다.**
+
+이 말의 뜻은 **배열은 런타임에도 자신이 담기로 한 원소의 타입을 인지하고 확인한다.** 따라서 위의 코드에서 Long 배열에 String 값을 넣으려하면 예외가 발생한 것이다.
+
+그러나 **제네릭은 타입 정보가 런타임에는 소거(erasure)된다.** 원소 타입은 컴파일 타임에만 검사하며 런타임에는 알 수가 없다는 뜻이다.
+
+> 제네릭에서 런타임때 타입 소거는 제네릭이 도입되기 전에 작성한 코드와 호환성을 위환 것이다.
+
+---
+
+위의 차이로 인해 **배열과 제네릭은 잘 어우러지지 못한다.**
+
+예를 들어 배열은 제네릭 타입, 매개변수화 타입, 타입 매개변수로 사용할 수 없다.
+
+```java
+public static class Test<T> {
+
+    private T[] arr;
+
+    public Test() {
+        arr = new T[10]; // 문법 오류
+    }
+}
+
+List<String>[] arr = new ArrayList<String>[1]; // 문법 오류
+```
+
+제네릭 배열을 만들지 못하게 막은 이유는 타입 안전하지 않기 때문이다.
+
+이를 허용하면 컴파일러가 자동 생성하는 형변환 코드에서 런타임에 ClassCastException 예외가 발생할 수 있다.
+
+**이는 컴파일타임에 타입 체크하고, 런타임에 ClassCastException 예외 발생을 최대한 방지하여 타입 안전성을 확보하기 위한 제네릭 타입 시스템의 취지에 어긋나는 것이다.**
+
+다음과 같이 제네릭 배열을 허용했을 때의 문제점을 살펴보자.
+
+```java
+// 허용한다고 가정
+List<String>[] stringLists = new ArrayList<String>[1];
+
+List<Integer> intList = new ArrayList<>();
+intList.add(42);
+
+// 배열은 공변이므로 아무 문제없이 넣을 수 있다.
+Object[] objects = stringLists;  
+
+// 제네릭은 타입 정보가 소거되므로 성공한다.
+// 런타임에는 List<Integer>가 List가 되고, List<Integer>[]는 단순히 List[]가 된다.
+// 즉 List[0] = List 와 다름없다.
+objects[0] = intList;          
+
+// 여기서 ClassCastException 예외 발생
+// 컴파일러는 List에서 꺼낸 원소를 String으로 자동 형변환하려고 하는데,
+// Integer가 저장되어 있었으므로 예외가 발생한다.
+String s = stringLists[0].get(0);
+```
+
+위와 같은 문제를 방지하기 위해 제네릭 배열을 사용할 수 없도록 애초에 막아야 하는 것이다.
+
+정규 타입 매개변수 E, List\<E\>나 List\<String\>와 같은 타입을 **실체화 불가 타입(non-reifiable type)**이라고 한다. **실체화되지 않아 런타임에는 컴파일타임보다 타입 정보를 적게 가지는 타입이다.**
+
+소거 메커니즘으로 인해 매개변수화 타입 가운데 실체화될 수 있는 타입은 List\<?\>와 Map\<?, ?\>과 같은 비한정적 와일드카드 타입뿐이다.
+
+> 배열을 제네릭으로 만들 수 없어 귀찮을 때가 많다. 예를 들어 제네릭 컬렉션에서 자신의 원소 타입을 담은 배열을 반환하는게 보통은 불가능하다.
+
+> 제네릭 타입과 가변인수 메서드를 함께 쓰면 해석하기 어려운 경고 메시지를 받게 된다. 가변인수 메서드를 호출할 때마다 가변인수 매개변수를 담을 배열이 만들어지는데, 배열의 원소가 실체화 불가 타입이면 경고가 발생하는 것이다. 이 문제는 @SafeVarargs 애너테이션으로 대처 가능하다.
+
+배열로 형변환할 때 제네릭 배열 생성 오류나 비검사 형변환 경고가 뜨는 경우, 대부분 배열인 E[] 대신에 컬렉션인 List\<E\>를 사용하면 해결된다.
+
+코드가 조금 복잡해지고 성능이 살짝 나빠질 수 있지만 타입 안전성과 상호 운용성은 좋아진다.
+
+```java
+public class Chooser {
+    private final Object[] choiceArray;
+
+    public Chooser(Collection choices) {
+        choiceArray = choices.toArray();
+    }
+
+    public Object choose() {
+        Random rnd = ThreadLocalRandom.current();
+        return choiceArray[rnd.nextInt(choiceArray.length)];
+    }
+}
+```
+
+컬렉션 안의 원소 중 무작위로 선택하는 Chooser 클래스를 예로 살펴볼 때, 이 클래스를 사용하려면 choose 메서드를 호출할 때마다 클라이언트 쪽에서는 반환된 Object를 원하는 타입으로 반환해야 한다.
+
+이 때 만약 타입이 다른 원소가 있었다면 런타임에 형변환 오류가 날 것이다.
+
+이렇게 배열을 사용하는 대신 아예 제네릭을 사용한다면 타입 안정성을 확보할 수 있을 것이다.
+
+```java
+public class Chooser<T> {
+    private final List<T> choiceList;
+
+    public Chooser(Collection<T> choices) {
+        choiceList = new ArrayList<>(choices);
+    }
+
+    public T choose() {
+        Random rnd = ThreadLocalRandom.current();
+        return choiceList.get(rnd.nextInt(choiceList.size()));
+    }
+}
+```
