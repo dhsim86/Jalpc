@@ -50,7 +50,8 @@ for (Iterator i = stamps.iterator(); i.hasNext(); ) {
 }
 ```
 
-**오류는 가능한 발생 즉시, 이상적으로는 컴파일할 때 발견하는 것이 좋다.** 위의 예에서는 런타임에서 확인할 수 있는데 이렇게 되면 **런타임에 문제를 겪는 코드와 원인을 제공한 코드가 물리적으로 상당히 떨어져 있을 가능성이 커진다.**
+**오류는 가능한 발생 즉시, 이상적으로는 컴파일할 때 발견하는 것이 좋다.** 
+위의 예에서는 런타임에서 확인할 수 있는데 이렇게 되면 **런타임에 문제를 겪는 코드와 원인을 제공한 코드가 물리적으로 상당히 떨어져 있을 가능성이 커진다.**
 
 예외 발생시 stamps에 잘못된 값을 넣은 지점을 찾기 위해 코드 전체를 확인해야 될 수 있다.
 
@@ -61,4 +62,80 @@ private final Collection<Stamp> stamps = ...;
 ```
 
 위와 같이 선언하면 컴파일러는 stamps에 Stamp의 인스턴스만을 넣어야 한다는 것을 인지하게 된다.
+따라서 아무 경고없이 컴파일된다면 의도대로 동작할 것임을 보장한다.
+
+로 타입(타입 매개변수가 없는 제네릭 타입)을 쓰는 것은 언어 차원에서 막지는 않았지만 사용해서는 안된다.
+**로 타입을 쓰면 제네릭이 안겨주는 안정성과 표현력을 모두 잃게 된다.**
+
+List와 같은 로 타입은 사용해서는 안되나, List<Object> 처럼 임의 객체를 허용하는 매개변수화 타입은 괜찮다.
+로 타입인 List와 매개변수화 타입인 List<Object>의 차이는, List는 제네릭 타입에서 완전히 발을 뺀 것이고, List<Object>는 모든 타입을 허용한다는 의사를 컴파일러에 명확히 전달한 것이다.
+
+매개변수로 List를 받는 메서드에는 List<String>을 전달할 수 있지만, List<Object>를 받는 메서드에는 전달할 수 없다. List<String>은 List의 하위 타입이지만, List<Object>의 하위 타입은 아니다. 따라서 **List<Object>를 사용할 때와는 달리 List 같은 로 타입을 사용하면 타입 안전성을 잃게 된다.**
+
+```java
+public class Raw {
+    public static void main(String[] args) {
+        List<String> strings = new ArrayList<>();
+        unsafeAdd(strings, Integer.valueOf(42));
+        String s = strings.get(0); // ClassCastException
+    }
+
+    private static void unsafeAdd(List list, Object o) {
+        list.add(o);
+    }
+}
+```
+
+이 코드를 그대로 실행하면, 예외가 발생한다. Integer를 String으로 변환하려 시도한 것이다.
+문제는 List와 같은 로 타입을 사용함으로써 컴파일 타임이 아닌, 런 타임에 이 오류를 인지할 수 있다는 것이다.
+
+이번에는 2개의 집합(Set)을 받아 공통 원소를 반환하는 메서드를 작성한다고 해보자.
+
+```java
+static int numElementsInCommon(Set s1, Set s2) {
+    int result = 0;
+    for (Object o1: s1) {
+        if (s2.contains(o1)) {
+            result++;
+        }
+    }
+    return result;
+}
+```
+
+위의 메서드는 동작은 하지만, 로 타입을 사용하여 안전하지 않다. 
+원소의 타입과는 상관없는 메서드를 작성할 때는 **안전하지 않은 로 타입보다는 비한정적 와일드카드 타입을 사용해야 한다.**
+
+```java
+static int numElementsInCommon(Set s1<?>, Set<?> s2)
+```
+
+Set과 Set<?>의 차이점은 Set과 같은 로 타입 컬렉션에는 아무 원소나 넣을 수 있어, 불변식을 훼손하기 쉽지만 Set<?>과 같은 비한정적 와일드카드 타입을 사용한 경우 null 이외에 어떤 원소도 넣을 수 없다.
+
+<br>
+### 몇 가지 예외사항
+
+로 타입을 사용하지 말라는 규칙에는 몇 가지 예외가 있다.
+
+**class 리터럴에는 로 타입을 써야 한다.** 자바 명세에서는 class 리터럴에 매개변수화 타입을 사용하지 못하도록 하였다.
+
+```java
+List.class
+String[].class
+int.class
+
+List<String>.class // X
+List<?>.class   // X
+```
+
+두 번째로는 instanceof 연산자와 관련이 있는데, **런타임에는 제네릭 타입 정보가 지워지므로 instanceof 연산자는 비한정적 와일드카드 타입 이외의 매개변수화 타입에는 적용할 수 없다.**
+
+그런데 instanceof 연산자는 로 타입과 비한정적 와일드카 드타입에서 똑같이 동작한다. 따라서 비한정적 와일드카드 타입 사용시, 꺽쇠나 물음표는 아무 역할없이 코드를 지저분하게 만드므로 다음과 같은 상황에서는 로 타입을 사용하는 것이 낫다.
+
+```java
+if (o instanceof Set) { // instanceof 연산자 사용시에는 로 타입 사용
+    Set<?> s = (Set<?>) o;  // 실제 사용시에는 로 타입이 아닌 비한정적 와일드카드 타입 사용
+    ...
+}
+```
 
