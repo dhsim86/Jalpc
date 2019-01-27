@@ -352,3 +352,94 @@ public class Chooser<T> {
     }
 }
 ```
+
+<br>
+## 31. 한정적 와일드카드를 사용해 API 유연성을 높이라.
+
+List\<String\>과 같은 매개변수화 타입은 불공변이다.
+즉 서로 다른 타입 Type1과 Type2가 있을 때, List\<Type1\>과 List\<Type2\>는 하위 타입도 상위 타입도 아니다.
+
+다음과 같은 스택을 표현하는 클래스가 있다고 해보자.
+
+```java
+public class Stack<E> {
+    public Stack();
+    public void push(E e);
+    public E pop();
+    public boolean isEmpty();
+}
+```
+
+그리고 일련의 원소를 스택에 넣는 메서드를 추가한다고 생각해보자.
+
+```java
+public void pushAll(Iterable<E> src) {
+    for (E e: src) {
+        push(e);
+    }
+}
+```
+
+이 메서드는 잘 컴파일되겠지만 완벽하지가 않다. Iterable src의 원소타입이 스택의 원소타입과 일치한다면 잘 동작할 것이다.
+
+그러나 Stack\<Number\>로 선언하고 pushAll 메서드로 Integer 객체를 넘기면 어떻게 될까? Integer는 Number의 하위 타입이므로 논리적으로 잘 동작해야할 것 같다.
+
+```java
+Stack<Number> numberStack = new Stack<>();
+Iterable<Integer> integers = ...;
+numberStack.pushAll(integers);
+```
+
+위와 같이 코드를 작성하면 오류 메시지가 뜬다. 매개변수화 타입이 불공변이기 때문이다.
+
+이를 위해 자바는 **한정적 와일드카드 타입**이라는 특별한 매개변수화 타입을 지원한다. 이를 통해 하위 타입인 원소도 사용할 수 있다.
+
+```java
+public void pushAll(Iterable<? extends E> src) {
+    for (E e: src) {
+        push(e);
+    }
+}
+```
+
+---
+
+다음은 pushAll의 대척점에 있는 popAll 메서드를 작성해보자.
+
+이 메서드는 Stack안의 모든 원소를 주어진 컬렉션으로 옮겨 담는다.
+
+```java
+public void popAll(Collection<E> dst) {
+    while (!isEmpty()) {
+        dst.add(pop())
+    }
+}
+```
+
+이번에도 주어진 컬렉션의 원소 타입이 스택의 원소 타입과 일치한다면 잘 동작할 것이다.
+
+그러나 컬렉션의 원소 타입이 Object라고 한다면 오류가 발생한다. 이 경우에도 한정적 와일드카드 타입으로 해결할 수 있다. 이를 통해 상위 타입의 원소를 가지는 컬렉션에 넣을 수 있다.
+
+```java
+public void popAll(Collection<? super E> dst) {
+    while (!isEmpty()) {
+        dst.add(pop())
+    }
+}
+```
+
+---
+
+위의 예에서 알 수 있듯이, 제네릭을 사용할 때 **유연성을 극대화하려면 원소의 생상자나 소비자용 입력 매개변수에 와일드카드 타입을 사용해야 한다.**
+
+어떤 와일드카드 타입을 사용해야 되는지는 **PECS(producer-extends, consumer-super)** 라는 공식을 기억해두면 좋을 것이다.
+
+즉 매개변수 타입 T가 생산자라면 \<? extends T\>를 사용하고, 소비자라면 \<? super T\>를 사용하는 것이다. PECS 공식은 와일드카드 타입을 사용하는 기본 원칙이다.
+
+> 여기서 생산자는 원소를 주는 역할이고, 소비자는 원소를 가져가는 역할이라고 보면 된다.
+
+> 입력 매개변수가 생산자 / 소비자 역할을 동시에 한다면 와일드카드 타입을 써도 좋을 게 없다. 타입을 정확히 지정해야 하는 상황으로 이 때는 와일드카드 타입을 사용하면 안된다.
+
+> 반환 타입에 한정적 와일드카드를 사용해서는 안된다. 유연성을 높여주기는 커녕 클라이언트 쪽에서 와일드카드 타입을 사용해야 되기 때문이다. 제대로 제네릭을 사용했다면 사용자는 와일드카드 타입이 쓰였다는 사실을 의식하지 못하겠지만, 와일드카드 타입을 신경써야 한다면 그 API에 문제가 있을 가능성이 크다.
+
+와일드카드 타입을 사용함으로써, **받아들여 할 매개변수는 받고 거절해야 할 매개변수는 거절하는 작업이 자동으로 이루어진다.** 
