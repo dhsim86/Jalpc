@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Effective Java 04 - 클래스와 인터페이스"
-date:   2019-01-14
+date:   2019-01-19
 desc:  "Effective Java 04 - 클래스와 인터페이스"
 keywords: "java"
 categories: [Java]
