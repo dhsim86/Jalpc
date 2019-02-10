@@ -108,4 +108,173 @@ public enum Planet {
 
 > 열거 타입도 클래스처럼 기능을 클라이언트에 노출해야할 이유가 없다면 private나 package-private로 선언한다. 널리 쓰이는 열거 타입이라면 톱 레벨 클래스로 두고, 특정 톱 레벨 클래스에서만 사용된다면 해당 클래스의 멤버로 둔다.
 
+위에서 정의한 Planet 열거 타입은 상수 마다 서로 다른 데이터를 할당하는데에 그쳤지만, 때로는 **상수마다 동작이 달라져야 하는 상황도 있을 것이다.** 
+예를 들어 다음과 같이 사칙 연산을 표현한 열거 타입을 선언하고 실제 연산까지 열거 타입 상수가 직접 수행한다고 생각해보자.
+
+```java
+public enum Operation {
+    PLUS, MINUS, TIMES, DIVIDE;
+
+    public double apply(double x, double y) {
+        switch(this) {
+            case PLUS: return x + y;
+            case MINUS: return x - y;
+            case TIMES: return x * y;
+            case DIVIDE: return x / y;
+        }
+        throw new AssertionError("Unkown operation: " + this);
+    }
+}
+```
+
+위와 같이 switch문을 통해 분기할 수도 있지만, 이는 깨지기 쉬운 코드이다. 새로운 상수를 추가하려면 해당 case 문도 추가해야 한다. 이런 메서드가 여러 개 있다면 각 메서드마다 추가해주어야 할 것이다.
+
+다행히 자바의 열거 타입은 상수별로 다르게 동작하는 코드를 구현하는 더 나은 수단을 제공한다. 다음과 같이 **열거 타입에 추상 메서드를 추가하고, 각 상수별 클래스 몸체를 각 상수에서 자신에 맞게 재정의하는 것이다.**
+
+이를 **상수별 메서드 구현 (constant-specific method implementation)** 이라고 한다.
+
+```java
+public enum Operation {
+    PLUS("+") {
+        public double apply(double x, double y) { return x + y; }
+    },
+    MINUS("-") {
+        public double apply(double x, double y) { return x - y; }
+    },
+    TIMES("*") {
+        public double apply(double x, double y) { return x * y; }
+    },
+    DIVIDE("/") {
+        public double apply(double x, double y) { return x / y; }
+    };
+
+    private final String symbol;
+
+    Operation(String symbol) { this.symbol = symbol; }
+
+    @Override public String toString() { return symbol; }
+
+    // 추상 메서드로 선언되었으므로, 상수에서 재정의하지 않으면 컴파일 에러가 발생한다.
+    public abstract double apply(double x, double y);
+
+    public static void main(String[] args) {
+        double x = Double.parseDouble(args[0]);
+        double y = Double.parseDouble(args[1]);
+        for (Operation op : Operation.values())
+            System.out.printf("%f %s %f = %f%n",
+                    x, op, y, op.apply(x, y));
+    }
+}
+```
+
+열거 타입에는 상수 이름을 입력받아 그 이름에 해당하는 상수를 반환해주는 **valueOf(String)** 메서드가 자동 생성된다. 열거 타입의 toString 메서드를 재정의할 때는 toString이 반환하는 문자열을 다시 해당 열거 타입 상수로 반환해주는 **fromString** 메서드를 제공하는 것이 좋다.
+
+```java
+public enum Operation {
+    
+    // Operation 상수가 이 맵에 저장되는 시점은 열거 타입 상수 생성 후,
+    // 정적 필드가 초기화될 때이다.
+    private static final Map<String, Operation> stringToEnum =
+            Stream.of(values()).collect(
+                    toMap(Object::toString, e -> e));
+
+    // 지정한 문자열에 해당하는 Operation을 (존재한다면) 반환한다.
+    public static Optional<Operation> fromString(String symbol) {
+        return Optional.ofNullable(stringToEnum.get(symbol));
+    }
+
+}
+```
+
+> 열거 타입 생성자에서는 정적 상수 변수가 아닌, 자신의 정적 변수에 접근할 수 없다. 열거 타입 생성자가 실행되는 시점에는 정적 필드가 아직 초기화되기 전이다. 마찬가지로 생성자에서 같은 열거 타입에 정의된 다른 열거 상수에도 접근이 불가능하다.
+
+---
+
+**상수별 메서드 구현시, 열거 타입 상수끼리는 코드를 공유하기가 어렵다는 단점이 있다.**
+
+다음과 같이 급여명세서에 쓸 요일을 표현하는 열거 타입을 예로 들어보자. 이 열거 타입은 직원의 시간당 기본임금과 그날 일한 시간이 주어지면 일당을 계산하는 메서드를 갖는다. 주중에 오버타임이 발생하면 잔업수당이 주어지고, 주말에는 무조건 잔업수당이 주어진다.
+
+```java
+enum PayrollDay {
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY;
+
+    private static final int MINS_PER_SHIFT = 8 * 60;
+    
+    int pay(int minutesWorked, int payRate) {
+        int basePay = minutesWorked * payRate;
+
+        int overtimePay;
+        switch(this) {
+            case SATURDAY:
+            case SUNDAY:
+                overtimePay = basePay / 2;
+                break;
+            default:
+                overtimePay = minutesWorked <= MINS_PER_SHIFT ?
+                    0 : (minutesWorked - MINS_PER_SHIFT) * payRate / 2;
+        }
+
+        return basePay + overtimePay;
+    }
+}
+```
+
+관리 관점에서는 위험한 코드이다. 휴가와 같은 새로운 값을 추가하려면 그 값을 처리하는 case 문도 잊지 말아야 한다.
+
+간단한 구현으로 급여를 정확히 계산하는 방법은 두 가지이다.
+
+1. 잔업수당을 계산하는 코드를 모든 상수에 중복해서 넣는 방법
+2. 계산코드를 평일용과 주말용으로 나누어 도우미 메서드로 작성 후 각 상수가 자신에 필요한 메서드를 호출
+
+위의 두 가지 방법 모두 코드가 장황해져 가독성이 크게 떨어지고 오류 발생 가능성이 커진다.
+
+가장 깔끔한 방법은 **새로운 상수를 추가할 때, 잔업수당 "전략"을 선택하도록 하는 것이다.**
+
+잔업수당 계산 자체를 **private 중첩 열거 타입**으로 옮기고 PayrollDay 열거 타입 생성자에서 이 중 적당한 것을 선택하도록 하는 것이다. 그리고 PayrollDay 열거 타입은 잔업수당 계산시, 중첩 열거 타입에 위임하도록 한다.
+
+```java
+enum PayrollDay {
+    MONDAY(WEEKDAY), TUESDAY(WEEKDAY), WEDNESDAY(WEEKDAY),
+    THURSDAY(WEEKDAY), FRIDAY(WEEKDAY),
+    SATURDAY(WEEKEND), SUNDAY(WEEKEND);
+
+    private final PayType payType;
+
+    PayrollDay(PayType payType) { this.payType = payType; }
+    
+    int pay(int minutesWorked, int payRate) {
+        // 전략 열거 타입으로 위임
+        return payType.pay(minutesWorked, payRate);
+    }
+
+    // 전략 열거 타입
+    enum PayType {
+        WEEKDAY {
+            int overtimePay(int minsWorked, int payRate) {
+                return minsWorked <= MINS_PER_SHIFT ? 0 :
+                        (minsWorked - MINS_PER_SHIFT) * payRate / 2;
+            }
+        },
+        WEEKEND {
+            int overtimePay(int minsWorked, int payRate) {
+                return minsWorked * payRate / 2;
+            }
+        };
+
+        abstract int overtimePay(int mins, int payRate);
+        private static final int MINS_PER_SHIFT = 8 * 60;
+
+        int pay(int minsWorked, int payRate) {
+            int basePay = minsWorked * payRate;
+            return basePay + overtimePay(minsWorked, payRate);
+        }
+    }
+```
+
+> switch 문은 열거 타입의 상수별 동작을 구현하는데 적합하지 않다.
+
+**필요한 원소들이 컴파일 타임에 알 수 있는 상수 집합이라면 항상 열거 타입을 사용하도록 한다.**
+
+<br>
+## 35. ordinal 메서드 대신 인스턴스 필드를 사용하라.
 
