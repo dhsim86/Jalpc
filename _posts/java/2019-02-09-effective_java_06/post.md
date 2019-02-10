@@ -404,6 +404,15 @@ class Plant {
 생애주기별로 총 3개의 집합으로 만들고 각 식물을 해당 집합에 넣는다.
 
 ```java
+Plant[] garden = {
+    new Plant("바질",    LifeCycle.ANNUAL),
+    new Plant("캐러웨이", LifeCycle.BIENNIAL),
+    new Plant("딜",      LifeCycle.ANNUAL),
+    new Plant("라벤더",   LifeCycle.PERENNIAL),
+    new Plant("파슬리",   LifeCycle.BIENNIAL),
+    new Plant("로즈마리", LifeCycle.PERENNIAL)
+};
+
 Set<Plant>[] plantsByLifeCycle = 
     (Set<Plant>[]) new Set[Plant.LifeCycle.values().length];
 
@@ -463,6 +472,7 @@ Map<Plant.LifeCycle, Set<Plant>> t = Arrays.stream(garden)
         .collect(groupingBy(p -> p.lifeCycle, () -> new EnumMap<>(LifeCycle.class), toSet()));
 ```
 
+<br>
 ## 38. 확장할 수 있는 열거 타입이 필요하다면 인터페이스를 사용하라.
 
 열거 타입은 확장할 수 없다. 
