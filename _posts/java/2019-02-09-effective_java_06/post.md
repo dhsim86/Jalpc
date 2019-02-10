@@ -455,7 +455,7 @@ System.out.println(Arrays.stream(garden)
     .collect(groupingBy(p -> p.lifeCycle));
 ```
 
-위의 groupingBy는 키를 p.lifeCycle로, 값을 Set<Plant> 인스턴스로 하는 Map을 만들어준다. 그런데 위 코드는 EnumMap을 사용하지 않으므로 성능 이점이 사라지는 문제가 있다. EnumMap을 사용하기 위해서는 다음과 같이 작성한다.
+위의 groupingBy는 키를 p.lifeCycle로, 값을 Set\<Plant\> 인스턴스로 하는 Map을 만들어준다. 그런데 위 코드는 EnumMap을 사용하지 않으므로 성능 이점이 사라지는 문제가 있다. EnumMap을 사용하기 위해서는 다음과 같이 작성한다.
 
 ```java
 // 두 번째 파라미터인 Supplier<M> mapFactory에 원하는 맵 구현체를 명시해주면 된다.
@@ -563,3 +563,357 @@ public static void main(String[] args) {
 인터페이스를 이용해 확장 가능한 열거 타입을 흉내내는 방식에도 한 가지 문제가 있는데, **열거 타입끼리 구현을 상속할 수 없다는 점이다.**
 
 아무 상태에 의존하지 않는 코드라면, **인터페이스의 default 메서드**를 사용하는 방법이 있다. 그러나 위의 Operation의 예에서는 연산 기호를 저장하고 찾는 로직 (toString)이 열거 타입 모두 들어가야 한다. 이런 경우에는 **도우미 클래스나 정적 도우미 메서드로 분리하는 방식으로 코드 중복을 없앨 수 있다.**
+
+<br>
+## 39. 명명 패턴보다 애너테이션을 사용하라.
+
+전통적으로 도구나 프레임워크가 특별히 다루어야 할 프로그램 요소에는 딱 구분되는 **명명 패턴**을 사용해왔다.
+
+예를 들어 테스트 프레임워크인 **JUnit**은 버전 3까지 테스트 메서드 이름을 **test**로 시작하게끔 하였다. 이 방식의 단점은 오타가 나면 안될 뿐만 아니라, 올바르게 사용되리라 보장이 안된다. 예를 들어, 개발자가 클래스 이름을 Test**로 시작하게 하여도 JUnit은 무시한다. 
+
+마지막으로 프로그램 요소를 매개변수로 전달할 방법이 없다는 점이다. 특정 예외를 던져야만 성공하는 테스트가 있다고 했을 때 기대하는 예외 타입을 테스트 메서드에 매개변수로 전달해야 되는데, 예외의 이름을 테스트 메서드 이름에 붙이는 방법도 있지만 보기가 나쁘고 깨지기도 쉽다.
+
+**애너테이션**은 이 모든 문제를 해결해줄 수 있다. Junit도 버전 4부터 전면 애너테이션을 도입하였다.
+Test라는 이름의 애너테이션을 정의해보자.
+
+```java
+// 매개변수가 없는 정적 메서드 전용
+// 적절한 애너테이션 처리가 없이 인스턴스 메서드나 매개변수가 있는 메서드에 달면 에러가 발생한다.
+
+// 메타 애너테이션
+@Retention(RetentionPolicy.RUNTIME) // 런타임에도 유지되어야 함
+@Target(ElementType.METHOD) // 메서드 선언에서만 사용되어야 함
+public @interface Test {
+
+}
+
+public class Sample {
+    @Test
+    public static void m1() { }        // 성공해야 한다.
+
+    public static void m2() { }
+
+    @Test public static void m3() {    // 실패해야 한다.
+        throw new RuntimeException("실패");
+    }
+
+    public static void m4() { }  // 테스트가 아니다.
+
+    @Test public void m5() { }   // 잘못 사용한 예: 정적 메서드가 아니다.
+
+    public static void m6() { }
+
+    @Test public static void m7() {    // 실패해야 한다.
+        throw new RuntimeException("실패");
+    }
+
+    public static void m8() { }
+}
+
+public class RunTests {
+    public static void main(String[] args) throws Exception {
+        int tests = 0;
+        int passed = 0;
+        Class<?> testClass = Sample.class;
+
+        // 클래스에 정의된 메서드를 차례로 호출한다.
+        for (Method m : testClass.getDeclaredMethods()) {
+            if (m.isAnnotationPresent(Test.class)) {
+                tests++;
+                try {
+                    m.invoke(null);
+                    passed++;
+
+                // 테스트 메서드가 예외를 던지면 리플렉션 매커니즘이
+                // InvocationTargetException 예외로 감싸서 다시 던진다.
+                } catch (InvocationTargetException wrappedExc) {
+                    Throwable exc = wrappedExc.getCause();
+                    System.out.println(m + " 실패: " + exc);
+                } catch (Exception exc) {
+                    System.out.println("잘못 사용한 @Test: " + m);
+                }
+            }
+        }
+        System.out.printf("성공: %d, 실패: %d%n",
+                passed, tests - passed);
+    }
+}
+
+```
+
+
+위와 같은 애너테이션을 **"애너테이션을 아무 매개변수 없이 단순히 대상에 마킹한다."는 뜻에서 마커 애너테이션이라고 한다.**
+
+@Test 애너테이션이 **Sample 클래스의 의미에 직접적인 영향을 주지 않는다.**
+**그저 이 애너테이션에 관심있는 프로그램에게 추가적인 정보만 제공해줄 뿐이다.**
+
+즉, **대상 코드의 의미는 그대로 둔 채, 그 애너테이션에 관심있는 도구에서 특별하게 처리할 수 있는 기회를 주는 것이다.**
+
+다음과 같이 의도한 대로 테스트 하나만 통과하는 것을 알 수 있다.
+<br>
+![00.png](/static/assets/img/blog/java/2019-02-09-effective_java_06/00.png)
+
+이제 특정 예외를 던져야만 성공하는 테스트를 지원해보자.
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ExceptionTest {
+    Class<? extends Throwable> value();
+}
+```
+
+이 애너테이션의 매개변수 타입은 **Class\<? extends Throwable\>** 이다. Throwable을 확장한 클래스의 Class 객체를 의미하며, 따라서 모든 예외와 오류 타입을 수용한다.
+
+```java
+public class Sample2 {
+    @ExceptionTest(ArithmeticException.class)
+    public static void m1() {  // 성공해야 한다.
+        int i = 0;
+        i = i / i;
+    }
+
+    @ExceptionTest(ArithmeticException.class)
+    public static void m2() {  // 실패해야 한다. (다른 예외 발생)
+        int[] a = new int[0];
+        int i = a[1];
+    }
+
+    @ExceptionTest(ArithmeticException.class)
+    public static void m3() { }  // 실패해야 한다. (예외가 발생하지 않음)
+}
+
+public class RunTests {
+    public static void main(String[] args) throws Exception {
+        int tests = 0;
+        int passed = 0;
+        Class<?> testClass = Sample2.class;
+        for (Method m : testClass.getDeclaredMethods()) {
+            if (m.isAnnotationPresent(Test.class)) {
+                tests++;
+                try {
+                    m.invoke(null);
+                    passed++;
+                } catch (InvocationTargetException wrappedExc) {
+                    Throwable exc = wrappedExc.getCause();
+                    System.out.println(m + " 실패: " + exc);
+                } catch (Exception exc) {
+                    System.out.println("잘못 사용한 @Test: " + m);
+                }
+            }
+
+            if (m.isAnnotationPresent(ExceptionTest.class)) {
+                tests++;
+                try {
+                    m.invoke(null);
+                    System.out.printf("테스트 %s 실패: 예외를 던지지 않음%n", m);
+                } catch (InvocationTargetException wrappedEx) {
+                    Throwable exc = wrappedEx.getCause();
+                    Class<? extends Throwable> excType =
+                            m.getAnnotation(ExceptionTest.class).value();
+                    
+                    // 예외 발생시, 해당 예외 타입이면 성공
+                    if (excType.isInstance(exc)) {
+                        passed++;
+                    } else {
+                        System.out.printf(
+                                "테스트 %s 실패: 기대한 예외 %s, 발생한 예외 %s%n",
+                                m, excType.getName(), exc);
+                    }
+                } catch (Exception exc) {
+                    System.out.println("잘못 사용한 @ExceptionTest: " + m);
+                }
+            }
+        }
+
+        System.out.printf("성공: %d, 실패: %d%n",
+                passed, tests - passed);
+    }
+}
+```
+
+<br>
+
+![01.png](/static/assets/img/blog/java/2019-02-09-effective_java_06/01.png)
+
+
+다음과 같이 예외를 여러 개 명시하고 그 중 하나만 발생해도 테스트 성공하게 할 수도 있다.
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ExceptionTest {
+    // 배열 매개변수 지정
+    Class<? extends Exception>[] value();
+}
+
+public class Sample3 {
+
+    @ExceptionTest(ArithmeticException.class)
+    public static void m1() {  // 성공해야 한다.
+        int i = 0;
+        i = i / i;
+    }
+    @ExceptionTest(ArithmeticException.class)
+    public static void m2() {  // 실패해야 한다. (다른 예외 발생)
+        int[] a = new int[0];
+        int i = a[1];
+    }
+    @ExceptionTest(ArithmeticException.class)
+    public static void m3() { }  // 실패해야 한다. (예외가 발생하지 않음)
+
+    // 여러 개 지정시 중괄호로 감싸고, 쉼표로 구분한다.
+    @ExceptionTest({ IndexOutOfBoundsException.class,
+                     NullPointerException.class })
+    public static void doublyBad() {   // 성공해야 한다.
+        List<String> list = new ArrayList<>();
+
+        // 자바 API 명세에 따르면 다음 메서드는 IndexOutOfBoundsException이나
+        // NullPointerException을 던질 수 있다.
+        list.addAll(5, null);
+    }
+}
+
+public class RunTests {
+    public static void main(String[] args) throws Exception {
+        int tests = 0;
+        int passed = 0;
+        Class<?> testClass = Sample3.class;
+        for (Method m : testClass.getDeclaredMethods()) {
+            if (m.isAnnotationPresent(Test.class)) {
+                tests++;
+                try {
+                    m.invoke(null);
+                    passed++;
+                } catch (InvocationTargetException wrappedExc) {
+                    Throwable exc = wrappedExc.getCause();
+                    System.out.println(m + " 실패: " + exc);
+                } catch (Exception exc) {
+                    System.out.println("잘못 사용한 @Test: " + m);
+                }
+            }
+
+            // 배열 매개변수를 받는 애너테이션을 처리하는 코드
+            if (m.isAnnotationPresent(ExceptionTest.class)) {
+                tests++;
+                try {
+                    m.invoke(null);
+                    System.out.printf("테스트 %s 실패: 예외를 던지지 않음%n", m);
+                } catch (Throwable wrappedExc) {
+                    Throwable exc = wrappedExc.getCause();
+                    int oldPassed = passed;
+                    Class<? extends Throwable>[] excTypes =
+                            m.getAnnotation(ExceptionTest.class).value();
+
+                    // 여러 예외를 검사할 수 있다.
+                    for (Class<? extends Throwable> excType : excTypes) {
+                        if (excType.isInstance(exc)) {
+                            passed++;
+                            break;
+                        }
+                    }
+                    if (passed == oldPassed)
+                        System.out.printf("테스트 %s 실패: %s %n", m, exc);
+                }
+            }
+        }
+        System.out.printf("성공: %d, 실패: %d%n",
+                passed, tests - passed);
+    }
+}
+```
+
+<br>
+
+![02.png](/static/assets/img/blog/java/2019-02-09-effective_java_06/02.png)
+
+---
+
+자바 8부터는 여러 개의 값을 받는 애너테이션을 다른 방식으로 만들 수도 있다.
+**배열 매개변수를 지정하는 대신, 애너테이션에 @Repetable 메타애너테이션을 다는 것이다.**
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+// 이 애너테이션에 "컨테이너 애너테이션"의 class 객체를 정의해야 한다.
+@Repeatable(ExceptionTestContainer.class)
+public @interface ExceptionTest {
+    Class<? extends Throwable> value();
+}
+
+// @Repetable 애너테이션을 단 애너테이션을 반환하는 "컨테이너 애너테이션"을 정의해야 한다.
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ExceptionTestContainer {
+    // 내부 애너테이션의 타입의 배열을 반환하는 value 메서드를 정의해야 한다.
+    ExceptionTest[] value();
+}
+
+public class Sample4 {
+
+    // 다음과 같이 반복 가능하게 애너테이션을 달 수 있다.
+    @ExceptionTest(IndexOutOfBoundsException.class)
+    @ExceptionTest(NullPointerException.class)
+    public static void doublyBad() {
+        List<String> list = new ArrayList<>();
+
+        // 자바 API 명세에 따르면 다음 메서드는 IndexOutOfBoundsException이나
+        // NullPointerException을 던질 수 있다.
+        list.addAll(5, null);
+    }
+}
+
+public class RunTests {
+    public static void main(String[] args) throws Exception {
+        int tests = 0;
+        int passed = 0;
+        Class testClass = Sample4.class;
+        for (Method m : testClass.getDeclaredMethods()) {
+            if (m.isAnnotationPresent(Test.class)) {
+                tests++;
+                try {
+                    m.invoke(null);
+                    passed++;
+                } catch (InvocationTargetException wrappedExc) {
+                    Throwable exc = wrappedExc.getCause();
+                    System.out.println(m + " 실패: " + exc);
+                } catch (Exception exc) {
+                    System.out.println("잘못 사용한 @Test: " + m);
+                }
+            }
+
+            // 반복 가능한 애너테이션을 여러 개 달았을 경우에는 "컨테이너 애너테이션"이 적용되므로
+            // m.isAnnotationPresent(ExceptionTest.class) == false,
+            // m.isAnnotationPresent(ExceptionTestContainer.class) == true 가 된다.
+            // 따라서 둘 다 검사하도록 해야 한다.
+            if (m.isAnnotationPresent(ExceptionTest.class)
+                    || m.isAnnotationPresent(ExceptionTestContainer.class)) {
+                tests++;
+                try {
+                    m.invoke(null);
+                    System.out.printf("테스트 %s 실패: 예외를 던지지 않음%n", m);
+                } catch (Throwable wrappedExc) {
+                    Throwable exc = wrappedExc.getCause();
+                    int oldPassed = passed;
+                    ExceptionTest[] excTests =
+                            m.getAnnotationsByType(ExceptionTest.class);
+                    for (ExceptionTest excTest : excTests) {
+                        if (excTest.value().isInstance(exc)) {
+                            passed++;
+                            break;
+                        }
+                    }
+                    if (passed == oldPassed)
+                        System.out.printf("테스트 %s 실패: %s %n", m, exc);
+                }
+            }
+        }
+        System.out.printf("성공: %d, 실패: %d%n",
+                          passed, tests - passed);
+    }
+}
+
+```
+
+이렇게 **소스코드에 추가적인 정보를 제공할 필요가 있다면 명명패턴 보다는 애너테이션을 사용하도록 한다.** 그리고 **자바 프로그래머라면 예외없이 자바가 제공하는 애너테이션 타입들은 사용해야 한다.**
+
