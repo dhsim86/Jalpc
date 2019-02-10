@@ -278,3 +278,46 @@ enum PayrollDay {
 <br>
 ## 35. ordinal 메서드 대신 인스턴스 필드를 사용하라.
 
+대부분의 열거 타입 상수는 자연스럽게 하나의 정숫값에 대응된다. 그리고 모든 열거 타입은 해당 상수가 몇 번째 위치인지를 반환하는 **ordinal** 메서드를 제공한다.
+
+열거 타입 상수와 연결된 정수값이 필요하면 다음과 같이 ordinal 메서드를 사용할 때가 있다.
+
+```java
+public enum Ensemble {
+    SOLO, DUET, TRIO, QUARTET, QUINTET,
+    SEXTET, SEPTET, OCTET, NONET, DECTET;
+
+    // 연주자 수 리턴
+    public int numberOfMusicians() {
+        return ordinal() + 1;
+    }
+}
+```
+
+동작은 하는데, 유지보수하기가 어려운 코드이다. 만약 상수 선언 순서를 변경하면 해당 메서드는 오동작하며, 이미 사용 중인 정수와 값이 같은 상수는 추가할 방법이 없다. 또한 값을 중간에 비워둘 수도 없다.
+
+따라서 **열거 타입 상수에 연결된 값은 ordinal 메서드로 얻지 말고 인스턴스 필드에 명시적으로 저장하는 것이 좋다.**
+
+```java
+public enum Ensemble {
+    SOLO(1), DUET(2), TRIO(3), QUARTET(4), QUINTET(5),
+    SEXTET(6), SEPTET(7), OCTET(8), DOUBLE_QUARTET(8),
+    NONET(9), DECTET(10), TRIPLE_QUARTET(12);
+
+    private final int numberOfMusicians;
+
+    Ensemble(int size) { 
+        this.numberOfMusicians = size;
+    }
+    public int numberOfMusicians() {
+        return numberOfMusicians;
+    }
+}
+```
+
+Enum API 문서에서 ordinal 메서드는 다음과 같이 설명되어 있다.
+
+> 대부분의 프로그래머는 이 메서드를 쓸 일이 없다. 이 메서드는 EnumSet과 EnumMap과 같은 열거 타입 기반의 범용 자료구조에 쓸 목적으로 설계되었다.
+
+따라서 위의 용도가 아니면 ordinal 메서드는 사용하지 않는다.
+
