@@ -463,3 +463,103 @@ Map<Plant.LifeCycle, Set<Plant>> t = Arrays.stream(garden)
         .collect(groupingBy(p -> p.lifeCycle, () -> new EnumMap<>(LifeCycle.class), toSet()));
 ```
 
+## 38. 확장할 수 있는 열거 타입이 필요하다면 인터페이스를 사용하라.
+
+열거 타입은 확장할 수 없다. 
+
+```java
+enum Plant {
+    
+}
+
+// 컴파일 에러
+enum PlantEx extends Plant {
+    
+}
+```
+
+대부분의 상황에서 열거 타입을 확장하는 것은 좋지 않은 생각이다. 확장한 열거 타입의 원소가 기반 열거 타입의 원소로 취급하는데, 그 반대가 성립되지 않는다. 또한 기반 열거 타입과 확장한 열거 타입 원소 모두를 순회할 방법이 마땅치 않고, 확장성을 높이려면 고려할 요소가 늘어나 설계와 구현이 복잡해진다.
+
+확장할 수 있는 열거 타입이 어울리는 쓰임이 최소한 하나는 있다. 가끔 API에서 제공하는 기본 열거 타입 외에 사용자가 확장할 수 있도록 열어줘야할 때가 있다.
+
+이럴 때에는 **열거 타입이 임의의 인터페이스를 구현할 수 있다는 사실을 이용하면 된다.** 열거 타입용 인터페이스를 정의하고, 열거 타입이 이 인터페이스를 구현하도록 하는 것이다. 이 때, 이 열거 타입은 그 인터페이스의 표준 구현체 역할을 한다.
+
+```java
+public interface Operation {
+    double apply(double x, double y);
+}
+
+public enum BasicOperation implements Operation {
+
+    PLUS("+") {
+        public double apply(double x, double y) { return x + y; }
+    },
+    MINUS("-") {
+        public double apply(double x, double y) { return x - y; }
+    },
+    TIMES("*") {
+        public double apply(double x, double y) { return x * y; }
+    },
+    DIVIDE("/") {
+        public double apply(double x, double y) { return x / y; }
+    };
+
+    private final String symbol;
+
+    BasicOperation(String symbol) {
+        this.symbol = symbol;
+    }
+
+    @Override public String toString() {
+        return symbol;
+    }
+}
+
+```
+
+열거 타입인 BasicOperation을 확장할 수는 없지만, 인터페이스인 Operation은 확장할 수 있고 그 인터페이스를 연산의 타입으로 사용하면 된다. 사용자가 BasicOperation이 아닌 자기만의 Operation 열거 타입을 정의하고 싶을 때는 Operation을 구현한 또 다른 열거 타입을 정의하도록 하면 된다.
+
+```java
+public enum ExtendedOperation implements Operation {
+    EXP("^") {
+        public double apply(double x, double y) {
+            return Math.pow(x, y);
+        }
+    },
+    REMAINDER("%") {
+        public double apply(double x, double y) {
+            return x % y;
+        }
+    };
+
+    private final String symbol;
+
+    ExtendedOperation(String symbol) {
+        this.symbol = symbol;
+    }
+    @Override public String toString() {
+        return symbol;
+    }
+}
+```
+
+새로 작성한 연산은 Operation 인터페이스를 사용하는 어느 곳에서든 사용 가능하다.
+
+```java
+// Class 객체가 열거 타입인 동시에 Operation의 하위 타입이어야 한다는 뜻이다.
+private static <T extends Enum<T> & Operation> void test(
+        Class<T> opEnumType, double x, double y) {
+    for (Operation op : opEnumType.getEnumConstants())
+        System.out.printf("%f %s %f = %f%n",
+                x, op, y, op.apply(x, y));
+}
+public static void main(String[] args) {
+    double x = Double.parseDouble(args[0]);
+    double y = Double.parseDouble(args[1]);
+    test(ExtendedOperation.class, x, y);
+}
+```
+
+인터페이스를 이용해 확장 가능한 열거 타입을 흉내내는 방식에도 한 가지 문제가 있는데, **열거 타입끼리 구현을 상속할 수 없다는 점이다.**
+
+아무 상태에 의존하지 않는 코드라면, **인터페이스의 default 메서드**를 사용하는 방법이 있다. 그러나 위의 Operation의 예에서는 연산 기호를 저장하고 찾는 로직 (toString)이 열거 타입 모두 들어가야 한다. 이런 경우에는 **도우미 클래스나 정적 도우미 메서드로 분리하는 방식으로 코드 중복을 없앨 수 있다.**
