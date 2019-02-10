@@ -917,3 +917,89 @@ public class RunTests {
 
 이렇게 **소스코드에 추가적인 정보를 제공할 필요가 있다면 명명패턴 보다는 애너테이션을 사용하도록 한다.** 그리고 **자바 프로그래머라면 예외없이 자바가 제공하는 애너테이션 타입들은 사용해야 한다.**
 
+<br>
+## 40. @Override 애너테이션을 일관되게 사용하라.
+
+자바가 기본으로 제공하는 애너테이션 중 보통의 프로그래머에게 가장 중요한 것은 **@Override** 애너테이션이다. 이 애너테이션이 달렸다는 것은 **상위 타입의 메서드를 재정의했음을 의미한다.**
+
+이 애너테이션을 일관되게 사용하면 각종 버그들을 예방할 수 있다.
+
+```java
+public class Bigram {
+    private final char first;
+    private final char second;
+
+    public Bigram(char first, char second) {
+        this.first  = first;
+        this.second = second;
+    }
+
+    public boolean equals(Bigram b) {
+        return b.first == first && b.second == second;
+    }
+
+    public int hashCode() {
+        return 31 * first + second;
+    }
+
+    public static void main(String[] args) {
+        Set<Bigram> s = new HashSet<>();
+        for (int i = 0; i < 10; i++)
+            for (char ch = 'a'; ch <= 'z'; ch++)
+                s.add(new Bigram(ch, ch));
+        System.out.println(s.size());
+    }
+}
+```
+
+main 메서드를 보면, 똑같은 소문자 2개로 구성된 인스턴스 26개를 10번 반복해서 Set에 추가한다음, 그 집합의 크기를 출력한다. Set은 중복을 허용하지 않으므로, 26이 출력될 것 같지만 실제로는 260이 출력된다.
+
+Bigram 클래스는 equals 메서드 및 hashCode 메서드를 재정의하였다. 그런데 이 클래스는 equals를 재정의한 것이 아니고 다중 정의한 것이다. **Object의 equals 메서드를 재정의하려면 매개변수 타입을 Object로 해야된다.** Object의 equals 메서드는 기본적으로 == 연산자와 똑같은 객체 식별성만을 검사하므로, 결국 위의 코드에서 260을 출력한 것이다.
+
+이 오류를 컴파일 단계에서 찾아내기 위해서는 @Override 애너테이션을 사용하여 재정의한다는 의도를 명시해야 한다.
+
+```java
+// 컴파일 에러
+
+@Override 
+public boolean equals(Bigram b) {
+    return b.first == first && b.second == second;
+}
+```
+
+잘못된 부분을 명확히 알려주므로, 올바르게 수정할 수 있다.
+
+```java
+@Override
+public boolean equals(Object o) {
+    if (!(o instanceof Bigram2))
+        return false;
+    Bigram2 b = (Bigram2) o;
+    return b.first == first && b.second == second;
+}
+```
+
+이렇게 컴파일 단계에서 오류를 즉각 찾아낼 수 있도록, **상위 클래스의 메서드를 재정의하려는 모든 메서드에 @Override 애너테이션을 다는 것이 좋다.**
+
+@Override는 클래스 뿐만 아니라 인터페이스의 메서드를 재정의할 때도 사용할 수 있다. **디폴트 메서드**를 지원하기 시작하면서, 인터페이스 메서드를 구현할 때도 @Override 애너테이션을 다는 습관을 들이면 메서드 시그니처가 올바른지 확인할 수 있다.
+
+<br>
+## 41. 정의하려는 것이 타입이라면 마커 인터페이스를 사용하라.
+
+아무 메서드도 담지 않고, 단지 자신을 구현하는 클래스가 특정 속성을 가짐을 표시해주는 인터페이스를 **마커 인터페이스**라고 한다. **Serializable** 인터페이스가 좋은 예이다. 
+
+> Serializable 인터페이스는 자신을 구현한 클래스의 인스턴스는 ObjectOutputStream을 통해 write할 수 있다고 알려준다.
+
+마커 애너테이션과 비교하자면, 두 가지 면에서 장점을 가진다.
+
+1. 마커 인터페이스는 이를 구현한 **클래스의 인스턴스들을 구분하기 위한 타입**으로 사용할 수 있으나 마커 애너테이션은 그럴 수 없다.
+   - 마커 인터페이스는 엄연한 타입이므로, 런타임에 발견할 오류를 컴파일 타임에 찾을 수 있다.
+2. 적용 대상을 더 정밀하게 지정할 수 있다.
+   - 적용 대상을 **ElementType.TYPE**으로 지정한 애너테이션은 모든 타입(클래스, 인터페이스, 열거 타입 등)에 달 수 있는데, 이는 부착할 수 있는 타입을 세밀하게 제한을 하지 못한다는 뜻이다.
+   - 마커 인터페이스라면 특정 클래스에서만 그 인터페이스를 확장하면 된다.
+
+반대로 **마커 애너테이션이 마커 인터페이스보다 나은 점으로는 거대한 애너테이션 시스템의 지원을 받을 수 있다는 점이다.** 따라서 애너테이션을 적극적으로 활용하는 프레임워크에서는 마커 애너테이션을 쓰는 쪽이 일관성을 지키는데 유리하다.
+
+클래스와 인터페이스 외의 프로그램 요소들(모듈, 패키지, 필드, 지역 변수등)에 마킹해야 될 경우에는 애너테이션을 사용해야 한다.
+
+만약 마커를 클래스나 인터페이스에 적용해야 할 때, **이 마킹이 된 클래스의 인스턴스를 매개변수로 받는 메서드를 작성할 일이 있다면 마커 인터페이스를 써야 한다.** 이렇게 하면 그 마커 인터페이스를 매개변수 타입으로 지정하여 컴파일타임에 오류를 잡을 수 있다. 만약 이런 메서드를 작성할 일이 없다면 마커 애너테이션이 더 나은 선택이다.
