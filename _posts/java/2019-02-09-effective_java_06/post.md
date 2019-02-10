@@ -321,3 +321,145 @@ Enum API 문서에서 ordinal 메서드는 다음과 같이 설명되어 있다.
 
 따라서 위의 용도가 아니면 ordinal 메서드는 사용하지 않는다.
 
+<br>
+## 36. 비트 필드 대신 EnumSet을 사용하라.
+
+열거한 값들이 주로 (단독이 아닌) 집합으로 사용될 경우, 정수 열거 패턴을 사용할 때 다음과 같이 선언해왔다.
+
+```java
+public class Text {
+    public static final int STYLE_BOLD = 1 << 0;
+    public static final int STYLE_ITALIC = 1 << 1;
+    public static final int STYLE_UNDERLINE = 1 << 2;
+    public static final int STYLE_STRIKETHROUGH = 1 << 3;
+
+    // 매개변수 styles는 위의 STYLE_** 상수를 비트별 OR한 값이다.
+    public void applyStyles(int styles) {
+        ...
+    }
+}
+
+text.applyStyles(STYLE_BOLD | STYLE_ITALIC);
+```
+
+위와 같이 비트별 OR을 사용해 여러 상수를 모은 집합을 비트 필드라고 한다.
+
+비트 필드를 사용하면 비트별 연산을 통해 집합 연산을 효율적으로 수행할 수 있다. **하지만 비트 필드는 정수 열거 패턴을 사용했을 때의 단점을 그대로 가지며, 추가로 다음 문제까지 안고 있다.**
+
+비트 필드 값이 그대로 출력될 때는 정수 열거 패턴 때보다 **해석하기가 더 까다롭다.** 또한 비트 필드 하나에 녹아 있는 모든 원소를 순회하기도 힘들다.
+
+**또한 비트 필드 선언시 최대 몇 비트가 필요한지를 미리 예측해야 한다.**
+
+자바에서는 이 비트 필드에 대한 더 나은 대안으로 **EnumSet** 클래스를 제공하는데, 이 클래스는 **열거 타입 상수의 값으로 구성된 집합을 효과적으로 표현한다.** Set 인터페이스를 구현하며, 타입 안전하고, 다른 어떤 Set 구현체와도 사용 가능하다. 
+
+> EnumSet 내부는 비트 벡터로 구현되어 있다. 원소가 64개 이하라면, long 변수 하나로 비트 필드에 견주는 성능을 보여준다. removeAll과 같은 대량 작업은 비트를 효율적으로 처리할 수 있는 산술 연산을 써서 구현되어 있다.
+
+```java
+public class Text {
+    public enum Style {BOLD, ITALIC, UNDERLINE, STRIKETHROUGH}
+
+    // 어떤 Set을 넘겨도 되나, EnumSet이 가장 좋다.
+    // 인터페이스로 파라미터 타입을 정의하는 것이 좋다.
+    public void applyStyles(Set<Style> styles) {
+        System.out.printf("Applying styles %s to text%n",
+                Objects.requireNonNull(styles));
+    }
+
+    public static void main(String[] args) {
+        Text text = new Text();
+        text.applyStyles(EnumSet.of(Style.BOLD, Style.ITALIC));
+    }
+}
+```
+
+<br>
+## 37. ordinal 인덱싱 대신, EnumMap을 사용하라.
+
+이따금 배열이나 리스트에서 원소를 꺼낼 때, ordinal 메서드를 통해 인덱스를 얻는 코드가 있다.
+
+```java
+class Plant {
+    enum LifeCycle {
+        ANNUAL,
+        PERENNIAL,
+        BIENNIAL
+    }
+
+    final String name;
+    final LifeCycle lifeCycle;
+
+    Plant(String name, LifeCycle lifeCycle) {
+        this.name = name;
+        this.lifeCycle = lifeCycle;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+```
+
+위와 같이 식물을 표현한 클래스의 인스턴스들을 배열 하나로 관리하고, 이들을 생애주기에 따라 묶어보자.
+생애주기별로 총 3개의 집합으로 만들고 각 식물을 해당 집합에 넣는다.
+
+```java
+Set<Plant>[] plantsByLifeCycle = 
+    (Set<Plant>[]) new Set[Plant.LifeCycle.values().length];
+
+for (int i = 0; i < plantsByLifeCycle.length; i++) {
+    plantsByLifeCycle[i] = new HashSet<>();
+}
+
+for (Plant p : garden) {
+    plantsByLifeCycle[p.lifeCycle.ordinal()].add(p);
+}
+
+for (int i = 0; i < plantsByLifeCycle.length; i++) {
+    System.out.println("%s: %s\n",
+        Plant.LifeCycle.values()[i], plantsByLifeCycle[i]);
+}
+```
+
+동작은 하는데 문제가 한가득이다. 배열은 제네릭과 호환되지 않으니 비검사 형변환을 수행해야 되고, 깔끔히 컴파일되지 않을 것이다. 
+
+**심각한 문제는 정확하게 정숫값을 사용한다는 것을 직접 보증해야 한다는 점이다.** 정수는 열거 타입과는 다르게 타입 안전하지 않기 때문이다. 잘못된 정숫값을 사용시 오동작하거나, ArrayIndexOutOfBoundsException을 던질 것이다.
+
+여기서 배열은 실질적으로 열거 타입 상수를 값으로 매핑하는 역할을 한다. 그러니 **Map으로 대체할 수 있다.**
+자바에서 열거 타입을 키로 사용하도록 설계한 Map 구현체인 **EnumMap** 클래스를 제공한다.
+
+```java
+Map<Plant.LifeCycle, Set<Plant>> plantsByLifeCycle =
+    new EnumMap<>(Plant.LifeCycle.class);
+
+for (Plant.LifeCycle lc : Plant.LifeCycle.values()) {
+    plantsByLifeCycle.put(lc, new HashSet<>());
+}
+
+for (Plant p : garden) {
+    plantsByLifeCycle.get(p.lifeCycle).add(p);
+}
+
+System.out.println(plantsByLifeCycle);
+```
+
+**더 짧고 명료할 뿐만 아니라 안전하고 성능도 원래 일반 배열 사용했을 때와 비등하다.**
+안전하지 않은 형 변환을 사용하지 않고, 맵의 키인 열거 타입이 그 자체로 출력용 문자열을 제공하므로 출력 결과에 직접 레이블을 달 필요가 없다.
+
+EnumMap의 성능이 ordinal을 쓴 배열과 비슷한 이유는 그 내부에서 배열을 사용하기 때문이다.
+
+스트림을 통해 맵을 관리하면 코드를 더 줄일 수도 있다.
+
+```java
+System.out.println(Arrays.stream(garden)
+    .collect(groupingBy(p -> p.lifeCycle));
+```
+
+위의 groupingBy는 키를 p.lifeCycle로, 값을 Set<Plant> 인스턴스로 하는 Map을 만들어준다. 그런데 위 코드는 EnumMap을 사용하지 않으므로 성능 이점이 사라지는 문제가 있다. EnumMap을 사용하기 위해서는 다음과 같이 작성한다.
+
+```java
+// 두 번째 파라미터인 Supplier<M> mapFactory에 원하는 맵 구현체를 명시해주면 된다.
+Map<Plant.LifeCycle, Set<Plant>> t = Arrays.stream(garden)
+        .collect(groupingBy(p -> p.lifeCycle, () -> new EnumMap<>(LifeCycle.class), toSet()));
+```
+
