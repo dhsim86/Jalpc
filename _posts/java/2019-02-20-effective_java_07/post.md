@@ -182,3 +182,128 @@ public enum Operation {
 반대로 익명 클래스에서의 this는 익명 클래스의 인스턴스, 자신을 가리킨다.  따라서 함수 객체가 자기 자신을 참조해야 한다면, 반드시 익명 클래스를 사용해야 한다.
 
 참고: [자바스크립트, 화살표 함수](https://poiemaweb.com/es6-arrow-function)
+
+## 43. 람다보다는 메서드 참조를 사용하라.
+
+람다가 익명 클래스보다 나은 점 중에서 가장 큰 특징은 **간결함**이다. 그런데 자바에서는 함수 객체를 람다보다도 더 간결하게 만드는 방법이 있는데 바로 **메서드 참조**이다.
+
+다음 코드는 임의의 키와 Integer 값의 매핑을 관리하는 프로그램의 일부이다. 이 코드는 키가 맵 안에 없다면 키와 숫자 1을 매핑하고, 이미 있다면 기존 매핑 값을 증가시킨다.
+
+```java
+map.merge(key, 1, (count, incr) -> count + incr);
+```
+
+> Map의 merge 메서드는 키, 값, 함수를 인수로 받으며, 주어진 키가 맵 안에 없다면 주이진 {키, 값} 쌍을 그대로 저장한다. 반대로 키가 이미 있다면 함수를 통해 현재 값과 주어진 값에 적용한 다음, 그 결과로 현재 값을 덮어 쓴다. {키, 함수의 결과}
+
+깔끔해 보이지만 매개변수 count와 incr가 하는 일 없이 공간을 꽤 차지하고 있다. 위 코드에서 람다는 단순히 두 인수의 합을 반환할 뿐이다.
+
+자바 8에서 Integer 클래스와 같은 박싱 타입은 이 람다와 기능이 같은 정적 메서드 sum을 제공한다.
+
+```java
+map.merge(key, 1, Integer::sum);
+```
+
+이렇게 메서드 참조를 사용하면 똑같은 결과를 더 보기 좋게 얻을 수 있다.
+
+매개변수가 늘어날수록 **메서드 참조로 제거할 수 있는 코드의 양이 늘어난다.** 다만 어떤 람다는 매개변수의 이름 자체가 프로그래머에게 좋은 가이드가 되기도 하므로, 메서드 참조보다 읽기 쉽고 유지보수도 용이할 수 있다.
+
+**보통 메서드 참조를 사용하는 편이 코드가 더 짧고 간결하므로, 람다로 구현했을 때 너무 길거나 복잡하다면 메서드 참조가 좋은 대안이 될 수 있다.**
+
+람다를 직접 사용하는 것보다는 람다로 작성할 코드를 새로운 메서드에 담은 다음, 람다 대신 그 메서드 참조를 사용하는 식으로 구현하면 **기능을 잘 드러내는 이름도 지어줄 수 있고 문서로도 남길 수 있다.**
+
+보통 IDE에서는 메서드 참조로 대체하라고 권하지만, 꼭 람다보다 메서드 참조가 간결한 것은 아니다. **주로 람다와 메서드가 같은 클래스에 있을 때 그렇다.** 다음과 같은 코드가 있다고 해보자.
+
+```java
+public class GoshThisClassNameIsHumongous {
+    ...
+    public static void action() {
+        ...
+    }
+    public static void foo() {
+        service.execute(GoshThisClassNameIsHumongous::action);
+    }
+    ...
+}
+```
+
+이를 람다로 대체해보면 다음과 같다.
+
+```java
+service.execute(() -> action());
+```
+
+이럴 때는 람다가 더 낫다. 같은 선상에서 **Function.identity()**를 사용하는 것보다는 람다 (x -\> x)를 사용하는 것이 낫다.
+
+> Function.identity 메서드는 인자로 들어온 값 그대로 반환하는 메서드이다.
+
+메서드 참조의 유형은 다섯 가지가 있는데, 가장 흔한 유형은 앞의 예에서 본 것처럼 **정적 메서드를 가리키는 메서드 참조이다.**
+
+다음으로 **인스턴스의 메서드를 참조하는 유형이 두 가지가 있다.**
+
+<br>
+### 한정적 메서드 참조
+
+수신 객체(receiving object)를 특정하는 한정적 인스턴스 메서드 참조이다. 근본적으로 정적 메서드 참조와 비슷한데, **함수 객체가 받는 인수와 참조되는 메서드가 받는 인수가 똑같다.**
+
+람다 캡쳐링을 통해, 람다 표현식 바깥에 있는 인스턴스의 메서드를 호출할 때 사용한다.
+
+```java
+Integer test = 10;
+List<Integer> values = Arrays.asList(10, 20, 30);
+ 
+// Predicate<Integer> t = Integer::equals;
+Predicate<Integer> testEquals = test::equals;
+
+long testCount = values.stream()
+        .filter(testEquals) // .filter(test::equals)
+        .count();
+```
+
+Predicate 인터페이스의 test 메서드는 인자 하나를 받는다. 그런데 equals 메서드는 비교하기 위해 두 객체(자신 및 비교 대상)가 필요하므로
+
+```java
+Predicate<Integer> predicate = Integer::equals;
+```
+
+와 같은 식으로 작성하지 못한다. 나머지 하나를 추론할 수 없기 때문이다. 
+
+하지만 다음과 같이 특정 인스턴스를 지정한다면 컴파일러 입장에서는 추론이 가능해진다.
+
+```java
+Predicate<Integer> testEquals = test::equals;
+```
+
+<br>
+### 비한정적 메서드 참조
+
+수신 객체를 특정하지 않는다.
+다음과 같이 특정 인스턴스를 지정하지 않고 String::isEmpty 메서드 참조를 사용했지만, 컴파일러가 추론하여 호출할 수 있다.
+
+```java
+List<String> test = Arrays.asList("", "Not Empty", "");
+long testCount = test.stream()
+        .filter(String::isEmpty)
+        .count();
+```
+
+---
+
+마지마으로 클래스 생성자를 가리키는 메서드 참조와 배열 생성자를 가리키는 메서드 참조가 있다. 생성자 참조는 팩터리 객체로 사용된다.
+
+```java
+public static class Point {
+    private int x;
+
+    public Point(int x) {
+        this.x = x;
+    }
+}
+
+List<Integer> valueList = Arrays.asList(1, 2, 3, 4, 5);
+List<Point> pointList = valueList.stream()
+        .map(Point::new)
+        .collect(Collectors.toList());
+```
+
+> 메서드 참조는 람다의 간단명료한 대안이 될 수 있다. 메서드 참조 쪽이 짧고 명확하다면 메서드 참조를 쓰고, 그렇지 않을 때만 람다를 사용하라.
+
