@@ -327,6 +327,8 @@ java.util.function 패키지에는 총 43개의 인터페이스가 담겨 있다
 | Supplier\<T\> | T get() | Instant::now |
 | Consumer\<T\> | void accept(T t) | System.out::println |
 
+<br>
+
 * Operator: 인수가 1개인 UnaryOperator와 2개인 BinaryOperator로 나뉘며, 반환값과 인수의 타입이 같은 함수
 * Predicate: 인수 하나를 받아 boolean을 반환
 * Function: 인수와 반환 타입이 다른 함수
@@ -366,7 +368,7 @@ There is no requirement that a new or distinct result be returned each time the 
 
 따라서 Callable 인터페이스는 Supplier 인터페이스의 특수한 버전이라고 할 수도 있다. 사실상 별 차이는 없다. Spring WebFlux에서 사용하는 Reactive Streams 구현체인 reactor **Mono**도 [**Mono.fromCallable**](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromCallable-java.util.concurrent.Callable-)과 [**Mono.fromSupplier**](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromSupplier-java.util.function.Supplier-) 라는 두 정적 메서드를 제공하고 있는데 문서를 보면 알겠지만 차이는 없다.
 
-**코드 상의 의미를 부여하기 위해서는** Callable과 Supplier를 구분해서 사용하는 것이 좋다고 생각한다. 다른 스레드에 의해 수행될 수 있거나 예외가 발생할 수 있으면 Callable 인터페이스를 사용하는 것이다.
+**코드 상의 의미를 부여하고 좀 더 이해하기 쉽도록** Callable과 Supplier를 구분해서 사용하는 것이 좋다고 생각한다. 다른 스레드에 의해 수행될 수 있거나 예외가 발생할 수 있으면 Callable 인터페이스를 사용하는 것이다.
 
 ---
 
