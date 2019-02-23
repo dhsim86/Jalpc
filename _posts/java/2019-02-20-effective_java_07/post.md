@@ -309,3 +309,64 @@ List<Point> pointList = valueList.stream()
 
 > 메서드 레퍼런스는 람다의 간단명료한 대안이 될 수 있다. 메서드 레퍼런스 쪽이 짧고 명확하다면 메서드 레퍼런스를 쓰고, 그렇지 않을 때만 람다를 사용하라.
 
+<br>
+## 44. 표준 함수형 인터페이스를 사용하라.
+
+java.util.function 패키지를 보면 다양한 용도의 표준 함수형 인터페이스가 담겨있다. 
+
+**필요한 용도에 맞는 게 있다면 직접 구현하지 말고 표준 함수형 인터페이스를 활용하는 것이 낫다.** API가 다루는 개념의 수가 줄어들어 익히기 더 쉬워진다. 또한 표준 함수형 인터페이스들은 유용한 디폴트 메서드를 제공하므로 다른 코드와의 상호운용성도 크게 좋아진다.
+
+java.util.function 패키지에는 총 43개의 인터페이스가 담겨 있다. 전부 기억하긴 어렵겠지만, 기본 인터페이스 6개만 기억하면 나머지를 충분히 유추할 수 있다.
+
+| 인터페이스 | 함수 시그니처 | 예 |
+| --- | --- | ---
+| UnaryOperator\<T\> | T apply(T t) | String::toLowerCase |
+| BinaryOperator\<T\> | T apply(T t1, T t2) | BigInteger::add |
+| Predicate\<T\> | boolean test(T t) | Collection::isEmpty |
+| Function\<T, R\> | R apply(T t) | Arrays.asList |
+| Supplier\<T\> | T get() | Instant::now |
+| Consumer\<T\> | void accept(T t) | System.out::println |
+
+* Operator: 인수가 1개인 UnaryOperator와 2개인 BinaryOperator로 나뉘며, 반환값과 인수의 타입이 같은 함수
+* Predicate: 인수 하나를 받아 boolean을 반환
+* Function: 인수와 반환 타입이 다른 함수
+* Supplier: 인수를 받지 않고 값을 반환하는 함수
+* Consumer: 인수를 하나 받고 반환값은 없는 함수
+
+<br>
+### Supplier와 Callable
+
+Supplier와 Callable은 같이 인수를 받지 않고 값을 반환하는 메서드를 정의하지만 차이점이 존재한다
+
+```java
+@FunctionalInterface
+public interface Callable<V> {
+    V call() throws Exception;
+}
+
+``` 
+
+```java
+@FunctionalInterface
+public interface Supplier<T> {
+    T get();
+}
+
+```
+
+Callable 인터페이스는 예외가 발생할 수 있는 구현을 위해 존재하며, 다른 스레드에 의해 수행될 수 있는 클래스의 인스턴스를 위해 디자인되었다.
+
+> A task that returns a result and **may throw an exception.** Implementors define a single method with no arguments called call.
+The Callable interface is similar to Runnable, in that both are **designed for classes whose instances are potentially executed by another thread.**
+
+이에 반해 Supplier 인터페이스는 **값을 제공하는 목적**에 충실한 인터페이스이다.
+
+> Represents a supplier of results.
+There is no requirement that a new or distinct result be returned each time the supplier is invoked.
+
+따라서 Callable 인터페이스의 사용처는 Supplier 인터페이스의 특수한 버전이라고 할 수도 있다. 사실상 별 차이는 없다. Spring WebFlux에서 사용하는 Reactive Streams 구현체인 reactor **Mono**도 [**Mono.fromCallable**](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromCallable-java.util.concurrent.Callable-)과 [**Mono.fromSupplier**](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromSupplier-java.util.function.Supplier-) 라는 두 정적 메서드를 제공하고 있는데 문서를 보면 알겠지만 차이는 없다.
+
+**코드 상의 의미를 부여하기 위해서는** Callable과 Supplier를 구분해서 사용하는 것이 좋다고 생각한다. 다른 스레드에 의해 수행될 수 있거나 예외가 발생할 수 있으면 Callable 인터페이스를 사용하는 것이다.
+
+---
+
