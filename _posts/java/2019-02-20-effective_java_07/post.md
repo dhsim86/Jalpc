@@ -364,7 +364,7 @@ The Callable interface is similar to Runnable, in that both are **designed for c
 > Represents a supplier of results.
 There is no requirement that a new or distinct result be returned each time the supplier is invoked.
 
-따라서 Callable 인터페이스의 사용처는 Supplier 인터페이스의 특수한 버전이라고 할 수도 있다. 사실상 별 차이는 없다. Spring WebFlux에서 사용하는 Reactive Streams 구현체인 reactor **Mono**도 [**Mono.fromCallable**](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromCallable-java.util.concurrent.Callable-)과 [**Mono.fromSupplier**](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromSupplier-java.util.function.Supplier-) 라는 두 정적 메서드를 제공하고 있는데 문서를 보면 알겠지만 차이는 없다.
+따라서 Callable 인터페이스는 Supplier 인터페이스의 특수한 버전이라고 할 수도 있다. 사실상 별 차이는 없다. Spring WebFlux에서 사용하는 Reactive Streams 구현체인 reactor **Mono**도 [**Mono.fromCallable**](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromCallable-java.util.concurrent.Callable-)과 [**Mono.fromSupplier**](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html#fromSupplier-java.util.function.Supplier-) 라는 두 정적 메서드를 제공하고 있는데 문서를 보면 알겠지만 차이는 없다.
 
 **코드 상의 의미를 부여하기 위해서는** Callable과 Supplier를 구분해서 사용하는 것이 좋다고 생각한다. 다른 스레드에 의해 수행될 수 있거나 예외가 발생할 수 있으면 Callable 인터페이스를 사용하는 것이다.
 
