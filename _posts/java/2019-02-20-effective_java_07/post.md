@@ -388,3 +388,159 @@ There is no requirement that a new or distinct result be returned each time the 
 
 함수형 인터페이스를 API에서 사용할 때, **서로 다른 함수형 인터페이스를 같은 위치의 인수로 받는 메서드들을 오버로딩해서는 안된다.** 클라이언트쪽으로 불필요하게 모호함을 안겨줄 뿐이며, 정확하게 메서드를 호출하기 위해 형변환해야 될 수도 있다.
 
+<br>
+## 45. 스트림은 주의해서 사용하라.
+
+스트림 API는 다량의 데이터 처리 작업을 위해 자바 8에 추가된 것이다. 이 API에서 제공하는 추상 개념 중 핵심은 두 가지이다. 
+
+1. 스트림(Stream): 데이터 원소의 유한 혹은 무한 시퀀스를 말한다. 스트림의 원소들은 컬렉션이나 배열, 파일 등 어디로부터든 올 수 있다.
+2. 스트림 파이프라인(Stream Pipeline): 원소들로 수행하는 연산 단계를 표현하는 개념
+
+스트림 파이프라인은 소스 스트림에서 시작해 **종단 연산으로 끝나며, 중간에 중간 연산이 있을 수 있다.** 중간 연산은 스트림을 어떠한 방식으로 **변환하는 것이다.**
+
+> 스트림 파이프라인은 기본적으로 지연 평가된다. 종단 연산이 호출될 때 평가가 이루어지며, 종단 연산을 빠뜨리면 중간 연산들은 아예 실행되지도 않는다. 
+
+스트림을 과하게 사용하면 다음 코드와 같이 이해하기가 어려울 수 있다.
+
+```java
+public static void main(String[] args) throws IOException {
+    Path dictionary = Paths.get(args[0]);
+    int minGroupSize = Integer.parseInt(args[1]);
+
+    try (Stream<String> words = Files.lines(dictionary)) {
+        words.collect(
+                groupingBy(word -> word.chars().sorted()
+                        .collect(StringBuilder::new,
+                                (sb, c) -> sb.append((char) c),
+                                StringBuilder::append).toString()))
+                .values().stream()
+                .filter(group -> group.size() >= minGroupSize)
+                .map(group -> group.size() + ": " + group)
+                .forEach(System.out::println);
+    }
+}
+```
+
+코드가 짧기는 하지만 읽기는 어렵다. **스트림을 과다하게 사용하면 프로그램을 읽거나 유지보수하기가 어려워진다.**
+
+스트림으로 모든 것을 해결하려고 하기 보다는 다음과 같이 적절히 코드를 분리하고, 적당히 사용하는 것이 더 읽기가 쉽다.
+
+```java
+public static void main(String[] args) throws IOException {
+    Path dictionary = Paths.get(args[0]);
+    int minGroupSize = Integer.parseInt(args[1]);
+
+    try (Stream<String> words = Files.lines(dictionary)) {
+        words.collect(groupingBy(word -> alphabetize(word)))
+                .values().stream()
+                .filter(group -> group.size() >= minGroupSize)
+                .forEach(g -> System.out.println(g.size() + ": " + g));
+    }
+}
+
+private static String alphabetize(String s) {
+    char[] a = s.toCharArray();
+    Arrays.sort(a);
+    return new String(a);
+}
+```
+
+> 위 코드처럼 도우미 메서드 활용의 중요성은 예전의 for / while과 같은 반복적인 코드보다 스트림 파이프라인에서 더 크다. 특정 연산에 적절한 이름을 지어주고 세부 구현을 분리하여 전체적인 가독성을 높인 것이다. 
+
+스트림을 처음 사용할 때, 모든 코드를 스트림으로 바꾸고 싶겠지만 **코드 가독성을 위해 스트림과 반복문을 적절히 조합하는 것이 최선이다.**
+
+다음과 같은 경우라면 스트림과 맞지 않는 것이다.
+
+1. 범위 안의 지역변수를 수정해야 할 필요가 있는 경우
+   - 람다는 final로 선언된 변수에 한해 **접근만 할 수 있고 수정은 불가능하다.**
+2. 중간에 return 문을 통해 빠져나가야 하거나, break / continue문을 통해 반복문을 종료, 아니면 Checked 예외를 던지는 경우
+   - 람다는 Checked 예외를 던질 수 없고, 중간에 빠져나오는 연산 같은 것은 없다.
+
+반대로 다음과 같은 경우라면 스트림과 궁합이 맞는 경우이다.
+
+1. 원소들의 시퀀스를 일관되게 변환하는 경우
+   - map이나 flatMap으로 변환하면 된다.
+2. 원소들의 시퀀스를 필터링하는 경우
+   - filter
+3. 시퀀스를 하나의 연산을 이용해 결합하는 경우
+   - reduce 등
+4. 원소들의 시퀀스를 컬렉션에 모은다.
+5. 원소들의 시퀀스에서 특정 조건을 만족하는 원소를 찾는 경우
+
+<br>
+## 46. 스트림에서는 부작용(Side effect) 없는 함수를 사용하라.
+
+스트림은 **함수형 프로그래밍에 기초한 패러다임이다.** 
+
+> 함수형 프로그래밍은 상태 변경이나 가변(mutable) 데이터를 피하고 **불변성(Immutability)를 지향**한다. 부작용이 없는 **순수 함수(오직 입력만이 결과에 영향을 주는 함수)**와 보조 함수의 조합을 통해 로직 내의 조건문과 반복문을 제거하여 복잡성을 해결하고, 변수의 사용을 억제하여 상태 변경을 피하려는 프로그래밍 패러다임이다. 조건문이나 반복문은 로직의 흐름을 어렵게 하여 가독성을 해치고 변수의 값은 누군가에 의해 얹ㅔ든지 변경될 수 있어 오류 발생의 근본적 원인이 될 수 있기 때문이다.
+
+> 함수형 프로그래밍은 순수 함수를 통해 부작용을 최대한 억제하여 오류를 피하고 프로그램의 안정성을 높이는 노력의 한 방법이라고 할 수 있다.
+
+스트림이 제공하는 표현력, 속도, 병렬성을 얻으려면 이 패러다임까지 받아들여야 한다.
+
+스트림 패러다임의 핵심은 계산을 일련의 변환으로 재구성하는 부분이다. 이 때 각 변환 단계는 **가능한 이전 단계의 결과값만 보고 처리하는 순수 함수여야 한다.** 다른 가변 상태를 참조하지 않고, 함수 스스로도 다른 상태를 변경하지 않아야 한다.
+
+```java
+Map<String, Long> freq = new HashMap<>();
+try (Stream<String> words = new Scanner(file).tokens()) {
+    words.forEach(word -> {
+        freq.merge(word.toLowerCase(), 1L, Long::sum);
+    });
+}
+```
+
+위의 코드는 절대 스트림 코드라 할 수 없다. 스트림 코드를 가장한 반복적 코드인데, forEach내에서 외부 상태인 freq를 변경하는 것이 문제이다.
+
+다음과 같이 **외부 상태를 변경하는 일이 없도록** 제대로 사용해야 한다.
+
+```java
+Map<String, Long> freq;
+try (Stream<String> words = new Scanner(file).tokens()) {
+    freq = words
+            .collect(groupingBy(String::toLowerCase, counting()));
+}
+```
+
+> forEach 연산은 스트림 계산 결과를 보고할 때만 사용해야 하고, 계산하는 용도로 사용해서는 안된다.
+
+<br>
+## 47. 반환 타입으로는 스트림보다 컬렉션이 낫다.
+
+일련의 원소 시퀀스를 반환하는 메서드를 작성할 때는, 이를 스트림으로 처리하기를 원하는 사용자와 반복문으로 처리하길 원하는 사용자가 있을 수 있으므로, 되도록 컬렉션으로 반환하는 것이 좋다.
+
+스트림은 Iterable으로 바로 변환이 되지 않으므로, 클라이언트 쪽에서 복잡하게 형변환해야 하는 작업이 필요하다. 그에 반해 Collection 인터페이스는 Iterable의 하위 타입이고, stream 메서드도 제공하여 반복과 스트림을 동시에 지원한다. 따라서 **원소 시퀀스를 반환하는 메서드는 Collection이나 그 하위 타입으로 사용하는 것이 최선이다.**
+
+<br>
+## 48. 스트림 병렬화는 주의해서 적용하라.
+
+스트림 API는 **parallel** 메서드를 통해 스트림 파이프라인을 병렬 실행할 수 있도록 지원한다. **동시성 프로그래밍을 할 때는 안정성(safety)와 응답 가능(liveness) 상태를 유지하기 위해 애써야 하는데,** 이는 병렬 스트림 파이프라인에서도 다를게 없다.
+
+```java
+public static void main(String[] args) {
+    primes().map(p -> TWO.pow(p.intValueExact()).subtract(ONE))
+            .parallel() // 스트림 병렬화
+            .filter(mersenne -> mersenne.isProbablePrime(50))
+            .limit(20)
+            .forEach(System.out::println);
+}
+
+static Stream<BigInteger> primes() {
+    return Stream.iterate(TWO, BigInteger::nextProbablePrime);
+}
+```
+
+위의 코드는 메르센 소수를 생성하는 프로그램인데, parallel 메서드를 통해 병렬적으로 수행하려고 한 것이다. 그런데, 이 프로그램을 실행하면 끝날 기미가 보이지 않는다. 이는 **스트림 라이브러리가 파이프라인을 병렬화하는 방법을 찾아내지 못했기 때문이다.**
+
+파이프라인 병렬화는 limit를 다룰 때, CPU 코어가 남는다면 원소를 몇 개 더 처리한 후 제한된 개수 이후의 결과를 버려도 아무런 해가 없다고 가정한다. 
+
+원래 메르센 소수를 찾을 때는 그 전 소수를 찾을 때보다 두 배의 시간이 걸리는데, 20번째까지 메르센 소수를 찾았을 때 그 시점의 CPU 코어가 놀고 있다면 21,22,23번째의 메르센 소수를 찾는 작업이(쿼드 코어일 경우) 병렬로 수행되며 결국 이 때문에 시간이 많이 걸리는 것이다.
+
+**이처럼 스트림을 잘못 병렬화하면 응답 불가를 포함해 성능이 나빠질뿐만 아니라 결과 자체가 잘못되거나 예상 못한 동작이 발생할 수 있다.**
+
+> 데이터 소스가 Stream.iterate이거나, 중간 연산으로 limit를 사용하면 파이프라인 병렬화로는 성능 개선을 기대할 수 없다.
+
+대체로 스트림 소스가 ArrayList, HashMap, HashSet의 인스턴스이거나 배열, int / long 범위일 때 병렬화의 효과가 가장 좋다. 이 자료구조들은 **모두 데이터를 원하는 크기로 정확하고 손쉽게 나눌 수 있어 다수의 스레드에 분배하기 좋다는 특징이 있다.**
+
+> 이 자료구조들의 공통점은 참조 지역성이 뛰어나다는 것이다. 
+
+계산도 올바르게 수행하고 성능도 빨라질 거라는 확신이 없다면 스트림 파이프라인 병렬화는 시도하지 않는게 좋다. 스트림을 잘못 병렬화하면 프로그램을 오동작하게 하거나, 성능을 급격히 떨어뜨린다.
