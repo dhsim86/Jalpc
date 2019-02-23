@@ -372,7 +372,7 @@ There is no requirement that a new or distinct result be returned each time the 
 
 ---
 
-위의 기본 인터페이스 (Operator, Predicate, Function, Supplier, Consumer)들은 **기본 타입을 좀 더 쉽게 쓸 수 있도록** 여러 변형이 존재한다. 그리고 **인수의 개수가 다른** (예를 들면 BiFunction\<T, U, R\>이나 BiConsumer\<T, \U\>) 변형도 있다.
+위의 기본 인터페이스 (Operator, Predicate, Function, Supplier, Consumer)들은 **기본 타입을 좀 더 쉽게 쓸 수 있도록** 여러 변형이 존재한다. 그리고 **인수의 개수가 다른** (예를 들면 BiFunction\<T, U, R\>이나 BiConsumer\<T, U\>) 변형도 있다.
 
 표준 함수형 인터페이스 대부분은 기본 타입만 지원한다. 성능을 위해서 박싱된 기본 타입을 넣어서 사용하는 것은 좋지 않다.
 
