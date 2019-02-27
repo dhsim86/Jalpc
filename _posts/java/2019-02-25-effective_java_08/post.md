@@ -176,4 +176,128 @@ public class CollectionClassifier {
 
 위 코드는 IDE를 사용해봐도 알겠지만, **Collection<?> 타입의 매개변수를 받는 메서드만 호출된다.** 이유는 오버로딩된 메서드를 선택하는 것은 컴파일타임에 정해지기 때문이다. main 메서드 for문의 c는 항상 Collection<?> 타입이다. 런타임에는 달라지겠지만 호출할 메서드를 선택하는 데는 영향을 주지 않는다.
 
-**재정의(Overriding)한 메서드는 동적으로 선택되고, 다중정의(Overloading)한 메서드는 정적으로 선택되므로 주의가 필요하다.** 
+**재정의(Overriding)한 메서드는 동적으로 선택되고, 다중정의(Overloading)한 메서드는 정적으로 선택되므로 주의가 필요하다.** 메서드를 재정의했다면 객체의 런타임 타입이 어떤 메서드를 호출할지의 기준이 된다.
+
+하지만 다중정의한 메서드 사이에서는 객체의 런타임 타입은 전혀 중요하지 않다. 호출할 메서드의 선택은 컴파일 타임에, 오직 매개변수의 컴파일타임 타입에 의해 정해진다. 따라서 다중정의된 API를 사용하는 사용자가 매개변수를 넘기면서 어떤 다중정의된 메서드가 호출될지를 모른다면 프로그램이 오동작하기 쉽다. **다중정의가 혼동을 일으키는 상황은 피해야 한다.**
+
+**안전하고 보수적으로 가려면 매개변수의 수가 같은 다중정의는 만들지말자.** 가변인수를 사용하는 메서드라면 아예 다중정의를 하지말아야 한다. **ObjectOutputStream** 클래스의 경우에는 모든 메서드에 다른 이름을 지어주는 길을 택했다. **writeBoolean(boolean), writeInt(int), writeLong(long)** 같은 식이다.
+
+한편 생성자는 이름을 다르게 지을 수 없으므로 두 번째 생성자부터는 무조건 다중정의가 된다. 하지만 정적 팩터리라는 대안을 활용할 수 있다.
+
+다중정의된 메서드들이 **함수형 인터페이스**를 인수로 받을 떄, 서로 다른 함수형 인터페이스라도 인수 위치가 같으면 혼란이 생길 수 있다. **ExecutorService** 클래스의 submit 메서드가 그 예로, Runnable과 Callable 인터페이스를 다중 정의하여 혼란을 일으킨다.
+
+```java
+ExecutorService exec = Executors.newCachedThreadPool();
+exec.submit(System.out::println); // 컴파일 에러, Runnable을 받는 메서드를 호출하고자 했지만 Callable를 받는 메서드도 있어 혼란을 일으킨다.
+```
+
+<br>
+
+![00.png](/static/assets/img/blog/java/2019-02-25-effective_java_08/00.png)
+
+println은 void를 반환하므로, 반환 값이 있는 Callable과 헷갈릴 리는 없다고 생각할 수도 있지만, 다중정의 메서드를 호출하는 알고리즘은 이렇게 동작하지 않는다. 따라서 메서드를 다중정의할 때 **서로 다른 함수형 인터페이스라도 같은 위치의 인수로 받아서는 안 된다.**
+
+> 기술적으로 말하면 System.out::println은 부정확한 메서드 레퍼런스(inexact method reference)이다. 암시적 타입 람다식이나 부정확한 메서드 레퍼런스 같은 인수 표현식은 목표 타입이 정해지기 전까지는 그 의미가 정해지지 않으므로, 적용성 테스트 때 무시된다.
+
+일반적으로 매개변수 수가 같을 때는 다중정의를 피하는 것이 좋다. 또한 다중정의시 어떤 다중정의 메서드가 호출될지 몰라도 기능은 같아야 한다.
+
+<br>
+## 53. 가변인수는 신중히 사용하라.
+
+인수 개수가 일정하지 않은 메서드를 정의해야 한다면 가변인수는 필요하다. 메서드 정의시 필수 매개변수는 가변인수 앞에 두고, 가변인수를 사용할 때는 성능 문제까지 고려해야 한다.
+
+<br>
+## 54. null이 아닌 빈 컬렉션이나 배열을 반환하라.
+
+```java
+public List<Cheese> getCheeses() {
+    return cheesesInStock.isEmpty() ? null : new ArrayList<>(cheeseInStock);
+}
+```
+
+이런 식으로 null을 리턴하는 메서드를 사용한다면 클라이언트 입장에서는 이 null을 처리하는 코드를 추가로 작성해야 한다. 따라서 이보다는 비어 있는 컬렉션이나 배열로 리턴하는 것이 좋다. 
+
+비어있는 컨테이너를 할당 후 리턴하는 것이 성능저하가 있다고 할 수는 있지만, 신경 쓸 수준이 못 된다. 그렇다하더라도 매번 같은 빈 불변 컬렉션을 반환하면 된다. **Collections.emptyList** 메서드가 그 예다.
+
+<br>
+## 55. Optional 반환은 신중히 하라.
+
+자바 8 이전에는 특정 조건에서 값을 반환할 수 없을 때 취할 수 있는 선택지가 두 가지 있었다. 예외를 던지거나, null을 리턴하는 것이다.
+
+두 방법은 모두 헛점이 있는데, **예외는 진짜 예외적인 상황에서만 사용해야 하며 스택 트레이스를 캡쳐하는 비용도 만만치 않다.** null을 반환하면 클라이언트 쪽에서는 별도의 null 처리 코드도 추가해야 한다.
+
+자바 8 이후 **Optional\<T\>**를 통해 반환할 수 있다. 이 클래스는 원소 최대 하나를 가질 수 있는 불변 컬렉션으로서, 보통 T를 반환해야 하지만 특정 조건에서는 반환하지 못할 경우 사용할 수 있다. 이 컬렉션을 반환하는 메서드는 **예외를 던지는 메서드보다 유연하고 사용하기 쉬우며, null을 반환하는 것보다 오류 가능성이 적다.**
+
+```java
+public static <E extends Comparable<E>> E max(Collection<E> c) {
+    if (c.isEmpty())
+        throw new IllegalArgumentException("빈 컬렉션");
+
+    E result = null;
+    for (E e : c)
+        if (result == null || e.compareTo(result) > 0)
+            result = Objects.requireNonNull(e);
+    return result;
+}
+```
+
+위의 메서드는 빈 컬렉션을 건네면 예외를 던진다. 다음은 Optional를 반환하는 메서드이다.
+
+```java
+public static <E extends Comparable<E>> Optional<E> max(Collection<E> c) {
+    if (c.isEmpty())
+        return Optional.empty();
+    E result = null;
+    for (E e : c)
+        if (result == null || e.compareTo(result) > 0)
+            result = Objects.requireNonNull(e);
+    return Optional.of(result);
+}
+```
+
+스트림의 종단 연산 중 상당수는 Optional을 반환한다. 따라서 다음과 같이 작성할 수도 있다.
+
+```java
+public static <E extends Comparable<E>>
+Optional<E> max(Collection<E> c) {
+    return c.stream().max(Comparator.naturalOrder());
+}
+```
+
+이렇게 Optional을 반환하면 사용하는 클라이언트 쪽에서는 적절한 값을 받지 못했을 때의 행동을 쉽게 취할 수 있다.
+
+```java
+public static void main(String[] args) {
+    List<String> words = Arrays.asList(args);
+    System.out.println(max(words));
+
+    // 값이 없을 경우 orElse 메서드를 통해 대신 취할 값을 선택한다.
+    String lastWordInLexicon = max(words).orElse("단어 없음...");
+    System.out.println(lastWordInLexicon);
+}
+```
+
+이렇게 Optional은 **Checked 예외와 취지가 비슷하다.** 클라이언트 쪽으로 값이 없을 수도 있다는 점을 알려주고 클라이언트는 반드시 취할 행동을 선택해야 한다.
+
+없다면 다음과 같이 예외를 던지게 할 수도 있다.
+
+```java
+// 예와가 아닌 예외 팩터리를 사용한 것이다.
+// 예외가 실제로 발생하지 않는 한 예외 생성 비용은 발생하지 않는다.
+Toy myToy = max(toys).orElseThrow(Exception::new)
+```
+
+만약 **orElse** 메서드로 기본 값을 설정하는 비용이 크다면 **Supplier 인터페이스**를 받는 **orElseGet** 메서드를 사용할 수도 있다.
+
+```java
+// 기본 값이 필요없는 경우라도 바로 평가되므로 String 값은 매번 생성된다.
+max(words).orElse("단어 없음...");
+
+// 기본 값이 없는 경우에 람다를 호출하여 생성하므로 매번 String 값을 생성하는 비용을 낮출 수 있다.
+max(words).orElseGet(() -> "단어 없음...");
+```
+
+반환 값으로 Optional을 사용한다고 해서 무조건 득이 되는 것은 아니다. 만약 컬렉션, 스트림, 배열과 같은 컨테이너 타입은 Optional로 감싸면 안된다. **비어 있는 컬렉션을 반환하도록 해야 클라이언트 쪽에서 Optional 처리코드를 넣지 않아도 된다.**
+
+박싱된 기본 타입을 담은 Optional은 기본 타입 자체보다 무거울 수 밖에 없다. 값을 두 겹이나 감싸기 때문이다. 따라서 이를 위해 **OptionalInt, OptionalLong, OptionalDouble**과 같은 클래스도 제공한다. Optional\<Integer\>와 같이 사용할 이유가 없다.
+
