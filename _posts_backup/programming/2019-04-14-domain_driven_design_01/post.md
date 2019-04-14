@@ -57,3 +57,55 @@ icon: icon-html
 
 모든 구성원이 함께 모델을 면밀히 만들어 나가면 도메인 전문가의 피드백, 협업을 통해 도메인 모델을 지속적으로 정제해나갈 수 있다. 이러한 모델은 명료하게 조직화되고 추상화될 수 있으며, 구현을 용이하게 해준다. 개발 과정에서 도메인 전문가의 지속적인 관여로 심층적인 업무 지식을 소프트웨어에 반영할 수 있다.  
 
+<br>
+
+## 지속적인 학습
+
+모든 팀 구성원이나 개발자, 도메인 전문가들이 함께 참여하는 도메인 모델링을 통해 모두 똑같이 지식을 얻고 의사소통 체계를 공유하며 구현을 거쳐 피드백 고리를 완성하는, 지식 탐구 프로세스를 궤도에 올려야 한다.
+
+<br>
+
+## 풍부한 지식이 담긴 설계
+
+모델에 포착돼 있는 지식은 단순한 명사 찾기 이상이다. 도메인에 관련된 엔티티만큼 업무 활동과 규칙도 도메인에 매우 중요하다. 지식 탐구는 이러한 통찰력을 반영하는 모델을 만들어 낸다.
+
+<br>
+
+### 감춰진 개념 추출하기
+
+선박 화물의 운송 예약을 위한 애플리케이션의 간단한 도메인 모델로 시작하자.  
+
+![00.png](/static/assets/img/blog/programming/2019-04-14-domain_driven_design_01/00.png)
+
+예약 애플리케이션의 책임이 각 Cargo(화물)를 하나의 Voyage(운항)와의 연관관계를 맺고, 그것을 기록/관리하는 것이라 해보자. 아마 애플리케이션에는 다음 메서드가 있을 것이다.
+
+```java
+public int makeBooking(Cargo cargo, Voyage voyage) {
+    int confirmation = orderConfirmationSequence.next();
+    voyage.addCargo(cargo, confirmation);
+    return confirmation;
+}
+```
+
+보통 해운 산업에서는 선박이 운항 중에 나를 수 있는 화물의 최대치보다 예약을 더 받아들이는 것이 관행이다. 이를 초과예약(overbooking) 이라 한다. 
+
+이 요구사항을 위한 클래스 다이어그램과 코드는 다음과 같다.  
+
+![01.png](/static/assets/img/blog/programming/2019-04-14-domain_driven_design_01/01.png)
+
+```java
+public int makeBooking(Cargo cargo, Voyage voyage) {
+    double maxBooking = voyage.capacity() * 1.1;
+    if ((voyage.bookedCargoSize() + cargo.size()) > maxBooking)
+      return –1;
+
+    int confirmation = orderConfirmationSequence.next();
+    voyage.addCargo(cargo, confirmation);
+    return confirmation;
+}
+```
+
+위와 같이 중요한 업무 규칙이 애플리케이션 메서드의 보호절로 감춰진다. 이런 코드는 다음과 같은 문제가 있다.
+
+1. 코드가 작성된 대로라면, 업무 전문가가 이 코드를 읽고 규칙을 바로 검증하지 못한다.
+2. 해당 업무에 종사하지 않고 기술적인 측면만 담당하는 사람은 코드와 요구사항을 결부시키기 어렵다.
