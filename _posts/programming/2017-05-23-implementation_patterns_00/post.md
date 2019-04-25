@@ -3,7 +3,7 @@ layout: post
 title:  "Implementation Patterns 00"
 date:   2017-05-23
 desc: "Implementation Patterns 00"
-keywords: "design patterns"
+keywords: "design patterns, implementation Patterns"
 categories: [Programming]
 tags: [design patterns]
 icon: icon-html
