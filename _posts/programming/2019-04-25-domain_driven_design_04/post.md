@@ -3,9 +3,9 @@ layout: post
 title:  "도메인 주도 설계 04 - 도메인의 격리"
 date:   2019-04-25
 desc:  "도메인 주도 설계 04 - 도메인의 격리"
-keywords: "DDD, Domain"
+keywords: "DDD, Domain, Domain Driven Design"
 categories: [Programming]
-tags: [DDD, Domain]
+tags: [DDD, Domain, Domain Driven Design]
 icon: icon-html
 ---
 
