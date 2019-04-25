@@ -3,7 +3,7 @@ layout: post
 title:  "Effective Java 08 - 메서드"
 date:   2019-02-25
 desc:  "Effective Java 08 - 메서드"
-keywords: "java"
+keywords: "java, effective java, method"
 categories: [Java]
 tags: [java]
 icon: icon-html

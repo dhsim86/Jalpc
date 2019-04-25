@@ -3,7 +3,7 @@ layout: post
 title:  "Effective Java 02 - 객체 생성과 파괴"
 date:   2019-01-13
 desc:  "Effective Java 02 - 객체 생성과 파괴"
-keywords: "java"
+keywords: "java, effective java, constructor, builder pattern, factory"
 categories: [Java]
 tags: [java]
 icon: icon-html

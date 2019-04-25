@@ -3,7 +3,7 @@ layout: post
 title:  "Effective Java 03 - 모든 객체의 공통 메서드"
 date:   2019-01-14
 desc:  "Effective Java 03 - 모든 객체의 공통 메서드"
-keywords: "java"
+keywords: "java, effective java, object, equals, hashCode, toString, clone, Comparable"
 categories: [Java]
 tags: [java]
 icon: icon-html

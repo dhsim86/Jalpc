@@ -3,7 +3,7 @@ layout: post
 title:  "Effective Java 10 - 예외"
 date:   2019-03-02
 desc:  "Effective Java 10 - 예외"
-keywords: "java"
+keywords: "java, effective java, exception"
 categories: [Java]
 tags: [java]
 icon: icon-html

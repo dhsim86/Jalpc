@@ -3,7 +3,7 @@ layout: post
 title:  "Effective Java 06 - 열거 타입과 애너테이션"
 date:   2019-02-09
 desc:  "Effective Java 06 - 열거 타입과 애너테이션"
-keywords: "java"
+keywords: "java, effective java, enum, annotation"
 categories: [Java]
 tags: [java]
 icon: icon-html

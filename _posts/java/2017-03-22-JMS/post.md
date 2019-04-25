@@ -3,7 +3,7 @@ layout: post
 title:  "JMS, Java Messaging System"
 date:   2017-03-22
 desc: "JMS, Java Messaging System"
-keywords: "server programming"
+keywords: "JMS"
 categories: [Java]
 tags: [java, messaging]
 icon: icon-html

@@ -3,7 +3,7 @@ layout: post
 title:  "Effective Java 09 - 일반적인 프로그래밍 원칙"
 date:   2019-03-01
 desc:  "Effective Java 09 - 일반적인 프로그래밍 원칙"
-keywords: "java"
+keywords: "java, effective java"
 categories: [Java]
 tags: [java]
 icon: icon-html

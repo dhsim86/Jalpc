@@ -3,7 +3,7 @@ layout: post
 title:  "Garbage Collection Algorithms"
 date:   2018-02-05
 desc:  "Garbage Collection Algorithms"
-keywords: "java"
+keywords: "java, garbage collection, gc, cms, g1"
 categories: [Java]
 tags: [java]
 icon: icon-html

@@ -3,9 +3,9 @@ layout: post
 title:  "Java Exception Handling"
 date:   2017-06-29
 desc: "Java Exception Handling"
-keywords: "java, @interface, annotation"
+keywords: "java, exception"
 categories: [Java]
-tags: [java, annotation, interface]
+tags: [java, exception]
 icon: icon-html
 ---
 

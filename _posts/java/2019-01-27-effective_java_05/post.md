@@ -3,7 +3,7 @@ layout: post
 title:  "Effective Java 05 - 제네릭"
 date:   2019-01-27
 desc:  "Effective Java 05 - 제네릭"
-keywords: "java"
+keywords: "java, effective java, generic"
 categories: [Java]
 tags: [java]
 icon: icon-html

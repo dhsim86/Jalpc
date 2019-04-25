@@ -3,7 +3,7 @@ layout: post
 title:  "Effective Java 07 - 람다와 스트림"
 date:   2019-02-20
 desc:  "Effective Java 07 - 람다와 스트림"
-keywords: "java"
+keywords: "java, effective java, lambda, stream, functional programming"
 categories: [Java]
 tags: [java]
 icon: icon-html
