@@ -3,7 +3,7 @@ layout: post
 title:  "F2FS: A New File System for Flash Storage - Usenix"
 date:   2017-04-01
 desc: "F2FS: A New File System for Flash Storage - Usenix"
-keywords: "Linux, File System, Linux Kernel"
+keywords: "Linux, File System, Linux Kernel, F2FS"
 categories: [Linux]
 tags: [file system, kernel, linux]
 icon: icon-html
