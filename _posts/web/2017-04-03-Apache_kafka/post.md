@@ -3,7 +3,7 @@ layout: post
 title:  "Apache Kafka Architecture"
 date:   2017-04-03
 desc: "Apache Kafka Architecture"
-keywords: "server programming"
+keywords: "kafka, messaging"
 categories: [Web]
 tags: [server programming]
 icon: icon-html

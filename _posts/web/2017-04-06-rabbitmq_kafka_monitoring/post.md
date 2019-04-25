@@ -3,7 +3,7 @@ layout: post
 title:  "RabbitMQ and Apache Kafka monitoring"
 date:   2017-04-06
 desc: "RabbitMQ and Apache Kafka monitoring"
-keywords: "server programming"
+keywords: "kafka, rabbitmq, RabbitMQ"
 categories: [Web]
 tags: [server programming]
 icon: icon-html

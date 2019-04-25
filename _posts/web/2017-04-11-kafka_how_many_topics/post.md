@@ -3,7 +3,7 @@ layout: post
 title:  "Kafka, How many topics are"
 date:   2017-04-11
 desc: "Kafka, How many topics are"
-keywords: "server programming"
+keywords: "kafka"
 categories: [Web]
 tags: [server programming]
 icon: icon-html

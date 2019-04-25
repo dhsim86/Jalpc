@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 06: AOP part.1"
 date:   2017-09-07
 desc: "Toby's Spring Chap 06: AOP part.1"
-keywords: "spring"
+keywords: "spring, toby spring, aop"
 categories: [Web]
 tags: [spring]
 icon: icon-html

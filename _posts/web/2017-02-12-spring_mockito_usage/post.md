@@ -3,7 +3,7 @@ layout: post
 title:  "Spring 에서 mockito 기본 사용법"
 date:   2017-02-12
 desc: "Spring 에서 mockito 기본 사용법"
-keywords: "mockito, spring"
+keywords: "mockito, spring, mockito"
 categories: [Web]
 tags: [mockito, spring]
 icon: icon-html

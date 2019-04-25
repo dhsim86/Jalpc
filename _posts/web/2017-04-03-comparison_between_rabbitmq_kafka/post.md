@@ -3,7 +3,7 @@ layout: post
 title:  "Comparison between RabbitMQ and Apache Kafka"
 date:   2017-04-03
 desc: "Comparison between RabbitMQ and Apache Kafka"
-keywords: "server programming"
+keywords: "kafka, messaging, rabbitmq, RabbitMQ"
 categories: [Web]
 tags: [server programming]
 icon: icon-html

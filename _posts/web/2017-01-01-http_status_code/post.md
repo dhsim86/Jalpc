@@ -3,7 +3,7 @@ layout: post
 title:  "Http 상태코드"
 date:   2017-01-01
 desc: "Http 상태코드"
-keywords: "java, web"
+keywords: "java, web, http status code, http"
 categories: [Web]
 tags: [java, web]
 icon: icon-html

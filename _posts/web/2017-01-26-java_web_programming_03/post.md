@@ -3,7 +3,7 @@ layout: post
 title:  "Java Web Programming Summary Note 03: Mini MVC Framework"
 date:   2017-01-26
 desc: "Java Web Programming Summary Note 03: Mini MVC Framework"
-keywords: "java, web"
+keywords: "java, web, spring, servlet"
 categories: [Web]
 tags: [java, web]
 icon: icon-html

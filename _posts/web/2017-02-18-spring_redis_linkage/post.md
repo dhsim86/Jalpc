@@ -3,7 +3,7 @@ layout: post
 title:  "Spring에서 Redis 사용하기"
 date:   2017-02-18
 desc: "Spring에서 Redis 사용하기"
-keywords: "redis, spring, database"
+keywords: "redis, spring, database, jedis"
 categories: [Web]
 tags: [redis, spring, database]
 icon: icon-html

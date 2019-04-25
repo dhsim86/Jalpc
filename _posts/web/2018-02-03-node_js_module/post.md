@@ -3,7 +3,7 @@ layout: post
 title:  "Node.js Module"
 date:   2018-02-03
 desc: "Node.js Module"
-keywords: "node.js"
+keywords: "node.js, module"
 categories: [Web]
 tags: [node.js]
 icon: icon-html

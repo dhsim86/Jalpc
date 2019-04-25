@@ -3,7 +3,7 @@ layout: post
 title:  "Java Web Programming Summary Note 00: Servlet Programming"
 date:   2017-01-24
 desc: "Java Web Programming Summary Note 00: Servlet Programming"
-keywords: "java, webg"
+keywords: "java, web, servlet, cgi"
 categories: [Web]
 tags: [java, web]
 icon: icon-html

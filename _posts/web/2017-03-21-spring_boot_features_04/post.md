@@ -3,7 +3,7 @@ layout: post
 title:  "Spring Boot Reference Guide Review 06 : Working with databases"
 date:   2017-03-20
 desc: "Spring Boot Reference Guide Review 06 :Working with databases"
-keywords: "spring"
+keywords: "spring, spring boot, sql, datasource"
 categories: [Web]
 tags: [spring]
 icon: icon-html

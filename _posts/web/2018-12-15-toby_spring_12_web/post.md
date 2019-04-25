@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 12: 스프링 웹 기술과 스프링 MVC"
 date:   2018-12-15
 desc: "Toby's Spring Chap 12: 스프링 웹 기술과 스프링 MVC"
-keywords: "spring"
+keywords: "spring, toby spring, mvc, dispatchservlet, servlet, handlermapping, handleradapter"
 categories: [Web]
 tags: [spring]
 icon: icon-html

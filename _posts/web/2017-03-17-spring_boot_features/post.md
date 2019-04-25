@@ -3,7 +3,7 @@ layout: post
 title:  "Spring Boot Reference Guide Review 03 : Part 4, Chapter.23 ~ 25"
 date:   2017-03-17
 desc: "Spring Boot Reference Guide Review 03 : Part 4, Chapter.23 ~ 25"
-keywords: "spring"
+keywords: "spring, spring boot"
 categories: [Web]
 tags: [spring]
 icon: icon-html

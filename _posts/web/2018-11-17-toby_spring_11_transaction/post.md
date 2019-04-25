@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 11: 트랜잭션"
 date:   2018-11-17
 desc: "Toby's Spring Chap 11: 트랜잭션"
-keywords: "spring"
+keywords: "spring, toby spring, transaction"
 categories: [Web]
 tags: [spring]
 icon: icon-html

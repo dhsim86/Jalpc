@@ -3,7 +3,7 @@ layout: post
 title:  "Spring Boot Reference Guide Review 05 : Developing web applications"
 date:   2017-03-20
 desc: "Spring Boot Reference Guide Review 05 : Developing web applications"
-keywords: "spring"
+keywords: "spring, spring boot"
 categories: [Web]
 tags: [spring]
 icon: icon-html

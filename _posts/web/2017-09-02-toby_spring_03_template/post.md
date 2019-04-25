@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 03: 템플릿"
 date:   2017-09-02
 desc: "Toby's Spring Chap 03: 템플릿"
-keywords: "spring"
+keywords: "spring, toby spring"
 categories: [Web]
 tags: [spring]
 icon: icon-html

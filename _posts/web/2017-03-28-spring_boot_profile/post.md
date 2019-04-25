@@ -3,7 +3,7 @@ layout: post
 title:  "Spring Boot Profile 설정"
 date:   2017-03-28
 desc: "Spring Boot Profile 설정"
-keywords: "spring"
+keywords: "spring, spring boot, profile, application.yml, application.properties"
 categories: [Web]
 tags: [spring]
 icon: icon-html

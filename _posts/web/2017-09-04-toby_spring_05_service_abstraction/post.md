@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 05: 서비스 추상화"
 date:   2017-09-04
 desc: "Toby's Spring Chap 05: 서비스 추상화"
-keywords: "spring"
+keywords: "spring, toby spring, transaction, service abstraction"
 categories: [Web]
 tags: [spring]
 icon: icon-html

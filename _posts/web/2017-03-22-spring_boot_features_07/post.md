@@ -3,7 +3,7 @@ layout: post
 title:  "Spring Boot Reference Guide Review 09 : Testing "
 date:   2017-03-22
 desc: "Spring Boot Reference Guide Review 09 : Testing"
-keywords: "spring"
+keywords: "spring, spring boot"
 categories: [Web]
 tags: [spring]
 icon: icon-html

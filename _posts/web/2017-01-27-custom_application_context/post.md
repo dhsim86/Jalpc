@@ -3,7 +3,7 @@ layout: post
 title:  "Java Web Programming: Custom ApplicationContext"
 date:   2017-01-27
 desc: "Java Web Programming: Custom ApplicationContext"
-keywords: "java, web, spring"
+keywords: "java, web, spring, mvc, application context"
 categories: [Web]
 tags: [java, web, spring]
 icon: icon-html

@@ -3,7 +3,7 @@ layout: post
 title:  "Java Web Programming Summary Note 02: MVC Architecture"
 date:   2017-01-25
 desc: "Java Web Programming Summary Note 02: MVC Architecture"
-keywords: "java, web"
+keywords: "java, web, mvc, servlet, servlet container, jsp"
 categories: [Web]
 tags: [java, web]
 icon: icon-html

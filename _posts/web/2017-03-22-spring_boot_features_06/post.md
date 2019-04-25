@@ -3,7 +3,7 @@ layout: post
 title:  "Spring Boot Reference Guide Review 08 : Messaging with Kafka"
 date:   2017-03-22
 desc: "Spring Boot Reference Guide Review 08 : Messaging with Kafka"
-keywords: "spring"
+keywords: "spring, kafka, spring boot"
 categories: [Web]
 tags: [spring]
 icon: icon-html

@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 04: 예외"
 date:   2017-09-03
 desc: "Toby's Spring Chap 04: 예외"
-keywords: "spring"
+keywords: "spring, toby spring, exception"
 categories: [Web]
 tags: [spring]
 icon: icon-html

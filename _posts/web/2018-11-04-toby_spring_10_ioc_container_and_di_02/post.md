@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 10: IOC 컨테이너와 DI part.2"
 date:   2018-11-04
 desc: "Toby's Spring Chap 10: IOC 컨테이너와 DI part.2"
-keywords: "spring"
+keywords: "spring, toby spring, ioc, container, di"
 categories: [Web]
 tags: [spring]
 icon: icon-html

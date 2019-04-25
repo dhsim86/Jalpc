@@ -3,7 +3,7 @@ layout: post
 title:  "Spring DispatcherServlet"
 date:   2017-03-27
 desc: "Spring DispatcherServlet"
-keywords: "spring"
+keywords: "spring, spring boot, dispatcher servlet, servlet"
 categories: [Web]
 tags: [spring]
 icon: icon-html

@@ -3,7 +3,7 @@ layout: post
 title:  "Spring Boot Reference Guide Review 04 : Logging"
 date:   2017-03-20
 desc: "Spring Boot Reference Guide Review 04 : Logging"
-keywords: "spring"
+keywords: "spring, spring boot, logging"
 categories: [Web]
 tags: [spring]
 icon: icon-html

@@ -3,7 +3,7 @@ layout: post
 title:  "ECMAScript6 (ES2015) Module"
 date:   2018-02-03
 desc: "ECMAScript6 (ES2015) Module"
-keywords: "javascript"
+keywords: "javascript, ECMAScript6, ES6, ES2015, module, js"
 categories: [Web]
 tags: [javascript]
 icon: icon-html

@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 07: 스프링 핵심 기술의 응용 part.3"
 date:   2017-10-28
 desc: "Toby's Spring Chap 07: 스프링 핵심 기술의 응용 part.3"
-keywords: "spring"
+keywords: "spring, toby spring"
 categories: [Web]
 tags: [spring]
 icon: icon-html

@@ -3,7 +3,7 @@ layout: post
 title:  "Java Web Programming Summary Note 01: Servlet and JDBC"
 date:   2017-01-25
 desc: "Java Web Programming Summary Note 01: Servlet and JDBC"
-keywords: "java, web"
+keywords: "java, web, jdbc, servlet"
 categories: [Web]
 tags: [java, web]
 icon: icon-html

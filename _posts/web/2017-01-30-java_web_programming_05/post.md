@@ -3,7 +3,7 @@ layout: post
 title:  "Java Web Programming Summary Note 05: Spring IoC Container"
 date:   2017-01-30
 desc: "Java Web Programming Summary Note 05: Spring IoC Container"
-keywords: "java, web, spring"
+keywords: "java, web, spring, ioc, di, annotation, container"
 categories: [Web]
 tags: [java, web, spring]
 icon: icon-html

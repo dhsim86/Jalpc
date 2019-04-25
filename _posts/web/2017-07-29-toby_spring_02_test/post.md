@@ -3,7 +3,7 @@ layout: post
 title:  "Toby's Spring Chap 02: 테스트"
 date:   2017-07-29
 desc: "Toby's Spring Chap 02: 테스트"
-keywords: "spring"
+keywords: "spring, toby spring"
 categories: [Web]
 tags: [spring]
 icon: icon-html

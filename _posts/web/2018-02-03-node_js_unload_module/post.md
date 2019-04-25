@@ -3,7 +3,7 @@ layout: post
 title:  "Node.js unload module 테스트"
 date:   2018-02-03
 desc: "Node.js unload module 테스트"
-keywords: "node.js"
+keywords: "node.js, module"
 categories: [Web]
 tags: [node.js]
 icon: icon-html

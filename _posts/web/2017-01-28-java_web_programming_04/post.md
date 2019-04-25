@@ -3,7 +3,7 @@ layout: post
 title:  "Java Web Programming Summary Note 04: Persistence Framework"
 date:   2017-01-28
 desc: "Java Web Programming Summary Note 04: Persistence Framework"
-keywords: "java, web"
+keywords: "java, web, orm, mybatis, jdbc"
 categories: [Web]
 tags: [java, web]
 icon: icon-html
