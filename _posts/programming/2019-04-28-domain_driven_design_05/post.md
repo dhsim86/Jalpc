@@ -3,7 +3,7 @@ layout: post
 title:  "도메인 주도 설계 05 - 소프트웨어에서 표현되는 모델"
 date:   2019-04-28
 desc:  "도메인 주도 설계 05 - 소프트웨어에서 표현되는 모델"
-keywords: "DDD, Domain, Domain Driven Design, 연관관계, associations"
+keywords: "DDD, Domain, Domain Driven Design, 연관관계, associations, Entity, Value Object, Service, Domain Service, Module"
 categories: [Programming]
 tags: [DDD, Domain, Domain Driven Design]
 icon: icon-html
