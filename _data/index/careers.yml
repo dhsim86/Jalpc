@@ -1,16 +1,16 @@
 # careers section data
 # if you don't have language feature(language.yml is empty), ignore "i18n" items
 - name:
-    detail: NHN Entertainment
+    detail: NHN
     i18n: company_a
   desc:
-    detail: Toast Cloud Platform development
+    detail: Toast Cloud Development Team
     i18n: company_a_desc
   date:
     detail: Jan. 2017 -
     i18n: company_a_date
   job:
-    detail: Java, Spring framework, Java script, Multimedia processing.
+    detail: Java, Cloud Development, Spring Framework, Reactive Programming, Rx.
     i18n: company_a_job
   icon: fa-plus-square
 
