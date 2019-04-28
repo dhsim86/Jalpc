@@ -3,7 +3,7 @@ layout: post
 title:  "도메인 주도 설계 03 - 모델과 구현의 연계"
 date:   2019-04-25
 desc:  "도메인 주도 설계 03 - 모델과 구현의 연계"
-keywords: "DDD, Domain, Domain Driven Design"
+keywords: "DDD, Domain, Domain Driven Design, Model Driven Design"
 categories: [Programming]
 tags: [DDD, Domain, Domain Driven Design]
 icon: icon-html
