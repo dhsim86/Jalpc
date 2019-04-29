@@ -3,7 +3,7 @@ layout: post
 title:  "도메인 주도 설계 02 - 의사소통과 언어사용"
 date:   2019-04-25
 desc:  "도메인 주도 설계 02 - 의사소통과 언어사용"
-keywords: "DDD, Domain, Domain Driven Design, UBIQUITOUS LANGUAGE"
+keywords: "도메인 주도 설계, DDD, Domain, Domain Driven Design, UBIQUITOUS LANGUAGE"
 categories: [Programming]
 tags: [DDD, Domain, Domain Driven Design]
 icon: icon-html

@@ -3,7 +3,7 @@ layout: post
 title:  "도메인 주도 설계 06 - 도메인 객체의 생명주기"
 date:   2019-04-28
 desc:  "도메인 주도 설계 06 - 도메인 객체의 생명주기"
-keywords: "DDD, Domain, Domain Driven Design, Aggregate, Repository, Factory"
+keywords: "도메인 주도 설계, DDD, Domain, Domain Driven Design, Aggregate, Repository, Factory"
 categories: [Programming]
 tags: [DDD, Domain, Domain Driven Design]
 icon: icon-html

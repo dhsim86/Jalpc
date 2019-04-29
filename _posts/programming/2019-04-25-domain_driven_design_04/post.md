@@ -3,7 +3,7 @@ layout: post
 title:  "도메인 주도 설계 04 - 도메인의 격리"
 date:   2019-04-25
 desc:  "도메인 주도 설계 04 - 도메인의 격리"
-keywords: "DDD, Domain, Domain Driven Design, Layerd Architecture"
+keywords: "도메인 주도 설계, DDD, Domain, Domain Driven Design, Layerd Architecture"
 categories: [Programming]
 tags: [DDD, Domain, Domain Driven Design]
 icon: icon-html

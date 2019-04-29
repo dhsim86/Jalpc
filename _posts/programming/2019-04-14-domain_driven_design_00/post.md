@@ -3,7 +3,7 @@ layout: post
 title:  "도메인 주도 설계 00 - 서문"
 date:   2019-04-14
 desc:  "도메인 주도 설계 00 - 서문"
-keywords: "DDD, Domain, Domain Driven Design"
+keywords: "도메인 주도 설계, DDD, Domain, Domain Driven Design"
 categories: [Programming]
 tags: [DDD, Domain, Domain Driven Design]
 icon: icon-html
