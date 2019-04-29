@@ -3,7 +3,7 @@ layout: post
 title:  "Implementation Patterns 00"
 date:   2017-05-23
 desc: "Implementation Patterns 00"
-keywords: "design patterns, implementation Patterns"
+keywords: "구현 패턴, 켄트 백, Kent Beck, design patterns, Implementation Patterns"
 categories: [Programming]
 tags: [design patterns]
 icon: icon-html
