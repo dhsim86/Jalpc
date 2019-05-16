@@ -3,7 +3,8 @@ layout: post
 title:  "도메인 주도 설계 09 - 암시적인 개념을 명확하게"
 date:   2019-05-16
 desc:  "도메인 주도 설계 09 - 암시적인 개념을 명확하게"
-keywords: "도메인 주도 설계, DDD, Domain, Domain Driven Design"
+keywords: "도메인 주도 설계, DDD, Domain, Domain Driven Design, Making Implicit Concepts
+Explicit, 암시적인 개념을 명확하게, Constraints, 제약조건, Processes, 프로세스, Specification, 명세"
 categories: [Programming]
 tags: [DDD, Domain, Domain Driven Design]
 icon: icon-html
@@ -140,3 +141,9 @@ class Bucket {
 ---
 
 **제약 조건과 프로세스는 객체지향 언어로 프로그래밍할 때 확연히 떠오르지 않는 넓은 범주의 모델 개념이지만, 일단 이를 모델의 요소로 간주하면 설계를 매우 명확히 만들 수 있다.**
+
+<br>
+
+## SPECIFICATION (명세)
+
+**SPECIFICATION(명세)는 특정한 종류의 규칙을 표현하는 매우 간결한 수단을 제공하며, 조건 로직으로부터 규칙을 분리하여 규칙이 모델 내에서 분명해지게끔 만들어준다.**
