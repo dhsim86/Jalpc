@@ -172,3 +172,5 @@ public boolean isOverdue() {
 위의 그림과 같이 Invoice 객체의 특정 상태를 검사하는 책임을 InvoiceDelinquency 객체로 옮기는 것이다. 이러한 객체를 Specification(명세)이라고 하며, 다른 객체에 대한 제약 조건을 기술한다. **Specification은 다른 객체가 Specification에 명시된 기준을 만족하는지 검사하는 것이다.**
 
 이 Specification을 통해 어느 도메인 객체에 대한 규칙을 도메인 계층에 유지시킬 수 있다. 아울러 완전한 객체를 통해 규칙을 표현하므로 설계가 모델을 더욱 명확히 반영할 수 있다.
+
+
