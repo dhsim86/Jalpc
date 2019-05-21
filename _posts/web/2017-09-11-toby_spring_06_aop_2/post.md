@@ -372,7 +372,127 @@ public class Client2 {
 
 자동 프록시 생성기의 기본 옵션은 프록시를 적용할 타겟이 구현한 모든 인터페이스를 프록시 빈도 구현하게 해주는 것이다. **프록시 빈의 클래스는 타겟 클래스와 같은 인터페이스를 구현할 뿐 다른 타입이다.**
 
+---
+
+JDK 다이내믹 프록시 방식을 활용한 AOP 적용시 주의사항이 있다. 애너테이션을 통해 AOP를 적용시, 클래스 뿐만 아니라 인터페이스에도 애너테이션을 붙여야 한다. 만약 인터페이스가 아닌 클래스에만 붙이면 다음과 같은 문제가 발생할 수 있다.
+
+```java
+public interface AopService {
+    void childOnly();
+
+    @AopTest
+    void parentChildBoth();
+}
+
+@Service
+public class AopServiceImpl implements AopService {
+    @Override
+    @AopTest
+    public void childOnly() {
+    }
+
+    @Override
+    @AopTest
+    public void parentChildBoth() {
+    }
+}
+
+@Getter
+@Setter
+@Aspect
+@Component
+public class AopObject {
+    @Pointcut("execution(public * ((@AopTest *)+).*(..)) && within(@AopTest *)")
+    private void executionOfAnyPublicMethodInAtAopTestType() {
+    }
+
+    @Pointcut("execution(@AopTest * *(..))")
+    private void executionOfAopTestMethod() {
+    }
+
+    @Before("executionOfAnyPublicMethodInAtAopTestType() || executionOfAopTestMethod()")
+    public void beforeWoved(JoinPoint joinPoint) {
+        Method method = ((MethodSignature)joinPoint.getSignature()).getMethod();
+        value.incrementAndGet();
+
+        // 클래스에만 애너테이션을 달았을 경우, AopTest 애너테이션 객체를 얻을 수 없다!
+        AopTest aopTestAnnotationOnMethod = method.getAnnotation(AopTest.class);
+        if (aopTestAnnotationOnMethod == null) {
+            foundAnnotationOnMethod = false;
+        }
+    }
+
+    private AtomicInteger value = new AtomicInteger();
+    private boolean foundAnnotationOnMethod = true;
+
+    public void reset() {
+        foundAnnotationOnMethod = true;
+        value.set(0);
+    }
+}
+
+@SpringBootTest(properties = {
+    "spring.aop.proxy-target-class=false"
+})
+@RunWith(SpringRunner.class)
+public class AopServiceWithJdkProxyTest {
+
+    @Autowired
+    private AopObject aopObject;
+
+    @Autowired
+    private AopService aopService;
+
+    @Autowired(required = false)
+    private AopServiceImpl aopServiceImpl;
+
+    @Before
+    public void beforeTest() {
+        aopObject.reset();
+    }
+
+    @Test
+    public void springDiTest() {
+        assertThat(aopService).isNotNull();
+        assertThat(aopServiceImpl).isNull();
+
+        assertThat(AopUtils.isJdkDynamicProxy(aopService)).isTrue();
+    }
+
+    @Test
+    public void childOnlyTest() {
+        given: {
+        }
+        when: {
+            aopService.childOnly();
+        }
+        then: {
+            assertThat(aopObject.getValue().get()).isEqualTo(1);
+            assertThat(aopObject.isFoundAnnotationOnClass()).isFalse();
+        }
+    }
+    
+    @Test
+    public void parentChildBothTest() {
+        given: {
+        }
+        when: {
+            aopService.parentChildBoth();
+        }
+        then: {
+            assertThat(aopObject.getValue().get()).isEqualTo(1);
+            assertThat(aopObject.isFoundAnnotationOnMethod()).isTrue();
+        }
+    }
+}
+```
+
+클래스에만 붙이더라도 @Before 어드바이스가 적용되기는 하지만, 어드바이스 내에서 @AopTest 애너테이션 정보를 얻을 수 없다. 이를 해결하기 위해서는 AOP를 적용할 클래스 뿐만 아니라 해당 클래스가 구현하는 인터페이스 쪽에도 애너테이션을 달아야 한다.
+
+> 클래스 프록시 방식을 사용할 경우에는 해당 문제가 없다.
+
 <br>
+
 ### 클래스를 이용한 프록시
 
 원래 스프링이 제공하는 AOP의 프록시는 인터페이스를 구현한 프록시이다.
