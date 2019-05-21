@@ -431,8 +431,9 @@ public class AopObject {
     }
 }
 
+// Spring Boot 2.0부터 디폴트 값이 true로, CGLib을 활용한 클래스 프록시 방식이 디폴트이다.
 @SpringBootTest(properties = {
-    "spring.aop.proxy-target-class=false"
+    "spring.aop.proxy-target-class=false"   
 })
 @RunWith(SpringRunner.class)
 public class AopServiceWithJdkProxyTest {
@@ -443,6 +444,7 @@ public class AopServiceWithJdkProxyTest {
     @Autowired
     private AopService aopService;
 
+    // JDK 다이내믹 프록시 방식이므로, 해당 빈을 찾을 수 없다.
     @Autowired(required = false)
     private AopServiceImpl aopServiceImpl;
 
@@ -454,7 +456,7 @@ public class AopServiceWithJdkProxyTest {
     @Test
     public void springDiTest() {
         assertThat(aopService).isNotNull();
-        assertThat(aopServiceImpl).isNull();
+        assertThat(aopServiceImpl).isNull();    // JDK 다이내믹 프록시 방식이므로, 해당 빈을 찾을 수 없다.
 
         assertThat(AopUtils.isJdkDynamicProxy(aopService)).isTrue();
     }
@@ -468,6 +470,8 @@ public class AopServiceWithJdkProxyTest {
         }
         then: {
             assertThat(aopObject.getValue().get()).isEqualTo(1);
+
+            // AopTest 애너테이션을 얻을 수 없다.
             assertThat(aopObject.isFoundAnnotationOnMethod()).isFalse();
         }
     }
@@ -481,6 +485,8 @@ public class AopServiceWithJdkProxyTest {
         }
         then: {
             assertThat(aopObject.getValue().get()).isEqualTo(1);
+
+            // 인터페이스, 클래스 모두 애너테이션을 달면 얻을 수 있다.
             assertThat(aopObject.isFoundAnnotationOnMethod()).isTrue();
         }
     }
