@@ -411,11 +411,6 @@ public class Target {
 
 스프링은 타깃 오브젝트가 인터페이스를 구현하고 있다면 인터페이스를 사용하는 JDK 다이내믹 프록시를 통해 프록시를 만들지만, 인터페이스가 없다면 CGLib을 통한 클래스 프록시를 만든다.
 
-참고: [Spring Manual 5.8 Proxying Mechanisms](https://docs.spring.io/spring/docs/5.1.7.RELEASE/spring-framework-reference/core.html#aop-introduction-defn)
-
-> Spring Boot 2.0부터 클래스 프록시 방식이 디폴트이다. CGLib을 활용한 이 클래스 프록시 방식은 바이트 코드 조작을 통한 일종의 캐싱 방식으로 JDK Dynamic 프록시 방식에 비해 성능 상의 이점도 존재한다. [What is the difference between JDK dynamic proxy and CGLib?
-](https://stackoverflow.com/questions/10664182/what-is-the-difference-between-jdk-dynamic-proxy-and-cglib)
-
 만약 인터페이스 유무에 상관없이 강제로 클래스 프록시를 사용하려면 다음과 같이 설정한다.
 
 ```java
@@ -425,3 +420,9 @@ public class Target {
      // ...
  }
 ```
+
+> Spring Boot 2.0부터 클래스 프록시 방식이 디폴트이다. (spring.aop.proxy-target-class 기본 값이 true이다.) CGLib을 활용한 이 클래스 프록시 방식은 바이트 코드 조작을 통한 일종의 캐싱 방식으로 JDK Dynamic 프록시 방식에 비해 성능 상의 이점도 존재한다. [What is the difference between JDK dynamic proxy and CGLib?
+](https://stackoverflow.com/questions/10664182/what-is-the-difference-between-jdk-dynamic-proxy-and-cglib)
+
+
+참고: [Spring Manual 5.8 Proxying Mechanisms](https://docs.spring.io/spring/docs/5.1.7.RELEASE/spring-framework-reference/core.html#aop-introduction-defn)
