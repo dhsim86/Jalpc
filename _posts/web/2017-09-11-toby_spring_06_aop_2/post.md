@@ -545,4 +545,4 @@ public class Target {
 ](https://stackoverflow.com/questions/10664182/what-is-the-difference-between-jdk-dynamic-proxy-and-cglib)
 
 
-참고: [Spring Manual 5.8 Proxying Mechanisms](https://docs.spring.io/spring/docs/5.1.7.RELEASE/spring-framework-reference/core.html#aop-introduction-defn)
+참고: [Spring Manual 5.8 Proxying Mechanisms](https://docs.spring.io/spring/docs/current/spring-framework-reference/core.html#aop-proxying)
