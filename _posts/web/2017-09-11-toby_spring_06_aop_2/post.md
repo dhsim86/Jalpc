@@ -405,9 +405,16 @@ public class Target {
 - 클래스 프록시를 만들기 위해 CGLib이라는 별도의 라이브러리를 사용하게 된다.
 - 타겟 오브젝트의 모든 public 메소드는 모두 프록시 대상으로 삼아 오버라이드한다.
 
-> 스프링은 이 클래스를 이용한 프록시를 제공하는 것은 어디까지나 레거시 코드나 인터페이스가 없는 외부 라이브러리 클래스에 AOP를 적용할 수 있도록 만들어준 것일 뿐, 평소에 타겟 클래스를 직접 DI받아 사용하다가 AOP가 필요해지면 이를 이용하라는 것이 아니다.
+> ~~스프링은 이 클래스를 이용한 프록시를 제공하는 것은 어디까지나 레거시 코드나 인터페이스가 없는 외부 라이브러리 클래스에 AOP를 적용할 수 있도록 만들어준 것일 뿐, 평소에 타겟 클래스를 직접 DI받아 사용하다가 AOP가 필요해지면 이를 이용하라는 것이 아니다.~~
+
+> Spring Framework 4 부터 위의 제약 사항이 해결되었다. 이제 CGLib 라이브러리를 활용한 클래스 프록시 방식을 사용하더라도 objenesis 라이브러리를 통해 프록시 객체를 생성하여, 생성자가 두 번 호출되지 않는다.  또한 public 메소드를 대상으로 모두 프록시 대상으로 삼는 것이 아닌, 메서드 하나 하나 따로 AOP 설정이 가능하다. (final 메서드는 여전히 AOP 적용이 되지 않는다.)
 
 스프링은 타깃 오브젝트가 인터페이스를 구현하고 있다면 인터페이스를 사용하는 JDK 다이내믹 프록시를 통해 프록시를 만들지만, 인터페이스가 없다면 CGLib을 통한 클래스 프록시를 만든다.
+
+참고: [Spring Manual 5.8 Proxying Mechanisms](https://docs.spring.io/spring/docs/5.1.7.RELEASE/spring-framework-reference/core.html#aop-introduction-defn)
+
+> Spring Boot 2.0부터 클래스 프록시 방식이 디폴트이다. CGLib을 활용한 이 클래스 프록시 방식은 바이트 코드 조작을 통한 일종의 캐싱 방식으로 JDK Dynamic 프록시 방식에 비해 성능 상의 이점도 존재한다. [What is the difference between JDK dynamic proxy and CGLib?
+](https://stackoverflow.com/questions/10664182/what-is-the-difference-between-jdk-dynamic-proxy-and-cglib)
 
 만약 인터페이스 유무에 상관없이 강제로 클래스 프록시를 사용하려면 다음과 같이 설정한다.
 
