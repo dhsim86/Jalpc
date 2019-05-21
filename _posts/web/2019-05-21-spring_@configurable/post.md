@@ -99,7 +99,7 @@ AspectJ는 다음과 같은 기능을 제공한다. 위빙(Weaving)은 AOP 로�
 
 ### maven 설정
 
-여기서는 Spring Boot 2.0.9 버전을 사용한다. 이 버전에 맞게 Spring Boot Starter를 통해 메이븐 의존성을 추가할 것이다. 테스트 용도로 데이터베이스는 H2 데이터베이스를 사용할 것이며, JPA를 통해 DB 엑세스할 것이다.
+여기서는 Spring Boot 2.0.9 버전을 사용한다. 이 버전에 맞게 Spring Boot Starter를 통해 maven 의존성을 추가할 것이다. 테스트 용도로 데이터베이스는 H2 데이터베이스를 사용할 것이며, JPA를 통해 DB 엑세스할 것이다.
 
 다음은 maven pom.xml이다. H2 및 JPA를 통해 DB를 사용하며, 유닛테스트를 위해 spring-boot-starter-test 의존성도 추가하였다.
 
