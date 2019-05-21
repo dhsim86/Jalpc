@@ -125,7 +125,6 @@ AspectJ는 다음과 같은 기능을 제공한다. 위빙(Weaving)은 AOP 로�
         <java.version>1.8</java.version>
 
         <h2.version>1.4.199</h2.version>
-        <aspectj.version>1.9.4</aspectj.version>
     </properties>
 
     <dependencies>
@@ -184,3 +183,23 @@ AspectJ는 다음과 같은 기능을 제공한다. 위빙(Weaving)은 AOP 로�
 
 > maven에서 AspectJ는 다양한 의존성이 있다. 여기서는 LTW만 사용할 것이므로 aspectjweaver만 추가한다.
 
+다음과 같이 pom.xml에 필요한 의존성을 추가한다.
+
+```xml
+        <aspectj.version>1.9.4</aspectj.version>
+
+        ...
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+            <scope>compile</scope>
+        </dependency>
+```
