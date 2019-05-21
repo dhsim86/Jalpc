@@ -547,7 +547,7 @@ public class Target {
  }
 ```
 
-> Spring Boot 2.0부터 클래스 프록시 방식이 디폴트이다. (spring.aop.proxy-target-class 기본 값이 true이다.) CGLib을 활용한 이 클래스 프록시 방식은 바이트 코드 조작을 통한 일종의 캐싱 방식으로 JDK Dynamic 프록시 방식에 비해 성능 상의 이점도 존재한다. [What is the difference between JDK dynamic proxy and CGLib?
+> Spring Boot 2.0부터 클래스 프록시 방식이 디폴트이다. (spring.aop.proxy-target-class 기본 값이 true이다.) CGLib을 활용한 이 클래스 프록시 방식은 바이트 코드 조작을 통한 일종의 캐싱 방식으로 JDK 다이내믹 프록시 방식에 비해 성능 상의 이점도 존재한다. [What is the difference between JDK dynamic proxy and CGLib?
 ](https://stackoverflow.com/questions/10664182/what-is-the-difference-between-jdk-dynamic-proxy-and-cglib)
 
 
