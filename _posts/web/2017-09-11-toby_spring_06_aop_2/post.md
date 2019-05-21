@@ -468,7 +468,7 @@ public class AopServiceWithJdkProxyTest {
         }
         then: {
             assertThat(aopObject.getValue().get()).isEqualTo(1);
-            assertThat(aopObject.isFoundAnnotationOnClass()).isFalse();
+            assertThat(aopObject.isFoundAnnotationOnMethod()).isFalse();
         }
     }
     
