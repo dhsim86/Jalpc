@@ -20,9 +20,10 @@ icon: icon-html
 
 <br>
 
-## @Configurable
+## [@Configurable](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/beans/factory/annotation/Configurable.html)
 
 스프링 프레임워크가 DDD 개발을 위해 지원하는 애너테이션이다.
+
 
 간단히 설명하면 DDD에서 식별성과 연속성을 가지는 객체인 엔티티나 애그리거트 루트 객체에 대해 자신을 나타내는 필드나 참조가 아닌, 그 **객체의 기능 / 행위를 구현함에 있어서 필요한 의존성을 주입하기 위해 사용하는 것이다.** (Value Object도 의존성이 필요하다면 사용할 수 있을 것 같지만 그런 사례가 있는지는 모르겠다.)
 
