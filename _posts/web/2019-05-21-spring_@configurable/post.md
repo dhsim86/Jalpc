@@ -190,39 +190,39 @@ AspectJ는 다음과 같은 기능을 제공한다. 위빙(Weaving)은 AOP 로�
 다음과 같이 pom.xml에 필요한 의존성을 추가한다.
 
 ```xml
-        <aspectj.version>1.9.4</aspectj.version>
+<aspectj.version>1.9.4</aspectj.version>
 
-        ...
+...
 
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
 
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>${aspectj.version}</version>
-            <scope>compile</scope>
-        </dependency>
+<dependency>
+    <groupId>org.aspectj</groupId>
+    <artifactId>aspectjweaver</artifactId>
+    <version>${aspectj.version}</version>
+    <scope>compile</scope>
+</dependency>
 ```
 
 그리고 앞서 언급하였는데, AspectJ의 LTW를 위해서는 위빙 작업을 위해 별도의 Agent가 필요하다. JVM 옵션, -javaagent 를 추가하여 애플리케이션을 실행해야 하지만, 여기서는 **maven-surefire-plugin** 플러그인을 통해 pom.xml에서 javaagent를 지정하도록 하겠다. 다음과 같이 플러그인을 추가한다.
 
 ```xml
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.10</version>
-                <configuration>
-                    <argLine>
-                        -javaagent:"${settings.localRepository}"/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
-                    </argLine>
-                    <useSystemClassLoader>true</useSystemClassLoader>
-                    <forkMode>always</forkMode>
-                </configuration>
-            </plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>2.10</version>
+    <configuration>
+        <argLine>
+            -javaagent:"${settings.localRepository}"/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
+        </argLine>
+        <useSystemClassLoader>true</useSystemClassLoader>
+        <forkMode>always</forkMode>
+    </configuration>
+</plugin>
 ```
 
 <br>
