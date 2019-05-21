@@ -38,7 +38,7 @@ icon: icon-html
 
 <br>
 
-### AspectJ
+## AspectJ
 
 스프링 프레임워크는 애플리케이션 컨텍스트의 BeanDefinition 들을 참조하여 등록된 스프링 빈들에 대한 의존성을 해결한다. 그런데 빈으로 등록되지 않은, 개발자가 직접 생성하는 도메인 객체에 대해서 어떻게 의존성을 주입해주는 것일까?
 
@@ -92,7 +92,11 @@ AspectJ는 다음과 같은 기능을 제공한다. 위빙(Weaving)은 AOP 로�
 
 <br>
 
-### 사전 준비
+## 사전 준비
+
+<br>
+
+### maven 설정
 
 먼저 여기서는 Spring Boot 2.0.9 버전을 사용한다. 이 버전에 맞게 Spring Boot Starter를 통해 메이븐 의존성을 추가할 것이다. 테스트 용도로 데이터베이스는 H2 데이터베이스를 사용할 것이며, JPA를 통해 DB 엑세스할 것이다.
 
@@ -203,3 +207,26 @@ AspectJ는 다음과 같은 기능을 제공한다. 위빙(Weaving)은 AOP 로�
             <scope>compile</scope>
         </dependency>
 ```
+
+그리고 앞서 언급하였는데, AspectJ의 LTW를 위해서는 위빙 작업을 위해 별도의 Agent가 필요하다. JVM 옵션, -javaagent 를 추가하여 애플리케이션을 실행해야 하지만, 여기서는 **maven-surefire-plugin** 플러그인을 통해 pom.xml에서 javaagent를 지정하도록 하겠다. 다음과 같이 플러그인을 추가한다.
+
+```xml
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.10</version>
+                <configuration>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}"/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
+                    </argLine>
+                    <useSystemClassLoader>true</useSystemClassLoader>
+                    <forkMode>always</forkMode>
+                </configuration>
+            </plugin>
+```
+
+<br>
+
+### H2 데이터베이스 설정
+
+테스트를 위해 H2 데이터베이스를 사용할 것이다.
