@@ -46,7 +46,6 @@ icon: icon-html
 다음 클래스가 있다고 해보자. User 도메인 객체는 자신의 정보를 DB에 저장하기 위해 repository를 필요로 한다고 하자.
 
 ```java
-@Entity
 @Getter
 @Setter
 public class User {
@@ -54,9 +53,6 @@ public class User {
     @Autowired
     private UserRepository repository;
 
-    @Id
-    @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;
