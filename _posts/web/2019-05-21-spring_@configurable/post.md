@@ -15,7 +15,10 @@ icon: icon-html
 **수많은 애플리케이션에서 다루어야 하는 문제에 대한 복잡성은 그 애플리케이션을 사용하는 사용자나 업무에 해당하는 도메인 그 자체이다.**  
 도메인 주도 설계, 즉 DDD는 요구사항에 대한 회의부터 시작하여 코드의 구현에 이르기까지 통일된 언어를 바탕으로 도메인 문제를 해결하여 효과적인 커뮤니케이션, 각 요구사항에 잘 들어맞는 명확한 도메인 모델을 바탕으로 소프트웨어의 품질을 높이고자 하는 것이다.
 
-스프링 프레임워크 기반으로 DDD의 설계 원칙을 잘 살린다면 모두가 웃으면서 커뮤니케이션을 하고 개발을 할 수 있을 것 같다. 좀 오래되긴 했지만 Spring Framework 2.0이 발표되면서 DDD 방식의 개발을 지원하기 위해 많은 노력이 들어갔다고 한다. (물론 프레임워크 스스로도 DDD의 장점을 살려 개발되었다고 한다.)  
+스프링 프레임워크는 생산성과 애플리케이션 품질을 위한 애플리케이션 프레임워크일 뿐만 아니라, 개발자로 하여금 스프링이 지향하는 개발 원칙이나 철학, 원리를 자연스럽게 따라갈 수 있도록 하기 위해 등장한 것이다. DDD도 스프링이 지향하는 주된 가치이자 개발 원리로, 스프링 프레임워크 2.0이 발표되면서 DDD 방식의 개발을 지원하기 위해 많은 노력이 들어갔다고 한다. (물론 프레임워크 스스로도 DDD의 장점을 살려 개발되었다고 한다.) 
+
+스프링 프레임워크 기반으로 DDD의 설계 원칙을 잘 살린다면 모두가 웃으면서 커뮤니케이션을 하고 개발을 할 수 있을 것 같다. 그럼 DDD 방식의 개발을 위해 스프링 프레임워크가 지원하는 것은 무엇일까?
+
 그 중 하나가 @Configurable을 통한 도메인 객체에 대한 의존성 주입이다.
 
 <br>
@@ -24,7 +27,7 @@ icon: icon-html
 
 스프링 프레임워크가 DDD 개발을 위해 지원하는 애너테이션이다.
 
-간단히 설명하면 **DDD에서 식별성과 연속성을 가지는 객체인 엔티티(Entity)나 애그리거트(Aggregate) 루트 객체에 대해 자신을 나타내는 필드나 참조가 아닌, 그 객체의 기능 / 행위를 구현함에 있어서 필요한 의존성을 주입하기 위해 사용하는 것이다.** (값 객체(Value Object)도 의존성이 필요하다면 사용할 수 있을 것 같지만 그런 사례가 있는지는 모르겠다.)
+간단히 설명하면 **DDD에서 식별성과 연속성을 가지는 엔티티(Entity)나 애그리거트(Aggregate) 루트와 같은 도메인 객체에 대해서 자신을 나타내는 필드나 참조가 아닌, 그 객체의 기능 / 행위를 구현함에 있어서 필요한 의존성을 주입하기 위해 사용하는 것이다.** (값 객체(Value Object)도 의존성이 필요하다면 사용할 수 있을 것 같지만 그런 사례가 있는지는 모르겠다.)
 
 스프링 프레임워크에서 의존성 주입을 위해 선제조건이 있는데, 의존성을 주입받는 객체나 주입이 되는 객체 모두 애플리케이션 컨텍스트에 미리 등록된 스프링 빈이어야 한다는 것이다.
 
@@ -35,6 +38,8 @@ icon: icon-html
 그렇다고 개발자가 도메인 객체 생성시 필요한 의존성을 주입해주기에는 너무 힘이 든다. 매번 객체가 생성할 때마가 매번 개입을 해야하며, 도중에 의존성 하나만 추가되어도 많은 양의 코드가 추가되어야 한다.
 
 스프링 프레임워크는 이 문제를 해결하여 비즈니스 로직 상에서 직접 도메인 객체를 생성할 때에도 적절하게 의존성을 주입해주는 기능을 제공한다. 그 것이 @Configurable 애너테이션이다.
+
+> 의존성 주입이 가능하다는 것은 빈 형태로 제공되는 각종 서비스, 예를 들어 AOP를 통한 어드바이스 적용이나 트랜잭션 지원도 가능하다는 것이다. @Configurable 애너테이션을 통해 의존성을 주입받을 수 있다면, 비즈니스 로직이 직접 생성하는 도메인 객체에 대해서도 AOP나 트랜잭션과 같은 서비스들을 적용시킬 수 있다.
 
 <br>
 
@@ -82,7 +87,7 @@ AspectJ는 다음과 같은 기능을 제공한다. 위빙(Weaving)은 AOP 로�
 * Post-compile weaving: 자바 class 파일이나 jar 파일에 위빙 작업을 진행한다.
 * Load-time weaving: 자바 클래스 로더가 클래스를 로딩할 때 위빙 작업을 진행한다. 별도의 위빙 agent가 필요하다.
 
-여기서 @Configurable을 활용한 도메인 객체에 대한 의존성 주입에 필요한 것은 **Load-time weaving(LTW)** 이다.
+여기서 @Configurable을 활용한 도메인 객체에 대한 의존성 주입에 필요한 것은 **Load-time weaving(LTW)** 이다. LTW를 통해 위빙을 위한 별도의 컴파일 작업이 필요없이 클래스가 로딩되는 시점에 자동으로 의존성을 주입해줄 수 있다.
 
 이제 사전에 필요한 지식은 습득하였으니 직접 간단한 코드와 유닛 테스트를 작성하여 의존성 주입이 되는지 확인해보자.
 
@@ -255,7 +260,7 @@ server:
 
 H2를 사용하기 위해 JDBC 드라이버 및 url을 설정하였고, 콘솔 화면에서 SQL 쿼리 확인 및 벌크 작업에 대한 JPA 설정을 추가하였다. 그리고 테스트 시작시에 미리 지정한 DB 스키마를 실행하여 자동으로 필요한 테이블 및 row 데이터를 insert 할 수 있도록 spring.jpa.generate-ddl을 true로 설정하였다.
 
-Spring Boot는 H2 사용시, classpath 경로에 있는 schema.sql 및 data.sql을 읽어들여 미리 테이블 생성 및 데이터를 적재해주는 기능을 제공한다. schema.sql에는 DDL 구문을 작성하고, 데이터 insert와 같은 DML 구문은 data.sql에 작성한다.
+Spring Boot는 H2 사용시, 클래스패스 경로에 있는 schema.sql 및 data.sql을 읽어들여 미리 테이블 생성 및 데이터를 적재해주는 기능을 제공한다. schema.sql에는 DDL 구문을 작성하고, 데이터 insert와 같은 DML 구문은 data.sql에 작성한다.
 
 다음과 같이 /src/main/resources 디렉터리 안에 다음과 같이 schema.sql 및 data.sql을 작성하자.
 
@@ -318,7 +323,7 @@ public class User {
 
 > 여기서 JPA의 @Entity 애너테이션을 사용하는 것이 DDD에서 얘기하는 엔티티(Entity) 객체로 정의한다는 말이 아니라는 것에 주의하자. JPA의 @Entity는 어느 DB 테이블과 연관관계를 맺는 (오브젝트 매핑)를 클래스라는 것을 의미하는 것이다.
 
-다음으로 DB 접근을 위해 UserRepository 인터페이스를 다음과 같이 정의한다. DB에 대한 기본적인 CRUD 기능을 제공하는 CRUDRepository를 상속하였다. List 형태로 받기 위해 원래 Iterable\<T\> 타입으로 리턴하는 findAll 메서드를 오버라이드하였다.
+다음으로 DB 접근을 위해 UserRepository 인터페이스를 다음과 같이 정의한다. DB에 대한 기본적인 CRUD 기능을 제공하는 CrudRepository를 상속하였다. List 형태로 받기 위해 원래 Iterable\<T\> 타입으로 리턴하는 findAll 메서드를 오버라이드하였다.
 
 ```java
 public interface UserRepository extends CrudRepository<User, Integer> {
@@ -358,7 +363,7 @@ public class UserRepositoryTest {
 
 이제 우리가 하고자 하는 것은 비즈니스 로직에서 직접 생성하는 **도메인 객체**인 User 클래스의 인스턴스에 자동으로 필요한 의존성을 주입하는 것이다.
 
-앞에서 문제 제기한 것처럼, User 클래스의 어떤 행위를 구현하기 위해(save 메서드) UserRepository 인스턴스가 필요하다고 생각해보자. User 클래스의 인스턴스는 스프링 빈이 아니므로 다음 코드와 같이 UserRepository 인스턴스를 주입받을 수 없다.
+앞에서 문제 제기한 것처럼, User 클래스의 어떤 행위를 구현하기 위해(save 메서드), UserRepository 인스턴스가 필요하다고 생각해보자. User 인스턴스는 스프링 빈이 아니므로 다음 코드와 같이 UserRepository 인스턴스를 주입받을 수 없다.
 
 ```java
 @Getter
@@ -384,7 +389,7 @@ public class User {
 }
 ```
 
-스프링 프레임워크는 DDD의 도메인 객체 구현에 있어서 필요한 의존성을 주입받을 수 있도록 @Configurable 애너테이션 및 AspectJ를 통해 해결한다고 언급하였다. AspectJ를 통해 도메인 객체 생성자 호출시 필요한 의존성을 자동으로 주입해줄 수 있도록 위빙해주는 것이다. 이런 스프링 프레임워크의 지원을 받아 우리는 DDD에서 얘기하는 도메인 객체 정의시 필요한 의존성을 쉽게 추가할 수 있다.
+스프링 프레임워크는 DDD의 도메인 객체 구현에 있어서 필요한 의존성을 주입받을 수 있도록 @Configurable 애너테이션 및 AspectJ를 통해 해결한다고 언급하였다. AspectJ를 통해 도메인 객체 생성자 호출시 필요한 의존성을 자동으로 주입해줄 수 있도록 위빙해주는 것이다. 이런 스프링 프레임워크의 지원을 받아 우리는 DDD에서의 도메인 객체 정의시 필요한 의존성을 쉽게 추가할 수 있다.
 
 다음과 같이 @Configurable 애너테이션을 추가한다.
 
@@ -430,13 +435,13 @@ public class AspectJConfig {
 }
 ```
 
-[**@EnableSpringConfigured**](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/annotation/aspectj/EnableSpringConfigured.html) 애너테이션은 Spring Boot가 @Configurable 애너테이션이 붙은 스프링 빈 팩토리에 의해 생성되지 않는 클래스의 인스턴스에 대해 의존성을 주입해주기 위해 사용하는 애너테이션이다.
+[**@EnableSpringConfigured**](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/annotation/aspectj/EnableSpringConfigured.html) 애너테이션은 Spring Boot가 @Configurable 애너테이션이 붙은, 스프링 빈 팩토리에 의해 생성되지 않는 클래스의 인스턴스에 대해 의존성을 주입해주기 위해 사용하는 애너테이션이다.
 
-[**@EnableLoadTimeWeaving**](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/annotation/EnableLoadTimeWeaving.html)은 AspectJ의 LTW를 사용하기 위한 애너테이션이다. 디폴트는 AUTODETECT 인데, 클래스패스에 AspectJ 설정인 aop.xml이 있는 경우에만 활성화한다. 우리는 여기서 따로 AspectJ 설정을 추가하지는 않았으므로 활성화를 위해서 ENABLED로 설정한다.
+[**@EnableLoadTimeWeaving**](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/annotation/EnableLoadTimeWeaving.html)은 AspectJ의 LTW를 사용하기 위한 애너테이션이다. 디폴트는 AUTODETECT 인데, 클래스패스에 AspectJ 설정인 aop.xml이 있는 경우에만 활성화한다. 우리는 여기서 따로 AspectJ 설정을 추가하지는 않았으므로 활성화하기 위해 ENABLED로 설정한다.
 
 [**InstrumentationLoadTimeWeaver**](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/instrument/classloading/InstrumentationLoadTimeWeaver.html) 타입의 오브젝트는 LTW를 위한 바이트 코드 조작시 필요한 스프링 Agent를 활성화하기 위한 빈이다.
 
-이로써 User 도메인 객체를 위한 필요한 설정 작업을 마쳤다. 다음으로 유닛 테스트를 통해 정상 동작하는지 확인해보자. 다음 테스트는 User 클래스의 인스턴스 생성시 UserRepository 인스턴스를 제대로 주입받았는지, 그리고 실제로 비즈니스 로직(DB에 User 클래스 인스턴스 저장)이 잘 실행되었는지 확인한다.
+이로써 User 도메인 객체를 위한 필요한 설정 작업을 마쳤다. 다음으로 유닛 테스트를 통해 정상 동작하는지 확인해보자. 다음 테스트는 User 인스턴스 생성시 UserRepository 인스턴스를 제대로 주입받았는지, 그리고 실제로 비즈니스 로직(DB에 User 인스턴스 저장)이 잘 실행되었는지 확인한다.
 
 ```java
 @SpringBootTest
@@ -488,9 +493,10 @@ public class UserTest {
 }
 ```
 
-위의 테스트를 실행하면 다음과 같이 테스트가 통과되는 것을 확인할 수 있었다.
+위의 테스트를 실행하면 다음과 같이 테스트가 통과되는 것을 확인할 수 있다.. User 인스턴스를 직접 생성하였는데 @Autowired를 통한 자동 와이어링을 통해 필요햔 UserRepository 인스턴스를 주입받은 것을 확인할 수 있었고, save 메서드도 잘 동작함을 확인할 수 있다.
 
 <br>
 
 ![03.png](/static/assets/img/blog/web/2019-05-21-spring_@configurable/03.png)
 
+이렇게 스프링 프레임워크에서 DDD 방식의 개발을 위해, 도메인 객체에 의존성 주입하는 설정, 테스트를 진행해보았다. 스프링 프레임워크를 사용하고 DDD에 관심이 많다면 스프링 프레임워크가 DDD를 위해 어떻게 지원하는지 알아보는 것도 나쁘지 않은 선택일 것이다.
