@@ -414,7 +414,7 @@ public class User {
 }
 ```
 
-그리고 이 @Configurable 애너테이션 및 AspectJ의 LTW를 Spring Boot에서 사용하기 위해서 다음과 같이 config을 설정해주어야 한다.
+그리고 이 @Configurable 애너테이션 및 AspectJ의 LTW를 Spring Boot에서 사용하기 위해서 다음과 같은 설정을 추가해주어야 한다.
 
 ```java
 @Configuration
