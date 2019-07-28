@@ -27,4 +27,6 @@ icon: icon-html
 3. 관련된 객체들이 함께 사용되도록 설계되었고, 이 부분에 대한 제약이 지켜지도록 하고 싶을 때
    - 어느 집합의 객체들이 함께 사용해야 되도록 설계되었다면, 특정 팩토리 클래스를 사용함으로써 이를 쉽게 지킬 수 있다.
 4. 라이브러리를 제공시, 그들의 구현이 아닌 인터페이스를 노출시키고 싶을 때
-ㅉ
+
+[Abstract Factory Example
+](https://github.com/dhsim86/design_pattern_study/commit/b6753b07a023922ec83cfaec5db565abe60568f9)
