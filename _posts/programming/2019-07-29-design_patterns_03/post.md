@@ -13,7 +13,7 @@ icon: icon-html
 
 ![00.png](/static/assets/img/blog/programming/2019-07-29-design_patterns_03/00.png)
 
-위 그림과 같이 인터페이스(Creator)는 Product 타입의 팩토리 메서드를 정의하고, 다른 메서드(operation)에서 이 팩토리 메서드를 통해 필요한 객체를 생성한다. 어떤 구체 클래스의 인스턴스를 생성할지는 서브 클래스인(ConcreteCreator)에게 맡긴다.
+위 그림과 같이 인터페이스(Creator)는 Product 타입의 팩토리 메서드를 정의하고, 다른 메서드(operation)에서 이 팩토리 메서드를 통해 필요한 객체를 생성한다. 어떤 구체 클래스의 인스턴스를 생성할지는 서브 클래스(ConcreteCreator)에게 맡긴다.
 
 > 위 그림에서는 Creator 클래스를 인터페이스 or 추상 클래스로 정의한 경우의 다이어그램이지만, 경우에 따라 Creator도 추상 클래스가 아닌 구체 클래스로 정의하고 팩토리 메서드는 기본 구현을 제공할 수도 있다.
 
