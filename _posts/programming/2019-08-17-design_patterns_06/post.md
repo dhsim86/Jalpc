@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "디자인 패턴 06 - 어댑터 (Adapter)"
-date:   2019-08-12
+date:   2019-08-17
 desc:  "디자인 패턴 06 - 어댑터 (Adapter)"
 keywords: "디자인 패턴, Design Patterns, 생성 패턴, 어댑터, Adapter, 적응자"
 categories: [Programming]
@@ -21,7 +21,7 @@ public interface Alarm {
     void sendImage(File image);
 }
 
-public class MailAlarm {
+public class MailAlarm implements Alarm{
 
     public void sendText(String text) {
         ...
