@@ -81,5 +81,7 @@ public class SmsTransferLib {
 
 > 가교(Bridge) 패턴은 어댑터 패턴과 유사하지만, 사용 목적이 다르다. 가교 패턴은 구현 코드와 추상 개념을 분리하여 서로에게 영향을 주지 않고 서로 확장할 수 있도록 하기 위함이고, 어댑터 패턴은 호환되지 않는 객체의 인터페이스를 사용할 수 있도록 하기 위한 목적이다.
 
+> 인터페이스 변경을 일으키는 어댑터 패턴과는 다르게, 데코레이터(Decorator) 패턴은 인터페이스의 변경없이 객체에 새로운 기능을 추가하기 위한 목적이고 재귀적 객체 합성을 통해 여러 기능을 추가할 수 있다.
+
 [Adapter Example
 ](https://github.com/dhsim86/design_pattern_study/commit/7dff7e52a469594f9f78bd988f55df3f6e943bb7)
