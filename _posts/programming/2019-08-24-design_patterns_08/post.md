@@ -130,3 +130,6 @@ public class Picture implements Graphic {
 > 모든 객체에 대한 인터페이스(Component)는 개별 객체와 복합 객체에 정의된 모든 공통의 연산을 정의하고 있어야 한다. 이렇게 해야 사용자가 개별 / 복합 객체를 구분할 필요없이 코드를 작성할 수 있다. 단, 개별 객체는 복합 객체에만 의미있는, 개별 요소를 다루는 연산을 아무 일도 하지 않도록 구현하거나 예외를 던지게하여 구현할 수 있다.
 
 > Garbage Collection 기능을 제공하지 않는 언어에서는 Leaf 객체를 삭제하는 책임을 Composite 클래스가 담당한다.
+
+[Composite Example
+](https://github.com/dhsim86/design_pattern_study/commit/adff8f05f1467cc6242155d8dab29e037dd63d63)
