@@ -3,7 +3,7 @@ layout: post
 title:  "디자인 패턴 07 - 가교 (Bridge)"
 date:   2019-08-17
 desc:  "디자인 패턴 07 - 가교 (Bridge)"
-keywords: "디자인 패턴, Design Patterns, 생성 패턴, 가교, Bridge"
+keywords: "디자인 패턴, Design Patterns, 구조 패턴, 가교, Bridge"
 categories: [Programming]
 tags: [Design Patterns]
 icon: icon-html

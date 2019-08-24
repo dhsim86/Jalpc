@@ -3,7 +3,7 @@ layout: post
 title:  "디자인 패턴 09 - 장식자 (Decorator)"
 date:   2019-08-24
 desc:  "디자인 패턴 09 - 장식자 (Decorator)"
-keywords: "디자인 패턴, Design Patterns, 생성 패턴, 장식자, Decorator"
+keywords: "디자인 패턴, Design Patterns, 구조 패턴, 장식자, Decorator"
 categories: [Programming]
 tags: [Design Patterns]
 icon: icon-html

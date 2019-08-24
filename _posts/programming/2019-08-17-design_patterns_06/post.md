@@ -3,7 +3,7 @@ layout: post
 title:  "디자인 패턴 06 - 어댑터 (Adapter)"
 date:   2019-08-17
 desc:  "디자인 패턴 06 - 어댑터 (Adapter)"
-keywords: "디자인 패턴, Design Patterns, 생성 패턴, 어댑터, Adapter, 적응자"
+keywords: "디자인 패턴, Design Patterns, 구조 패턴, 어댑터, Adapter, 적응자"
 categories: [Programming]
 tags: [Design Patterns]
 icon: icon-html
