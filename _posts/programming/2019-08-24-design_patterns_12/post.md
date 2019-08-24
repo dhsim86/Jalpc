@@ -2,7 +2,7 @@
 layout: post
 title:  "디자인 패턴 12 - 프록시 (Proxy)"
 date:   2019-08-24
-desc:  ""디자인 패턴 12 - 프록시 (Proxy)"
+desc:  "디자인 패턴 12 - 프록시 (Proxy)"
 keywords: "디자인 패턴, Design Patterns, 구조 패턴, 프록시, Proxy"
 categories: [Programming]
 tags: [Design Patterns]
