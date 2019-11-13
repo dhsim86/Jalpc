@@ -2,7 +2,7 @@
 layout: post
 title:  "디자인 패턴 13 - 책임 연쇄(Chain of Responsibility)"
 date:   2019-11-12
-desc:  "디자인 패턴 12 - 책임 연쇄(Chain of Responsibility)"
+desc:  "디자인 패턴 13 - 책임 연쇄(Chain of Responsibility)"
 keywords: "디자인 패턴, Design Patterns, 행동 패턴, 책임 연쇄, Chain of Responsibility"
 categories: [Programming]
 tags: [Design Patterns]
