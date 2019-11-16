@@ -17,5 +17,5 @@ icon: icon-html
 
 ![00.png](/static/assets/img/blog/programming/2019-11-13-design_patterns_14/00.png)
 
-Invoker에서 명령을 처리할 것을 요청하며, ConcreteCommand가 이 명령을 받아 실제 처리할 객체인 Receiver로 명령을 전달하며 처리할 수 있도록 한다.
+Invoker에서 명령을 처리할 것을 요청하며, ConcreteCommand가 이 명령을 받아 실제 처리할 객체인 Receiver로 명령을 전달하며 처리할 수 있도록 한다. 이를 통해 **요청 처리하는 것을 호출하는 객체(Invoker)와 이를 수행하는 객체(Receiver)를 Command 객체를 통해 분리**할 수 있다.
 
