@@ -657,23 +657,24 @@ G1 알고리즘의 목표 중 하나는, GC로 인해 애플리케이션 스레�
 
 이를 위해 G1은 다음과 같이 구현된다.
 
-앞서 살펴봤던 연속된 Young 영역 및 Old 영역으로 Heap을 관리하지 않는다. **대신 Heap 영역을 일정한 크기의 작은 공간으로 나눈다.** (기본 2048개의 공간이다.)
-
-각 공간은 Eden이거나 Survivor, Old 가 된다. 물론 논리적으로 봤을 때, Eden 및 Survivor에 해당하는 공간을 합쳐서 본다면 Young 영역으로 볼 수 있다. Old 또한 마찬가지.
+앞서 살펴봤던 연속된 Young 영역 및 Old 영역으로 Heap을 관리하지 않는다. **대신 Heap 영역을 일정한 크기의 작은 공간(region)으로 나눈다.** (기본 2048개의 region이다.) 각 region은 Eden이거나 Survivor, Old 가 된다. 물론 논리적으로 봤을 때, Eden 및 Survivor에 해당하는 region을 합쳐서 본다면 Young 영역으로 볼 수 있다. Old 또한 마찬가지.
 
 <br>
+
 ![14.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/14.png)
 
-이렇게 구현하면 garbage collector 입장에서는 **한 GC 사이클에 전체 Young / Old 영역에 대해서 GC를 수행할 필요가 없다는 것이다.** <br>
-G1 GC는 잘게 나누어진 공간 중 **일정 개수의 공간을 Collection Set이라 불리는 서브셋에 포함시켜, 이 서브셋에 포함되는 공간에 대해서만 GC를 수행한다.**
+이렇게 구현한다면 garbage collector 입장에서는 전체 heap을 대상으로 하는 것이 아니라 점진적으로 해결해야 될 문제에 접근하도록 할 수 있다. 한 GC 사이클에 모든 Young / Old 영역에 대해 GC를 수행할 필요가 없다는 것이다.
 
-> 단, Young 영역에 해당하는 모든 공간에 대해서는 Collection Set에 모두 포함되어 한 GC 사이클에 모두 GC가 수행되며, **Old 영역에 대해서만 Collection Set에 포함된 공간에 대해서만 GC를 수행한다.**
+G1 GC는 잘개 나누어진 각 region들을 collection set이라 불리는 것으로 분류하여 이 region만을 고려하여 garbage collection을 수행한다.
+
+> Young 영역에 해당하는 모든 region에 대해서는 Collection Set에 모두 포함되어 한 GC 사이클에 모두 GC가 수행되며, **Old 영역의 경우 collection set에 포함되어 garbage collection의 대상이 되거나 안될 수 있다.**
 
 <br>
+
 ![15.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/15.png)
 
-또한 GC를 수행할 때, 각 공간마다 가지고 있는 살아있는 객체의 수를 조사하는데 이 정보는 Collection Set을 만들 때 참조된다. <br>
-G1 GC는 살아있는 객체가 아닌 garbage collector 대상이 되는, **더 이상 사용하지 않는 객체가 많은 공간부터 Collection Set에 포함시킨다.** <br>
+또한 GC를 수행할 때, 각 region이 가지고 있는 살아있는 객체의 수를 조사하는데 이 정보는 애플리케이션 스레드와 동시에 수행되는 concurrent phase에 수행되어 Collection Set을 만들 때 참조된다. <br>
+G1 GC는 살아있는 객체가 아닌 garbage collector 대상이 되는, **더 이상 사용하지 않는 객체가 많은 region부터 Collection Set에 포함시킨다.** <br>
 따라서 이 GC의 이름이 Garbage-First 인 것이다.
 
 G1 GC를 사용하기 위해서는 다음과 같이 JVM 파라미터를 설정한다.
@@ -685,8 +686,8 @@ java -XX:+UseG1GC com.mypackages.MyExecutableClass
 <br>
 ### Evacuation Pause: Fully Young
 
-애플리케이션이 처음 시작되었을 때는, G1은 GC를 위해 참조될 정보가 없기 때문에 **fully-young 모드로 동작한다.**
-Young 영역이 가득찼을 경우에 애플리케이션 스레드는 잠시 멈추게 되고, Young 영역에 있는 살아있는 객체들은 Survivor 영역으로 이동시킨다. 객체 이동하는 동작을 Evacuation이라고 부르는데, 이전에 봤던 GC 알고리즘들과 거의 동일하다. 
+애플리케이션이 처음 시작되었을 때는, G1은 GC를 위해 참조될 정보가 없기 때문에 **Young 영역에 대해서만 수행하는 fully-young 모드로 동작한다.**
+Young 영역이 가득찼을 경우에 살아있는 객체를 마킹하기 위해 애플리케이션 스레드는 잠시 멈추게 되고, Young 영역에 있는 살아있는 객체들은 Survivor 영역으로 이동시킨다. 객체 이동하는 동작을 Evacuation이라고 부르는데, 이전에 봤던 GC 알고리즘들과 거의 동일하다. 
 
 Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와는 관계가 없는 로그를 빼고 살펴보도록 한다. 해당 로그들은 애플리케이션 스레드와 동시에 동작하는 concurrent 단계일 때 다시 볼 것이다. 또한 GC 스레드가 병렬로 동작할 때 남는 로그(Parallel) 들과 "Other" 단계일 때의 로그도 나누어서 볼 것이다.
 
@@ -700,7 +701,7 @@ Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와
 <li class="description"><span class="node">[Code Root Purge: 0.0 ms]</span> – 역시 GC를 위해 가지고 있던 정보를 정리한다.</li>
 <li class="description"><span class="node">[Other: 0.4 ms]</span> – GC를 위해 자잘한 일을 수행한 것이다.</li>
 <li class="description"><span class="node">…</span> – 따로 살펴본다.</li>
-<li class="description"><span class="node">[Eden: 24.0M(24.0M)-&gt;0.0B(13.0M) </span> – 이 단계 전후의 Eden 공간의 사용량 및 크기이다.</li>
+<li class="description"><span class="node">[Eden: 24.0M(24.0M)-&gt;0.0B(13.0M) </span> – 이 단계 전후의 Eden region의 사용량 및 크기이다.</li>
 <li class="description"><span class="node">Survivors: 0.0B-&gt;3072.0K </span> – 이 단계 전후의 Survivor 크기이다.</li>
 <li class="description"><span class="node">Heap: 24.0M(256.0M)-&gt;21.9M(256.0M)]</span> – 이 단계 전후의 Heap 영역의 사용량 및 크기이다.</li>
 <li class="description"><span class="node"> [Times: user=0.04 sys=0.04, real=0.02 secs] </span> – 해당 단계에서 걸린 시간으로 user 및 system, real 로 나누어서 보여주고 있다:
@@ -723,7 +724,7 @@ Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와
 <li class="description"><span class="node"> [GC Worker Start (ms)</span> – 해당 동작들을 수행하기 시작할 때의 timestamp이다. Min 과 Max의 값이 많이 다르면 이는 너무 많이 스레드의 개수를 설정하였거나 JVM이 아닌 다른 프로세스가 CPU 시간을 많이 잡아먹었을 때이다.  </li>
 <li class="description"><span class="node">[Ext Root Scanning (ms)</span> – Heap 영역에 존재하지 않는 클래스 로더나 JNI 참조 정보, JVM 시스템 정보를 스캔하면서 걸린 시간이다.</li>
 <li class="description"><span class="node">[Code Root Scanning (ms)</span> – 로컬변수와 같은 GC root로부터 참조되는 객체들을 스캔하는데 걸린 시간이다.</li>
-<li class="description"><span class="node">[Object Copy (ms)</span> – GC 대상이 되는 공간으로부터 객체들을 복사하는데 걸린 시간이다.</li>
+<li class="description"><span class="node">[Object Copy (ms)</span> – GC 대상이 되는 region으로부터 객체들을 복사하는데 걸린 시간이다.</li>
 <li class="description"><span class="node">[Termination (ms)</span> – GC 동작을 수행 후 스레드들이 더 이상 할 작업이 없다는 것을 확인하고 종료하는데 걸린 시간이다.</li>
 <li class="description"><span class="node">[Termination Attempts</span> – 스레드들이 GC 동작을 종료하기 위해 시도한 횟수이다. GC 종료를 시도할 때 실패하는 경우는 GC를 위해 할 동작이 아직 있다는 것이다.</li>
 <li class="description"><span class="node">[GC Worker Other (ms)</span> – GC를 위해 자잘한 일을 하는데 걸린 시간이다.</li>
@@ -740,7 +741,7 @@ Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와
 <li class="description"><span class="node">[Other: 0.4 ms]</span> – GC를 위해 기타 작업을 하는데 있어서 걸린 시간으로 GC 스레드들이 병렬로 수행한다.</li>
 <li class="description"><span class="node">[Ref Proc: 0.2 ms]</span> – non-strong reference들과 관련된 작업을 수행하면서 걸린 시간이다.</li>
 <li class="description"><span class="node">[Ref Enq: 0.0 ms]</span> – 남아있는 non-strong reference들을 ReferenceQueue에 큐잉하는데 걸린 시간이다.</li>
-<li class="description"><span class="node">[Free CSet: 0.0 ms]</span> – Collection Set에 있던, GC를 수행해서 비어버린 공간들을 반환하기 위해 걸린 시간이다. 이 공간들은 다음 객체 생성할 때 쓰일 것이다. </li>
+<li class="description"><span class="node">[Free CSet: 0.0 ms]</span> – Collection Set에 있던, GC를 수행해서 비어버린 region들을 반환하기 위해 걸린 시간이다. 이 region들은 다음 객체 생성할 때 쓰일 것이다. </li>
 </ol>
 </div>
 
@@ -750,15 +751,19 @@ Evacuation에 대한 로그는 좀 많은데, 여기서는 fully-young 모드와
 G1 GC 알고리즘의 컨셉은 CMS GC와 많이 비슷하기 때문에, CMS 알고리즘을 잘 이해하고 있다면 이 알고리즘을 이해하는데도 별 어려움이 없을 것이다.
 비록 디테일한 구현은 다르겠지만, 애플리케이션 스레드와 동시에 동작하는 Concurrent Mark는 매우 비슷하다.
 
-G1 GC의 Concurrent Mark는 Snapshot-At-The-Beginning 접근법에 따라, 비록 애플리케이션 스레드의 동작에 따라 객체의 그래프가 변하더라도 해당 사이클 초반에 살아있는 모든 객체를 mark 를 시도한다. 그리고 이 정보는 힙 영역의 애플리케이션 객체 상태 정보를 유지할 수 있게 하고 이는 Collection Set를 만드는데 참조된다.
+G1 GC의 Concurrent Mark는 Snapshot-At-The-Beginning 접근법에 따라, mark 단계의 시작점에서, 비록 애플리케이션 스레드의 동작에 따라 객체의 그래프가 변하더라도, 살아있는 모든 객체를 mark 를 시도한다. 이 정보는 각 region의 살아있는 객체들의 정보를 유지할 수 있게 하고 Collection Set를 만드는데 참조된다.
 
-이 단계는 head 영역의 사용량이 일정 이상이 되었을 때 시작된다. 디폴트는 힙 전체 영역의 45%이지만, **InitiatingHeapOccupancyPercent** 라는 JVM 옵션을 통해 변경할 수 있다. CMS GC랑 비슷하게 이 단계도 여러 서브 단계로 이루어져 있으며 어떤 단계는 애플리케이션과 동시에 동작하지만, 어떤 단계는 Stop-The-World 를 유발한다.
+Concurrent Marking 단계는 head 영역의 사용량이 일정 이상이 되었을 때 시작된다. 디폴트는 힙 전체 영역의 45%이지만, **InitiatingHeapOccupancyPercent** 라는 JVM 옵션을 통해 변경할 수 있다. CMS GC랑 비슷하게 이 단계도 여러 세부 단계로 나누어 수행되는데 어떤 단계는 애플리케이션과 동시에 동작하지만, 어떤 단계는 Stop-The-World 를 유발한다.
+
+<br>
+
+![16.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/16.png)
 
 ---
 
 **Phase 1: Initial Mark**
 
-이 단계에서는 GC Root로부터 바로 참조되는 객체를 mark 한다.
+**이 단계에서는 GC Root로부터 바로 참조되는 살아 있는 객체를 mark 한다. (Old region의 객체로부터 참조되는 Survivor Region을 mark**)
 CMS GC는 Stop-The-World를 일으키는 단계였지만, G1 GC는 Evacuation 단계 (Young GC)로부터 트리거되기 때문에 (piggy-backed) 그 오버헤드는 덜하다. 다음 로그와 같이 확인할 수 있다.
 
 ```
@@ -769,8 +774,9 @@ CMS GC는 Stop-The-World를 일으키는 단계였지만, G1 GC는 Evacuation �
 
 **Phase 2: Root Region Scan**
 
-이 단계에서는 Root 영역에 속해 있는 살아있는 객체로부터 참조되는 모든 객체를 mark 한다.
-애플리케이션 스레드와 동시에 동작하며, 이 때문에 다음 Evacuation 단계 (Young GC)가 일어나기 전까지 반드시 완료해야 한다. (객체의 상태가 변화하고 있는 Young GC가 발생하면 많은 문제가 발생하기 때문이다.)
+이 단계에서는 **Root region (Survivor region)에 속해 있는, 살아있는 모든 객체를 mark 한다.**
+애플리케이션 스레드와 동시에 동작하며, 다음 Evacuation 단계 (Young GC)가 일어나기 전까지 반드시 완료해야 한다. (객체의 그래프, 상태를 변화시키는 Young GC가 발생하면 많은 문제가 발생하기 때문이다.)
+
 
 ```
 1.362: [GC concurrent-root-region-scan-start]
@@ -781,10 +787,10 @@ CMS GC는 Stop-The-World를 일으키는 단계였지만, G1 GC는 Evacuation �
 
 **Phase 3: Concurrent Mark**
 
-CMS GC와 매우 유사하게, 특별한 비트맵을 이용하여 힙 영역의 모든 살아있는 객체를 mark 한다. 애플리케이션 스레드와 동시에 동작한다.
+CMS GC와 매우 유사하게, **객체 그래프를 따라 Heap 영역의 모든 살아있는 객체를 식별하여 특별한 비트맵을 이용하여 mark 해둔다.**
+애플리케이션 스레드와 동시에 동작한다.
 
-Snapshop-At-The-Beginning 접근법에 따라, 살아있는 객체를 모두 mark를 하려고 하는데 도중에 애플리케이션 스레드에 의해 업데이트 되는
-객체 상태는 특별한 log buffer 를 통해 따로 쌓아둔다.
+> 만약 이 단계에서 비어 있는 region (살아있는 객체를 보유하고 있지 않은)이 발견되면 즉시 회수된다.
 
 ```
 1.364: [GC concurrent-mark-start]
@@ -795,9 +801,9 @@ Snapshop-At-The-Beginning 접근법에 따라, 살아있는 객체를 모두 mar
 
 **Phase 4: Remark**
 
-이 단계는 Stop-The-World를 일으키는 단계로, mark 하는 단계를 완료하는 단계이다. 애플리케이션 스레드를 잠시 멈추고 log buffer에 있던 정보를 참조하여 객체 상태 업데이트를 완료한다.
+이 단계는 **Stop-The-World를 일으키는 단계로, mark 하는 단계를 완료**하는 단계이다. 애플리케이션 스레드를 잠시 멈추고 log buffer에 있던 정보를 참조하여 객체 상태 업데이트를 완료한다.
 
-또한 모든 공간 (Region)에 대해서 가지고 있는 살아있는 객체의 수를 나타내는 live stat를 계산한다.
+또한 모든 **region에 대해서 가지고 있는 살아있는 객체의 수를 나타내는 live stat (Region Liveness)를 계산한다.**
 
 ```
 1.645: [GC remark 1.645: [Finalize Marking, 0.0009461 secs] 1.646: [GC ref-proc, 0.0000417 secs] 1.646: [Unloading, 0.0011301 secs], 0.0074056 secs]
@@ -806,16 +812,22 @@ Snapshop-At-The-Beginning 접근법에 따라, 살아있는 객체를 모두 mar
 
 ---
 
-**Phase 5: Cleanup**
+**Phase 5: Cleanup / Copying**
 
-마지막 단계는, heap 영역에 있는 모든 살아있는 객체 정보를 조사한다. 또한 살아있지 않는 객체만 가지고 있는 공간은 비워진다.
+마지막 단계는 먼저 다음 GC를 위해 heap 영역에 있는 모든 살아있는 객체 정보를 조사해둔다. 
 
-해당 단계에서 비어 있는 영역을 회수하는 것과 살아있는 객체의 상태를 계산하는 것과 같은 일부 로직은 애플리케이션 스레드와 동시에 동작하지만, 어떤 로직은 Stop-The-World를 일으켜 애플리케이션 스레드의 방해없이 자기 자신의 작업을 완료한다.
+각 로직에 따라 애플리케이션 스레드와 동시에 수행되는 것도 있고, Stop-The-World를 일으키는 것도 있다.
+**각 region의 liveness, 즉 살아 있는 객체가 가장 적은 region을 선택하여 collect 한다.**
+
+> Young / Old region은 이 시점에 같이 collect 된다.
+
+ 해당 단계에서 완전히 비어 있는 region을 회수하는 것이나 살아있는 객체의 상태를 계산하는 것과 같은 일부 로직은 애플리케이션 스레드와 동시에 동작하지만, 어떤 로직은 Stop-The-World를 일으켜 애플리케이션 스레드의 방해없이 자기 자신의 작업을 완료한다.
 
 ```
 1.652: [GC cleanup 1213M->1213M(1885M), 0.0030492 secs]
 [Times: user=0.01 sys=0.00, real=0.00 secs]
 ```
+
 
 ---
 
