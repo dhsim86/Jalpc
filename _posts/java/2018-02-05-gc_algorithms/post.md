@@ -1,15 +1,15 @@
 ---
 layout: post
-title:  "Garbage Collection Algorithms"
+title:  "Java Garbage Collection Algorithms"
 date:   2018-02-05
-desc:  "Garbage Collection Algorithms"
-keywords: "java, garbage collection, gc, cms, g1"
+desc:  "Java Garbage Collection Algorithms"
+keywords: "java, garbage collection, gc, cms, g1, 가비지 컬렉션"
 categories: [Java]
 tags: [java]
 icon: icon-html
 ---
 
-# Garbage Collection Algorithms
+# Java Garbage Collection Algorithms
 
 <br>
 ## GC Algorithms: Basics

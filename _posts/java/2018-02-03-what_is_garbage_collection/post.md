@@ -3,7 +3,7 @@ layout: post
 title:  "Garbage Collection 기본 개념"
 date:   2018-02-04
 desc: "Garbage Collection 기본 개념"
-keywords: "java, garbage collection, gc"
+keywords: "java, garbage collection, gc, cms, g1, 가비지 컬렉션"
 categories: [Java]
 tags: [java]
 icon: icon-html
