@@ -1,57 +1,71 @@
 # careers section data
 # if you don't have language feature(language.yml is empty), ignore "i18n" items
 - name:
-    detail: NHN
+    detail: KakaoPay
     i18n: company_a
   desc:
     detail: Toast Cloud Development Team
     i18n: company_a_desc
   date:
-    detail: Jan. 2017 -
+    detail: August. 2020 -
     i18n: company_a_date
   job:
-    detail: Java, Cloud Development, Spring Framework, Reactive Programming, Rx.
+    detail: Java Backend Develop
     i18n: company_a_job
   icon: fa-plus-square
 
 - name:
-    detail: Samsung Electronics
+    detail: NHN
     i18n: company_b
   desc:
-    detail: Linux Kernel F2FS File System development, Server SSD Firmware (PM1725), NVDIMM-P
+    detail: Toast Cloud Development Team
     i18n: company_b_desc
   date:
-    detail: Feb. 2013 - Dec. 2016
+    detail: Jan. 2017 - July. 2020
     i18n: company_b_date
   job:
-    detail: Linux Kernel programming, SSD embedded firmware.
+    detail: Java, Cloud Development, Spring Framework, Reactive Programming, Rx.
     i18n: company_b_job
   icon: fa-plus-square
 
 - name:
-    detail: Samsung Software Membership
+    detail: Samsung Electronics
     i18n: company_c
   desc:
-    detail: MemDebugger, Social Magazine, x86 based OS for testing memory defect
+    detail: Linux Kernel F2FS File System development, Server SSD Firmware (PM1725), NVDIMM-P
     i18n: company_c_desc
   date:
-    detail: July. 2011 - Feb. 2013
+    detail: Feb. 2013 - Dec. 2016
     i18n: company_c_date
   job:
-    detail: Reverse engineering, Windows IOCP, x86 assembly, OS development.
+    detail: Linux Kernel programming, SSD embedded firmware.
     i18n: company_c_job
   icon: fa-plus-square
 
 - name:
-    detail: Kumoh National Inistitute Technology
+    detail: Samsung Software Membership
     i18n: company_d
   desc:
-    detail: Graduated in 2013.
+    detail: MemDebugger, Social Magazine, x86 based OS for testing memory defect
     i18n: company_d_desc
   date:
-    detail: Mar. 2006 - Feb. 2013
+    detail: July. 2011 - Feb. 2013
     i18n: company_d_date
   job:
-    detail: Computer Engineering
+    detail: Reverse engineering, Windows IOCP, x86 assembly, OS development.
     i18n: company_d_job
+  icon: fa-plus-square
+
+- name:
+    detail: Kumoh National Inistitute Technology
+    i18n: company_e
+  desc:
+    detail: Graduated in 2013.
+    i18n: company_e_desc
+  date:
+    detail: Mar. 2006 - Feb. 2013
+    i18n: company_e_date
+  job:
+    detail: Computer Engineering
+    i18n: company_e_job
   icon: fa-plus-square
