@@ -91,7 +91,7 @@ List<Complaint> litany = Collections.list(legacyLitany);
 
 정적 팩터리와 생성자에는 똑같은 제약이 있는데, **선택적 매개변수가 많아지면 적절히 대응하기 어렵다**는 점이다.
 
-다음과 같이 필수 매개변수를 받는 생성자를 두고, 그 생성자를 사용하는 다른 생성자를 늘려가는 점층적 생성자 패턴으로 구현할 수도 있다.
+다음과 같이 필수 매개변수를 받는 생성자를 두고, 그 생성자를 사용하는 다른 생성자를 늘려가는 점층적 생성자 패턴으로 구현할 수 있다.
 
 ```java
 public class NutritionFacts {
@@ -314,11 +314,25 @@ Mosaic create(Supplier<? extends Tile> tileFactory) {
 생성자 대신 정적 팩터리 메서드를 제공하는 불변 객채에서는 정적 팩터리 메서드를 사용해 불필요한 객체 생성을 막을 수 있다.
 
 ```java
+String s = new String("str");  // 매번 불필요하게 String 인스턴스를 생성한다.
 Boolean(String); // Java 9에서 deprecated. 매번 새로운 객체를 생성한다.
+
+String s = "str"; // 매번 새로운 String 인스턴스를 생성하지 않고 문자열 리터럴를 한번 생성하고 이를 참조만 한다.
 Boolean.valueOf(String) // 불필요한 객체 생성을 피한다.
 ```
 
 불필요한 객체를 만들어내는 예로 오토박싱이 있다. 오토박싱은 프로그래머가 기본 타입과 박싱된 기본 타입을 섞어 쓸 때 자동으로 상호 변환해준다. 오토박싱을 위한 객체 생성 비용으로 인해 성능에 영향이 갈 수도 있다.
+
+```java
+public static long sum() {
+    Long sum = 0L;
+    for (long i = 0; i <= Integer.MAX_VALUE; i++) {
+        sum += i;   // 불필요한 오토박싱으로 Long 객체가 불필요하게 생성된다.
+    }
+    return sum;
+}
+```
+
 따라서 되도록이면 박싱된 타입보다는 기본 타입을 사용하도록 한다.
 
 <br>
@@ -377,6 +391,8 @@ public Object pop() {
 }
 ```
 
+null 대입을 해두면 나중에 다 쓴 참조(obsolete reference)를 엉뚱하게 참조하여 이상 동작하는 것을, NullPointerException 예외를 통해 조기에 버그를 발견할 수도 있다.
+
 null 대입과 같은 객체 참조 해제는 항상 위의 경우와 같은 예외적인 상황에서만 사용하여 코드가 지저분해지지 않도록 한다. 자기 메모리를 직접 관리하는 경우라면 항상 메모리 누수에 주의해야 한다.
 
 <br>
@@ -404,6 +420,48 @@ finalizer와 cleaner는 또한 가비지 컬렉터의 효율을 떨어뜨린다.
 
 finalizer 및 cleaner 대신에 **AutoCloseable** 을 구현해주고, 인스턴스 사용 후 close 메소드를 통해 정리 작업을 진행하는 것이 좋다. (예외가 발생하더라도 close를 호출할 수 있도록 try-with-resource를 사용해야 한다.)
 
+cleanner 와 finalizer의 적절한 쓰임새는 close 메서드를 호출하지 않을 경우에 대한 안전망 역할과 네이티브 객체를 참조하고 있는 경우이다.
+
+```java
+public class Room implements AutoCloseable {
+    private static final Cleaner cleaner = Cleaner.create();
+
+    // 청소가 필요한 자원
+    // Room 인스턴스를 참조하면 순환 참조하게 되므로 가비지 컬렉터가 Room 인스턴스를 회수할 기회를 가지지 못하게 된다.
+    // 정적 이너 클래스가 아닌 일반 이너 클래스면 자동으로 바깥 클래스 객체 참조를 가지므로 가비지 컬렉터가 회수 못할 수 있다.
+    private static class State implements Runnable {
+        int numJunkPiles;
+
+        State(int numJunkPiles) {
+            this.numJunkPiles = numJinkPiles;
+        }
+
+        @Override
+        public void run()  {
+            System.out.println("방 청소");
+            numJunkPiles = 0;
+        }
+    }
+
+    private final State state;
+    private final Cleaner.Cleanable cleanable;
+
+    public Room(int numJunkPiles) {
+        state = new State(numJunkPiles);
+
+        // 미처 close 메소드를 호출하지 않는 경우가 있다면, 
+        // 가비지 컬렉터가 Room 인스턴스를 회수할 때, 아마도 State의 run 메소드를 호출하여 자원을 회수할 수 있다. (maybe)
+        cleanable = cleaner.register(this, state);
+    }
+
+    // 보통 try-with-resource에 의해 호출되어 자원이 회수될 것이다.
+    @Override
+    public void close() {
+        cleanable.clean();
+    }
+}
+```
+
 <br>
 ## 9. try-finally 보다는 try-with-resources를 사용하라.
 
@@ -430,7 +488,7 @@ static void copy(String src, String dst) throws IOException {
 }
 ```
 
-위의 코드와 같이 여러 자원을 사용할 때는 중첩되는 try-finally 블록을 사용해야 되서 코드가 지저분해질 수 있고, read 메서드에서 예외 발생했는데, close 메서드에서도 예외가 발생하면 두 번째 예외가 첫 번째 예외를 삼킨다. 따라서 사용자 입장에서는 디버깅이 매우 어렵게 될 수 있다.
+위의 코드와 같이 여러 자원을 사용할 때는 중첩되는 try-finally 블록을 사용해야 되서 코드가 지저분해질 수 있고, read 메서드에서 예외 발생했는데, close 메서드에서도 예외가 발생하면 두 번째 예외 (close 예외)가 첫 번째 예외(read 예외)를 삼킨다. 따라서 사용자 입장에서는 디버깅이 매우 어렵게 될 수 있다.
 
 이러한 문제를 자바 7의 try-with-resource를 통해 해결할 수 있다.
 이 구조를 사용하려면 해당 자원이 **AutoCloseable** 인터페이스를 구현해야 한다.
@@ -438,8 +496,8 @@ AutoCloeseable 인터페이스는 close 메소드 하나만 정의한 단순한 
 
 ```java
 static void copy(String src, String dst) throws IOException {
-    try (InputStream   in = new FileInputStream(src);
-            OutputStream out = new FileOutputStream(dst)) {
+    try (InputStream in = new FileInputStream(src);
+         OutputStream out = new FileOutputStream(dst)) {
         byte[] buf = new byte[BUFFER_SIZE];
         int n;
         while ((n = in.read(buf)) >= 0)
@@ -448,7 +506,7 @@ static void copy(String src, String dst) throws IOException {
 }
 ```
 
-try-with-resources 를 사용하면 코드가 간결해질 뿐만 아니라, read 및 close (보이지 않는) 메서드에서 둘다 예외가 발생시 read에 대한 예외가 삼켜지지 않고 기록된다. 
+try-with-resources 를 사용하면 코드가 간결해질 뿐만 아니라, read 및 close (보이지 않는) 메서드에서 둘다 예외가 발생시 read에 대한 예외가 삼켜지지 않고 기록된다. (억제된 예외, supressed 예외로 확인 가능하다.)
 close 메서드에 대한 예외는 숨겨지긴 하지만 스택 추적 내역에 suppressed라는 꼬리표를 통해 기록이 남게 된다. getSuppressed 메소드를 통해 프로그램 코드에서 숨겨진 예외를 가져올 수도 있다.
 
 다음과 같이 다수의 예외를 한 catch 문으로 처리할 수도 있다.
