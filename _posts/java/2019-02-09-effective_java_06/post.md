@@ -556,7 +556,7 @@ public enum ExtendedOperation implements Operation {
 새로 작성한 연산은 Operation 인터페이스를 사용하는 어느 곳에서든 사용 가능하다.
 
 ```java
-// Class 객체가 열거 타입인 동시에 Operation의 하위 타입이어야 한다는 뜻이다.
+// Class 리터럴의 타입 매개변수의 타입은 열거 타입인 동시에 Operation의 하위 타입이어야 한다는 뜻이다.
 private static <T extends Enum<T> & Operation> void test(
         Class<T> opEnumType, double x, double y) {
     for (Operation op : opEnumType.getEnumConstants())
