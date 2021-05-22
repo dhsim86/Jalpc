@@ -29,16 +29,20 @@ JVM에서 사용할 수 있는 모든 GC 알고리즘은 **어느 객체가 살�
 <br>
 ![00.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/00.png)
 
-첫 번째로, GC는 먼저 **Garbage Collection Roots (GC Roots)**라 불리는 특별한 객체를 정의한다. 다음은 GC Roots라 불릴 수 있는 객체의 종류이다.
+첫 번째로, GC는 먼저 **Garbage Collection Root (GC Root)**라 불리는 특별한 객체를 정의한다. 다음은 GC Root라 불릴 수 있는 객체의 종류이다.
 
-* 지역 변수나 현재 수행되고 있는 메소드의 파라미터 객체들
-* 활성화된 스레드
-* Static 객체
-* JNI 참조 정보
+* Class Loader에 의해 로딩된 클래스
+* Local Variable / Parameters (지역 변수 / 매개 변수)
+* Active Threads (현재 활성화된 스레드)
+* Static fields (정적 변수)
+* JNI Reference
+  * JNI 메소드의 지역 변수 / 매개 변수
+  * 전역 JNI 참조 변수
+* Monitor로 사용된 객체
 
-다음으로, GC는 **GC Roots로부터 시작하여, 객체가 참조하는 것을 따라가며 (위 그림을 대변하자면, 객체 그래프를 순회하며) 살아있는 모든 객체를 탐색한다.** 탐색된 모든 객체는 **Marked** 된다.
+다음으로, GC는 **GC Root로부터 시작하여, 객체가 참조하는 것을 따라가며 (위 그림을 대변하자면, 객체 그래프를 순회하며) 살아 있는 모든 객체를 탐색한다.** 탐색된 모든 객체는 **Marked** 된다.
 
-위의 그림에서 **푸른색 vertex로 표현된 것은 살아있는 객체라 판별된 객체이다. 이 단계가 끝나면 살아있는 모든 객체는 모두 Marking 되었을 것이며,** 그 외의 모든 객체들은 (위의 그림에서 회색 그래프로 표현된 객체들) GC Roots로부터 닿지 않는, 애플리케이션에서 더 이상 사용되지 않는 객체들로 간주된다. 이 객체들은 GC의 대상이며, 다음 단계에서 GC 알고리즘은 이 객체들이 점유한 메모리를 회수해야 한다.
+위의 그림에서 **푸른색 vertex로 표현된 것은 살아있는 객체라 판별된 객체이다. 이 단계가 끝나면 살아있는 모든 객체는 모두 Marking 되었을 것이며,** 그 외의 모든 객체들은 (위의 그림에서 회색 그래프로 표현된 객체들) GC Root로부터 닿지 않는, 애플리케이션에서 더 이상 사용되지 않는 객체들로 간주된다. 이 객체들은 GC의 대상이며, 다음 단계에서 GC 알고리즘은 이 객체들이 점유한 메모리를 회수해야 한다.
 
 Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 
@@ -55,7 +59,7 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 <br>
 ### Sweep
 
-**Mark and Sweep**에서 이 Sweep 단계는 Marking 단계가 끝난 후, GC Roots 및 살아있는 객체로 표현되는 그래프에 포함되지 않는 객체들의 **메모리 영역이 회수한다.** 회수된 메모리 영역은 내부적으로 이 영역을 관리하는 **free-list** 라는 자료구조를 통해 관리한다. 아마도 이 자료구조는 다시 사용할 수 있는 영역과 그 것의 크기를 기록해두었을 것이다.
+**Mark and Sweep**에서 이 Sweep 단계는 Marking 단계가 끝난 후, GC Root 및 살아있는 객체로 표현되는 그래프에 포함되지 않는 객체들의 **메모리 영역이 회수한다.** 회수된 메모리 영역은 내부적으로 이 영역을 관리하는 **free-list** 라는 자료구조를 통해 관리한다. 아마도 이 자료구조는 다시 사용할 수 있는 영역과 그 것의 크기를 기록해두었을 것이다.
 
 <br>
 ![01.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/01.png)
@@ -79,6 +83,8 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 
 **Mark and Copy**의 Copy 단계는 메모리 영역을 여러 영역으로 나누고, **살아있는 객체를 다른 영역으로 복사한다는 것을 의미한다.** 
 (ex. Eden -> Survivor / From survivor -> To survivor / Survivor -> Old)
+
+> Copy 단계도 Stop-The-World를 유발시킨다.
 
 <br>
 ![03.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/03.png)
@@ -233,6 +239,8 @@ Minor GC 때와는 다른데, Young 영역 뿐만 아니라 Old 영역 및 Metas
 Serial GC와 마찬가지로 **Young 영역은 mark-copy, Old 영역에 대해서는 mark-copy-compact 가 수행된다. 마찬가지로 모두 Stop-The-World를 일으킨다.**
 단 Serial GC와는 다른 점은 GC를 수행하는 여러 스레드가 병렬로 수행된다는 점이다. 따라서 Serial GC에 비해 걸리는 시간이 짧다.
 
+> 병렬로 GC를 수행하여 빠르게 끝내는 전략으로 대용량 Heap 영역을 사용할 경우 유리하다.
+
 GC를 수행하는 스레드의 개수는 **-XX:ParallelGCThreads=NNN** 라는 JVM 파라미터를 통해 설정할 수 있다. 기본 값은 JVM에 수행되는 환경의 core 개수이다.
 
 다음과 같이 파라미터를 설정하여 Parallel GC를 사용할 수있다. Young / Old 영역별로 수행되는 GC를 다르게 설정한다.
@@ -243,10 +251,12 @@ java -XX:+UseParallelOldGC com.mypackages.MyExecutableClass
 java -XX:+UseParallelGC -XX:+UseParallelOldGC com.mypackages.MyExecutableClass
 ```
 
-Parallel GC는 **애플리케이션의 Throughput이 아주 중요할 때 고려해 볼 수 있다.**
+Parallel GC는 **애플리케이션의 Throughput이 아주 중요할 때 고려해 볼 수 있다.** 
 
 * GC가 수행되는 동안에는 모든 코어가 병렬적으로 GC를 수행하므로, 결국 GC로 인해 애플리케이션이 멈추는 시간이 짧아질 수 있다.
 * GC 사이클 간격, 즉 애플리케이션이 수행될 때는 GC 로직을 위해 시스템 리소스가 낭비되지 않는다.
+
+> Hotspot JVM에서는 여러 스레드에 의해 병렬로 GC가 수행될 경우, Young / Survivor 영역에서 Old 영역으로 객체를 이동시킬 때 동기화 문제를 회피하기 위해 PLAB(Parallel Allocation Buffer)를 사용한다. PLAB는 각 GC 스레드가 받는 Old 영역의 객체 할당 공간이다. 각 GC 스레드는 이를 통해 스레드 경합하지 않고 바로 Old 영역에 객체를 이동시킬 수 있다.
 
 반면에, **GC는 수행되는 도중에 중단되지 않기 때문에 GC가 수행되는 시간이 길어지면 여전히 애플리케이션 스레드도 장기간 멈출 수 있다.**
 즉, 애플리케이션의 Latency가 중요할 때는 다음에 설명할 CMS나 G1 GC도 고려해봐야 한다.
@@ -344,10 +354,12 @@ Young 영역에 대해서는 Parallel GC와 마찬가지로 mark-copy 알고리�
 이 GC는 Old 영역에 대한 GC가 발생할 때, 애플리케이션 스레드가 장시간 멈추는 것을 되도록 피하고자 디자인된 것이다.
 다음 두 가지 방법을 통해, 애플리케이션 스레드가 멈추는 것을 막는다.
 
-1. Old 영역에 대해서 compaction을 수행하지 않고, 객체를 할당할 수 있는 공간을 관리하는 자료구조 (free-list)를 따로 관리한다. compaction도 객체 복사가 일어나므로 애플리케이션 스레드를 멈추게 된다.
-2. Mark와 sweep 단계에서는 특정 단계빼고는 애플리케이션 스레드와 병렬적으로 수행된다.
+1. Old 영역에 대해서 Compaction을 수행하지 않고, 객체를 할당할 수 있는 공간을 관리하는 자료구조 (free-list)를 따로 관리한다. Compaction도 객체 복사가 일어나므로 애플리케이션 스레드를 멈추게 된다.
+2. Mark와 Sweep 단계에서는 특정 단계 빼고는 애플리케이션 스레드와 병렬적으로 수행된다.
 
 이 의미는 애플리케이션 스레드가 GC로 인해 멈추는 시간을 현저히 줄일 수 있다는 것이다.
+
+> 각 GC 단계 중 특정 단계는 애플리케이션 스레드와 병렬로 수행하는 것과 더불어, 애플리케이션 스레드가 멈추는 기간인 Stop-The-World를 분산함으로써 응답 시간을 개선한다.
 
 당연히 GC를 수행하기 위해서는 CPU 코어를 사용하게 되므로 애플리케이션 스레드와 CPU 자원을 얻기 위해 경쟁하게 된다. 기본적으로 이 GC를 위해 수행되는 스레드 개수는 실제 환경의 CPU 코어 개수의 1/4 이다.
 
@@ -454,6 +466,8 @@ GC가 수행된 후, Young 영역의 사용량은 545,336K 가 줄었지만 Heap
 CMS GC에서 Stop-The-World 를 일으키는 두 개의 이벤트 중 하나이다.
 이 단계에서는 **GC Root 로부터 바로 참조되거나, Young 영역의 살아있는 객체로부터 참조되는 모든 Old 영역의 객체를 mark 한다.**
 
+> mark 되는 객체는 GC Root로부터 바로 참조되는 살아 있는 객체이다. 비로 Stop-The-World를 일으키지만 속도가 빠르다.
+
 <br>
 ![09.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/09.png)
 
@@ -511,10 +525,10 @@ Concurrent 라는 이름이 나타내는 것처럼, 이 단계에서 애플리�
 
 이 단계도 "Concurrent" 단계로서, 애플리케이션 스레드를 멈추지 않고 동작한다.
 
-이전 단계에서 애플리케이션 스레드와 동시에 동작하였기 때문에, 객체들간의 참조 그래프가 변했을 수 있다. (Young 영역의 GC가 발생되어 Old 영역으로 객체가 이동되거나, 새로운 객체가 생성되었을 경우. **CMS의 Old 영역 GC 도중에도 Young 영역에 대한 GC가 일어날 수 있다.**)
+이전 단계에서 애플리케이션 스레드와 동시에 동작하였기 때문에, 객체들 간의 참조 그래프가 변했을 수 있다. (Young 영역의 GC가 발생되어 Old 영역으로 객체가 이동되거나, 새로운 객체가 생성되었을 경우. **CMS의 Old 영역 GC 도중에도 Young 영역에 대한 GC가 일어날 수 있다.**)
 
 JVM은 **힙 영역을 일정 크기로 나누어 각 영역을 "Card"**라 불리는 것으로 관리하고, 
-Marking 단계에서 **변화한 객체를 갖고 있는 Card를 dirty로 표시해두는 "[Card Marking](http://psy-lob-saw.blogspot.kr/2014/10/the-jvm-write-barrier-card-marking.html)" 이라는 기법을 사용한다.**
+Marking 단계에서 **변화한 객체를 갖고 있는 Card를 dirty로 표시해두는 "[Card Marking](http://psy-lob-saw.blogspot.com/2014/10/the-jvm-write-barrier-card-marking.html)" 이라는 기법을 사용한다.**
 
 <br>
 ![11.png](/static/assets/img/blog/java/2018-02-05-gc_algorithms/11.png)
