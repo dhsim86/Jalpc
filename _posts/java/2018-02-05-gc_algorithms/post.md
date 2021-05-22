@@ -81,7 +81,7 @@ Marking 단계에는 알아야 할 중요한 것은 다음과 같다.
 <br>
 ### Copy
 
-**Mark and Copy**의 Copy 단계는 Sweep과 마찬가지로 살아 있는 객체를 어딘가로 복사한다는 점에서 비슷하지만, 객체가 이동해 갈 영역이 다르다. 메모리 영역을 여러 영역으로 나누고, **살아있는 객체를 다른 영역으로 복사하는 것이다.** 
+**Mark and Copy**의 Copy 단계는 Compact와 마찬가지로 살아 있는 객체를 어딘가로 복사한다는 점에서 비슷하지만, 객체가 이동해 갈 영역이 다르다. 메모리 영역을 여러 영역으로 나누고, **살아있는 객체를 다른 영역으로 복사하는 것이다.** 
 (ex. Eden -> Survivor / From survivor -> To survivor / Survivor -> Old)
 
 > Copy 단계도 Stop-The-World를 유발시킨다.
