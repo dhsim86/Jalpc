@@ -218,7 +218,7 @@ TLAB는 힙의 Eden 영역에서 여러 스레드가 동시에 객체 할당시,
 
 각 스레드마다 할당 주소 범위를 부여하여 이 영역을 로컬 할당 버퍼로써 사용하는데, 스레드가 다른 스레드에 영향을 주지 않고 동기화가 필요없이 빠른 객체 할당이 가능해진다.
 
-> TLAB 영역을 새로 할당받거나 할당된 TLAB가 부족하여 새로이 할당을 받을 때는 동기화 이슈가 발생하지만 객체 할당 횟수에 비해서는 동기화 이슈가 대폭 줄어든다.
+> TLAB 영역을 새로 할당받거나 할당된 TLAB가 부족하여 새로이 할당을 받을 때는 동기화 이슈가 발생하지만 객체 할당에 비해서는 동기화 이슈가 대폭 줄어든다.
 
 TLAB에 할당할 때는 빠르게 수행되지만 TLAB에 충분한 크기의 여유 공간이 없을 경우 TLAB 바깥 영역에서 객체 할당을 시도하는데, 이 때 스레드 간의 경합이 발생하여 성능이 떨어지게 된다. 이를 위해 JVM에서는 TLAB를 위한 옵션을 제공한다.
 
@@ -244,10 +244,6 @@ JVM은 Minor GC 수행시 이 Card Table의 Dirty Card만 검색한다면 Old �
 [The JVM Write Barrier - Card Marking](http://psy-lob-saw.blogspot.com/2014/10/the-jvm-write-barrier-card-marking.html)<br>
 
 ---
-
-
-<br>
-![06.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/06.png)
 
 GC 대상인지를 식별하는 Mark 단계가 끝나면, **Eden 영역의 살아있는 모든 객체들은 두 개의 Survivor 영역 중 하나의 영역으로 Copy되며 Eden 영역은 완전히 비워지게 된다.** 이를 **"Mark and Copy"** 라고 부른다.
 
