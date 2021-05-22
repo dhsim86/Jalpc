@@ -203,13 +203,13 @@ David ungar 라는 사람이 1984년에 ['Generation Scavenging: A Non-disruptiv
 ![05.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/05.png)
 
 <br>
-### Eden
+## Eden
 
 Eden 영역에서는 객체가 새로 생성될 때 할당받는 공간이다. 애플리케이션 스레드는 보통 여러 개이므로, 당연히 객체 생성도 동시에 발생할 수 있다. 따라서 Eden 영역도 **Thread Local Allocation Buffer (TLAB)** 라는 여러 영역으로 다시 나뉜다. 이를 통해 동기화가 필요없이 각 애플리케이션 스레드들은 자신이 필요한 공간을 할당받을 수 있다.
 
 ---
 
-#### TLAB
+### TLAB
 
 <br>
 ![08.png](/static/assets/img/blog/java/2018-02-03-what_is_garbage_collection/08.png)
@@ -235,7 +235,7 @@ JVM은 **Card Table을 활용한 Card Marking** 를 통해 해결한다. Old 영
 
 ---
 
-#### Card Table
+### Card Table
 
 Card Table이란 Old 영역의 메모리를 대표하는 별도의 자료구조이다. 만약 Young 영역의 객체를 참조하는 객체가 Old 영역에 있다면, 이 Old 영역의 객체의 시작주소에 카드(일종의 Flag)를 Dirty로 표시하고 해당 내용을 Card Table에 기록한다. 이후 더 이상 참조하지 않게 되면 Dirty Card도 사라지게 하여 객체 간의 참조 관계를 쉽게 파악할 수 있다.
 
@@ -252,7 +252,7 @@ JVM은 Minor GC 수행시 이 Card Table의 Dirty Card만 검색한다면 Old �
 GC 대상인지를 식별하는 Mark 단계가 끝나면, **Eden 영역의 살아있는 모든 객체들은 두 개의 Survivor 영역 중 하나의 영역으로 Copy되며 Eden 영역은 완전히 비워지게 된다.** 이를 **"Mark and Copy"** 라고 부른다.
 
 <br>
-### Survivor spaces
+## Survivor spaces
 
 JVM에서는 Survivor 영역에 해당하는 두 개의 분리된 영역을 관리하는데 "from" / "to"로 나뉜다. 여기서 중요한 것은 **반드시 두 영역 중 하나는 비어있는 상태여야 하는 것이다.**
 
@@ -278,7 +278,7 @@ XX:+MaxTenuringThreshold=값
 > Survivor 영역의 공간이 살아있는 모든 Young 영역의 객체를 수용할 수 없을 경우에도 Old 영역으로의 객체 이동이 일어난다.
 
 <br>
-### Old Generation
+## Old Generation
 
 Old 영역은 Young 영역보다 크고, 계속 살아있을 것으로 간주되는 객체들이 점유한다. 이 Old 영역에 대한 GC 구현은 Young 영역에 대한 GC 보다 더 복잡하다. 
 
@@ -292,7 +292,7 @@ Old 영역의 GC는 Young 영역의 GC보다 빈번하게 발생하지도 않는
 
 
 <br>
-### PermGen
+## PermGen
 
 Java 8 이전 버전에서는 **"Permanent Generation**이라는 특수한 영역이 있었는데, 여기에는 class와 같은 메타데이터나 문자열과 같은 값들이 이 곳에 위치해 있었다. 
 
@@ -312,7 +312,7 @@ java -XX:MaxPermSize=256m com.mycompany.MyApplication
 ```
 
 <br>
-### Metaspace
+## Metaspace
 
 이렇게 필요한 PermGen 영역 크기를 예상하는 것은 어려운 것이었기 때문에, Java 8에서는 이 영역을 없애고 Metaspace 라는 새로운 영역이 생겼다. PermGen 영역에 저장하던 값들 중에 static 객체와 같은 값들은 다 일반 heap 영역에 저장하여 최대한 GC 대상이 되도록 하였다.
 
