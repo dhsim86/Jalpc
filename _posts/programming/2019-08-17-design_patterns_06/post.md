@@ -61,7 +61,7 @@ public class SmsTransferLib {
 
 * 현재 사용 중인 인터페이스와 필요한 클래스를 전부 상속하여 구현
    * Alarm 인터페이스와 SmsTransferLib을 모두 상속받는 SmsAlarm 클래스를 정의
-   * 이 방법은 만약 Adaptee에 여러 서브 클래스가 존재하는 경우 부적합하다. 모든 서브 클래스들에 대해 상속을 따로 해야된다. 또한 Adaptee의 서브 클래스에만 정의된 기능은 사용할 수 없다.
+   * 이 방법은 만약 Adaptee에 여러 서브 클래스가 존재하는 경우 부적합하다. 모든 서브 클래스들에 대해 상속을 따로 해야된다. 상속을 따로 하지 않는다면 Adaptee의 서브 클래스에만 정의된 기능은 사용할 수 없다.
    * Adaptee를 상속하므로, Adaptee의 연산을 오버라이딩하여 재정의할 수도 있다.
 
 ![01.png](/static/assets/img/blog/programming/2019-08-17-design_patterns_06/01.png)
@@ -79,7 +79,7 @@ public class SmsTransferLib {
 
 > 가교(Bridge) 패턴은 어댑터 패턴과 유사하지만, 사용 목적이 다르다. 가교 패턴은 구현 코드와 추상 개념을 분리하여 서로에게 영향을 주지 않고 서로 확장할 수 있도록 하기 위함이고, 어댑터 패턴은 호환되지 않는 객체의 인터페이스를 사용할 수 있도록 하기 위한 목적이다.
 
-> 인터페이스 변경을 일으키는 어댑터 패턴과는 다르게, 데코레이터(Decorator) 패턴은 인터페이스의 변경없이 객체에 새로운 기능을 추가하기 위한 목적이고 재귀적 객체 합성을 통해 여러 기능을 추가할 수 있다.
+> 인터페이스 변경을 일으키는 어댑터 패턴과는 다르게, 장식자(Decorator) 패턴은 인터페이스의 변경없이 객체에 새로운 기능을 추가하기 위한 목적이고 재귀적 객체 합성을 통해 여러 기능을 추가할 수 있다.
 
 [Adapter Example
 ](https://github.com/dhsim86/design_pattern_study/commit/7dff7e52a469594f9f78bd988f55df3f6e943bb7)
