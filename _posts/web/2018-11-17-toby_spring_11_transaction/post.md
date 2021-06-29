@@ -165,7 +165,10 @@ public class AppConfig {
 
 인터페이스를 구현하는 클래스인 경우에도 강제로 클래스 프록시 모드를 적용할 수 있다.
 
-이 때 주의점은 **@Transaction 애노테이션은 반드시 클래스에 부여해야 한다.** 인터페이스를 구현하는 클래스일 경우라도 마찬가지이다. 만약 인터페이스에만 붙일 경우, 그 정보가 구현 클래스로 전달되지 않는다. 따라서 이 경우에는 트랜잭션이 적용되지 않는다. **(JDK 다이내믹 프록시 / 클래스 프록시 모드, 모두)**
+이 때 주의점은 **@Transaction 애노테이션은 반드시 클래스에 부여해야 한다.** 인터페이스를 구현하는 클래스일 경우라도 마찬가지이다. 만약 인터페이스에만 붙일 경우, 그 정보가 구현 클래스로 전달되지 않는다. 따라서 이 경우에는 트랜잭션이 적용되지 않는다. 
+
+> The Spring team recommends that you annotate only concrete classes (and methods of concrete classes) with the @Transactional annotation, as opposed to annotating interfaces. You certainly can place the @Transactional annotation on an interface (or an interface method), but this works only as you would expect it to if you use interface-based proxies. The fact that Java annotations are not inherited from interfaces means that, if you use class-based proxies (proxy-target-class="true") or the weaving-based aspect (mode="aspectj"), the transaction settings are not recognized by the proxying and weaving infrastructure, and the object is not wrapped in a transactional proxy.
+
 
 @Transactional 애노테이션을 클래스에만 붙이더라도 타깃 클래스가 인터페이스를 구현하고, proxyTargetClass를 **false**(Spring Boot 2.0부터)로 했을 경우 JDK 다이내믹 프록시로 AOP가 적용된다. **(단, 애너테이션을 활용한 JDK 다이내믹 프록시 AOP 적용시 인터페이스, 클래스 모두 애너테이션을 붙이는게 좋다.)**
 
